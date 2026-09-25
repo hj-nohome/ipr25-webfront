@@ -25,6 +25,7 @@ body::before {
   content: '';
   position: absolute;
   inset: 0;
+  z-index: -1;
   background-image:
     linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.2)),
     url('../images/bg-cover.png');
