@@ -31,26 +31,12 @@ const revealObserver = new IntersectionObserver(
 document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el))
 
 const navEl = document.querySelector('.nav')
-const lightPanels = document.querySelectorAll('.panel--purple-light')
+const scrollSentinel = document.querySelector('#scroll-sentinel')
 
-if (navEl && lightPanels.length) {
-  const navHeight =
-    parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-height')) || 72
-  const intersectingLightPanels = new Set()
+if (navEl && scrollSentinel) {
+  const stickyNavObserver = new IntersectionObserver(([entry]) => {
+    navEl.classList.toggle('nav--scrolled', !entry.isIntersecting)
+  })
 
-  const navColorObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          intersectingLightPanels.add(entry.target)
-        } else {
-          intersectingLightPanels.delete(entry.target)
-        }
-      })
-      navEl.classList.toggle('nav--on-light', intersectingLightPanels.size > 0)
-    },
-    { rootMargin: `-${navHeight}px 0px -${window.innerHeight - navHeight}px 0px` }
-  )
-
-  lightPanels.forEach((panel) => navColorObserver.observe(panel))
+  stickyNavObserver.observe(scrollSentinel)
 }

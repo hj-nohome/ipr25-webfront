@@ -28,22 +28,33 @@ a {
   color: inherit;
 }
 
+#scroll-sentinel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
 /* Nav */
 .nav {
   position: sticky;
   top: 0;
   z-index: 10;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transition: background 0.3s ease, backdrop-filter 0.3s ease;
 }
 
-/*the white line below the nav*/
-.nav::after {
-  content: '';
-  position: absolute;
-  left: calc(24px + max(0px, (100vw - 1200px) / 2));
-  right: 0;
-  bottom: 0;
-  height: 1px;
-  background: var(--border);
+/* Toggled by main.js (via IntersectionObserver on #scroll-sentinel) once
+   the page has scrolled past the very top: picks up a frosted-glass
+   background instead of staying fully transparent over the hero. */
+.nav--scrolled {
+  background: color-mix(in srgb, var(--bg) 75%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .nav__inner {
@@ -74,7 +85,7 @@ a {
 
 .nav__links {
   display: flex;
-  gap: 32px;
+  gap: 80px;
 }
 
 .nav__link {
@@ -106,22 +117,7 @@ a {
   transition: background 0.2s ease;
 }
 
-/* Toggled by main.js (via IntersectionObserver) whenever a light panel
-   is scrolled directly behind the sticky nav, so the nav text/icon stay
-   readable instead of white-on-white. */
-.nav--on-light .nav__link {
-  color: #17131f;
-}
-
-.nav--on-light .nav__toggle span {
-  background: #17131f;
-}
-
 @media (max-width: 768px) {
-  .nav::after {
-    left: 20px;
-  }
-
   .nav__links {
     position: absolute;
     top: var(--nav-height);
