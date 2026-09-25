@@ -1,7 +1,4 @@
 :root {
-  /* Temporarily matched to .panel--purple-dark (Executive Summary part 1)
-     to preview how the "transparent" panels will blend once real
-     background media replaces this placeholder color. */
   --text: #ffffff;
   --bg: #332c5e;
   --border: #ffffff;
@@ -18,6 +15,13 @@
 
 body {
   margin: 0;
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.2)),
+    url('../images/bg-cover.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: scroll;
 }
 
 a {
@@ -29,7 +33,17 @@ a {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: var(--bg);
+}
+
+/*the white line below the nav*/
+.nav::after {
+  content: '';
+  position: absolute;
+  left: calc(24px + max(0px, (100vw - 1200px) / 2));
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--border);
 }
 
 .nav__inner {
@@ -42,10 +56,20 @@ a {
 }
 
 .nav__brand {
-  font-weight: 700;
-  font-size: 20px;
-  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
   text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.nav__brand:hover {
+  opacity: 0.7;
+}
+
+.nav__brand img {
+  height: 32px;
+  width: auto;
+  display: block;
 }
 
 .nav__links {
@@ -58,6 +82,11 @@ a {
   font-size: 14px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.nav__link:hover {
+  opacity: 0.7;
 }
 
 .nav__toggle {
@@ -74,9 +103,25 @@ a {
   width: 22px;
   height: 2px;
   background: var(--text);
+  transition: background 0.2s ease;
+}
+
+/* Toggled by main.js (via IntersectionObserver) whenever a light panel
+   is scrolled directly behind the sticky nav, so the nav text/icon stay
+   readable instead of white-on-white. */
+.nav--on-light .nav__link {
+  color: #17131f;
+}
+
+.nav--on-light .nav__toggle span {
+  background: #17131f;
 }
 
 @media (max-width: 768px) {
+  .nav::after {
+    left: 20px;
+  }
+
   .nav__links {
     position: absolute;
     top: var(--nav-height);
@@ -107,6 +152,7 @@ a {
 
 /* Hero */
 .hero {
+  position: relative;
   margin-left: calc(24px + max(0px, (100vw - 1200px) / 2));
   margin-right: 0;
   padding: 80px;
@@ -116,8 +162,21 @@ a {
   align-items: start;
 }
 
+/* Extends the panel background through the left margin (the responsive
+   gutter), without moving .hero's own border-left/content position. */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 100%;
+  width: 100vw;
+  background: inherit;
+}
+
 .hero__title {
-  font-size: 56px;
+  font-size: 68px;
+  font-weight: 400;
   line-height: 1.05;
   letter-spacing: -0.02em;
   margin: 0;
@@ -243,7 +302,7 @@ a {
 }
 
 .panel--purple-dark {
-  --panel-bg: linear-gradient(135deg, #332c5e 0%, #3b2150 100%);
+  --panel-bg: #332c5e;
   --panel-text: #ffffff;
 }
 
@@ -274,7 +333,8 @@ a {
 }
 
 .split-section__title {
-  font-size: 32px;
+  font-size: 42px;
+  font-weight: 400;
   letter-spacing: -0.02em;
   margin: 0;
 }
@@ -287,9 +347,13 @@ a {
 .split-section__media {
   aspect-ratio: 4 / 5;
   max-width: 380px;
-  border: 1px solid var(--border);
   border-radius: 4px;
-  background: color-mix(in srgb, var(--panel-text, var(--text)) 5%, transparent);
+  overflow: hidden;
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    color-mix(in srgb, #3d2394 75%, transparent) 100%
+  );
   display: flex;
   align-items: center;
   justify-content: center;
@@ -299,6 +363,14 @@ a {
 .split-section__media svg {
   width: 72px;
   height: 72px;
+}
+
+.split-section__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
 }
 
 .button {
@@ -440,14 +512,41 @@ a {
 
 /* Chapters list */
 .chapters {
+  position: relative;
   margin-left: calc(24px + max(0px, (100vw - 1200px) / 2));
   margin-right: 0;
   padding: 80px 0 0 80px;
-  border-left: 1px solid var(--border);
+}
+
+/* Extends the panel background through the left margin (the responsive
+   gutter), without moving .chapters' own border-left/content position. */
+.chapters::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 100%;
+  width: 100vw;
+  background: inherit;
+}
+
+/* Drawn as its own layer (instead of border-left) so it paints above
+   .chapters__list's bled-out content instead of being covered by it. */
+.chapters::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 0.8px;
+  background: var(--border);
+  z-index: 1;
+  pointer-events: none;
 }
 
 .chapters__title {
-  font-size: 32px;
+  font-size: 42px;
+  font-weight: 400;
   letter-spacing: -0.02em;
   margin: 0 0 32px;
 }
@@ -461,6 +560,8 @@ a {
 }
 
 .chapters__item {
+  max-height: 100px;
+  overflow: hidden;
   border-bottom: 1px solid var(--border);
 }
 
@@ -468,7 +569,7 @@ a {
   display: flex;
   align-items: center;
   gap: 20px;
-  padding: 16px 120px 16px 80px;
+  padding: 8px 120px 8px 80px;
   text-decoration: none;
   color: var(--text);
   transition: background 0.2s ease;
@@ -480,20 +581,17 @@ a {
 
 .chapters__thumb {
   flex-shrink: 0;
-  width: 56px;
-  height: 56px;
-  border-radius: 4px;
-  border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--text) 5%, transparent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: color-mix(in srgb, var(--text) 35%, transparent);
+  align-self: stretch;
+  aspect-ratio: 1 / 1;
+  margin: -8px 0;
+  overflow: hidden;
 }
 
-.chapters__thumb svg {
-  width: 24px;
-  height: 24px;
+.chapters__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .chapters__name {
@@ -504,7 +602,7 @@ a {
 .chapters__tag {
   flex-shrink: 0;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 200;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   opacity: 0.6;
@@ -576,11 +674,6 @@ a {
 
   .chapters__link {
     padding-left: 4px;
-  }
-
-  .chapters__thumb {
-    width: 44px;
-    height: 44px;
   }
 
   .chapters__name {
