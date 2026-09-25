@@ -15,6 +15,16 @@
 
 body {
   margin: 0;
+  position: relative;
+}
+
+/* Kept as its own layer (rather than background-image directly on body)
+   so it can fade in independently once loaded, without also hiding the
+   page content that opacity on body itself would affect. */
+body::before {
+  content: '';
+  position: absolute;
+  inset: 0;
   background-image:
     linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.2)),
     url('../images/bg-cover.png');
@@ -22,6 +32,15 @@ body {
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: scroll;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+
+/* Toggled by main.js once the background image has actually finished
+   downloading (via a preloaded Image()), rather than fading in blind. */
+body.bg-loaded::before {
+  opacity: 1;
 }
 
 a {
@@ -338,6 +357,7 @@ a {
 .split-section__body {
   margin: 0;
   opacity: 0.75;
+  font-size: 18px;
 }
 
 .split-section__media {

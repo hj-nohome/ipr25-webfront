@@ -1,4 +1,9 @@
 import './style.css'
+import bgCoverUrl from '../images/bg-cover.png'
+
+const bgPreload = new Image()
+bgPreload.onload = () => document.body.classList.add('bg-loaded')
+bgPreload.src = bgCoverUrl
 
 const toggle = document.querySelector('#nav-toggle')
 const links = document.querySelector('#nav-links')
