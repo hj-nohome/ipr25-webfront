@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Statistics | ipr25-testing</title>
+</head>
+
+<body>
+  <div id="scroll-sentinel" aria-hidden="true"></div>
+  <header class="nav">
+    <div class="nav__inner">
+      <a href="/" class="nav__brand">
+        <img src="images/mcmc-logo.png" alt="MCMC" />
+      </a>
+      <nav id="nav-links" class="nav__links">
+        <a href="index.html#chapters" class="nav__link">CHAPTERS</a>
+        <a href="statistics.html" class="nav__link">STATISTICS</a>
+        <a href="#" class="nav__link">DOWNLOAD</a>
+      </nav>
+      <button id="nav-toggle" class="nav__toggle" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="figures">
+      <h1 class="figures__title reveal">Statistics</h1>
+      <p class="figures__intro reveal">
+          Across the wider ecosystem, digital inclusion, online
+          safety, trusted transactions, content innovation and
+          the continued growth of e-commerce and parcel
+          delivery reinforced the industry's role in Malaysia's
+          digital future.
+      </p>
+
+      <div class="figures__layout reveal reveal--delay-1">
+        <div class="figures__sidebar">
+          <div class="figures__search-wrap">
+            <input
+              type="search"
+              id="figures-search"
+              class="figures__search"
+              placeholder="Search by figure number or caption&hellip;"
+              aria-label="Search figures"
+            />
+          </div>
+        <aside class="figures__filters" id="figures-filters" aria-label="Filter by chapter"></aside>
+        </div>
+        <div class="figures__grid" id="figures-grid"></div>
+      </div>
+      <p class="figures__empty" id="figures-empty" hidden>No figures match your search.</p>
+    </section>
+  </main>
+
+  <div class="figure-modal" id="figure-modal" aria-hidden="true">
+    <div class="figure-modal__bg" data-modal-close></div>
+    <div class="figure-modal__panel" role="dialog" aria-modal="true" aria-labelledby="figure-modal-title">
+      <button type="button" class="figure-modal__close" data-modal-close aria-label="Close figure">
+        <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
+          <path d="M4 4l10 10M14 4 4 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+      </button>
+      <div class="figure-modal__media" id="figure-modal-media"></div>
+      <div class="figure-modal__tag" id="figure-modal-tag"></div>
+      <h2 class="figure-modal__title" id="figure-modal-title"></h2>
+      <p class="figure-modal__caption" id="figure-modal-caption"></p>
+    </div>
+  </div>
+
+  <footer class="site-footer panel panel--purple-dark">
+    <div class="footer-container">
+
+      <!-- Column 1: Contact Info -->
+      <div class="footer-column">
+        <h3>Contact us:</h3>
+        <p>T: +603 8688 8000</p>
+        <p>F: +603 8688 1000</p>
+        <p>Email: <a href="#">www.mcmc.gov.my</a></p>
+
+        <p class="footer-copyright">&copy; 2026 Malaysian Communications and Multimedia Commission. All rights reserved.
+        </p>
+      </div>
+
+      <!-- Column 2: Address -->
+      <div class="footer-column" style="padding-top:48px;">
+        <p>MCMC HQ Tower 1<br>
+          Jalan Impact, Cyber 6 63000 Cyberjaya<br>
+          Selangor Darul Ehsan, Malaysia</p>
+      </div>
+
+    </div>
+  </footer>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>
