@@ -18,28 +18,35 @@ body {
   position: relative;
 }
 
-/* Kept as its own layer (rather than background-image directly on body)
-   so it can fade in independently once loaded, without also hiding the
-   page content that opacity on body itself would affect. */
-body::before {
-  content: '';
-  position: absolute;
+/* Background video, injected into every page by main.js. Fixed to the
+   viewport so it stays put behind the content as the page scrolls. */
+.bg-video {
+  position: fixed;
   inset: 0;
-  z-index: -1;
-  background-image:
-    linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.2)),
-    url('../images/bg-cover.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: scroll;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   opacity: 0;
   transition: opacity 0.6s ease;
   pointer-events: none;
 }
 
-/* Toggled by main.js once the background image has actually finished
-   downloading (via a preloaded Image()), rather than fading in blind. */
+/* Dark gradient over the video to keep text readable. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.2));
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+
+/* Toggled by main.js once the video has a frame ready to show, so it
+   fades in instead of popping in mid-load. */
+body.bg-loaded .bg-video,
 body.bg-loaded::before {
   opacity: 1;
 }

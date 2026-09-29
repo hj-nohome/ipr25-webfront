@@ -1,9 +1,26 @@
 import './style.css'
-import bgCoverUrl from '../images/bg-cover.png'
+import bgVideoUrl from '../images/ipr-background-video.webm'
 
-const bgPreload = new Image()
-bgPreload.onload = () => document.body.classList.add('bg-loaded')
-bgPreload.src = bgCoverUrl
+// Looping background video, shared by every page. Skipped when the
+// reader has asked the browser to save data; with reduced motion it
+// loads but stays paused, showing its first frame as a still image.
+const saveData = navigator.connection?.saveData === true
+
+if (!saveData) {
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const bgVideo = document.createElement('video')
+  bgVideo.className = 'bg-video'
+  bgVideo.src = bgVideoUrl
+  bgVideo.muted = true // required for autoplay
+  bgVideo.loop = true
+  bgVideo.playsInline = true
+  bgVideo.autoplay = !reducedMotion
+  bgVideo.preload = 'auto'
+  bgVideo.disablePictureInPicture = true
+  bgVideo.setAttribute('aria-hidden', 'true')
+  bgVideo.addEventListener('loadeddata', () => document.body.classList.add('bg-loaded'), { once: true })
+  document.body.prepend(bgVideo)
+}
 
 const toggle = document.querySelector('#nav-toggle')
 const links = document.querySelector('#nav-links')
