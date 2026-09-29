@@ -1,12 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&display=swap');
+
 :root {
+  --font-family: 'Figtree', system-ui, 'Segoe UI', Roboto, sans-serif;
   --text: #ffffff;
   --bg: #332c5e;
   --border: #ffffff;
   --nav-height: 72px;
+  /* Left edge of the page content: centres a 1200px column on wide
+     screens, with a 24px minimum (20px on phones, below). */
+  --gutter: calc(24px + max(0px, (100vw - 1200px) / 2));
   color-scheme: dark;
-  font: 16px/1.5 system-ui, 'Segoe UI', Roboto, sans-serif;
+  font: 16px/1.5 var(--font-family);
   color: var(--text);
   background: var(--bg);
+}
+
+@media (max-width: 768px) {
+  :root {
+    --gutter: 20px;
+  }
 }
 
 * {
@@ -18,18 +30,25 @@ body {
   position: relative;
 }
 
-/* Background video, injected into every page by main.js. Fixed to the
+/* Background video, injected into every page by main.js as two copies
+   that crossfade into each other at the loop point. Fixed to the
    viewport so it stays put behind the content as the page scrolls. */
 .bg-video {
   position: fixed;
   inset: 0;
-  z-index: -2;
+  z-index: -3;
   width: 100%;
   height: 100%;
   object-fit: cover;
   opacity: 0;
-  transition: opacity 0.6s ease;
+  /* Duration set by main.js so the CSS fade and JS handover match. */
+  transition: opacity var(--bg-crossfade, 1s) linear;
   pointer-events: none;
+}
+
+/* The incoming copy fades in on top of the outgoing one. */
+.bg-video.is-front {
+  z-index: -2;
 }
 
 /* Dark gradient over the video to keep text readable. */
@@ -46,7 +65,7 @@ body::before {
 
 /* Toggled by main.js once the video has a frame ready to show, so it
    fades in instead of popping in mid-load. */
-body.bg-loaded .bg-video,
+body.bg-loaded .bg-video.is-visible,
 body.bg-loaded::before {
   opacity: 1;
 }
@@ -69,9 +88,6 @@ a {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: transparent;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
   transition:
     background 0.3s ease,
     backdrop-filter 0.3s ease,
@@ -106,7 +122,7 @@ a {
 }
 
 .nav__inner {
-  margin: 0 calc(24px + max(0px, (100vw - 1200px) / 2));
+  margin: 0 var(--gutter);
   height: var(--nav-height);
   padding: 0 24px 0 0;
   display: flex;
@@ -141,11 +157,48 @@ a {
   font-size: 14px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  transition: color 0.2s ease, opacity 0.2s ease;
+  transition: opacity 0.2s ease;
 }
 
 .nav__link:hover {
   opacity: 0.7;
+}
+
+/* Underline that draws in from the left on hover/focus (same easing as
+   the page's drawn lines) and retracts to the right on leave. The link
+   for the current page (aria-current="page") keeps it. Desktop only: in
+   the phone menu the links are full-width rows, where the line would run
+   the width of the screen. */
+@media (min-width: 769px) {
+  .nav__link {
+    position: relative;
+  }
+
+  .nav__link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -6px;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .nav__link:hover::after,
+  .nav__link:focus-visible::after,
+  .nav__link[aria-current='page']::after {
+    transform: none;
+    transform-origin: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav__link::after {
+    transition: none;
+  }
 }
 
 .nav__toggle {
@@ -162,7 +215,6 @@ a {
   width: 22px;
   height: 2px;
   background: var(--text);
-  transition: background 0.2s ease;
 }
 
 @media (max-width: 768px) {
@@ -196,26 +248,12 @@ a {
 
 /* Hero */
 .hero {
-  position: relative;
-  margin-left: calc(24px + max(0px, (100vw - 1200px) / 2));
-  margin-right: 0;
+  margin-left: var(--gutter);
   padding: 80px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 48px;
   align-items: start;
-}
-
-/* Extends the panel background through the left margin (the responsive
-   gutter), without moving .hero's own border-left/content position. */
-.hero::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 100%;
-  width: 100vw;
-  background: inherit;
 }
 
 .hero__title {
@@ -302,10 +340,7 @@ a {
   }
 }
 
-/* Scroll reveal: fade + slide up as an element enters the viewport.
-   main.js toggles .is-visible via IntersectionObserver on any .reveal
-   element; .reveal--delay-1 staggers a second element slightly behind.
-   .reveal--stagger items get a cascading delay set by main.js. */
+/* Scroll reveal: fade + slide up as an element enters the viewport. */
 .reveal {
   opacity: 0;
   transform: translateY(32px);
@@ -333,7 +368,6 @@ a {
 @media (max-width: 768px) {
   .hero {
     grid-template-columns: 1fr;
-    margin-left: 20px;
     padding: 40px 20px;
   }
 
@@ -342,13 +376,10 @@ a {
   }
 }
 
-/* Color panels: reusable theme blocks (black text on light bg, white text
-   on dark bg). Apply alongside .split-section, or to any container that
-   needs its own fixed background regardless of the reader's OS theme. */
+/* Color panels: reusable theme blocks */
 .panel {
   background: var(--panel-bg, var(--bg));
   color: var(--panel-text, var(--text));
-  border-top: none;
 }
 
 .panel--purple-light {
@@ -361,23 +392,26 @@ a {
   --panel-text: #ffffff;
 }
 
-/* Placeholder swatch standing in for a future background image/media */
-.panel--purple-media {
-  --panel-bg: #3b2150;
-  --panel-text: #ffffff;
-}
-
-/* Split section: reusable text + media layout for report sections
-   (Chairman's Statement, Executive Summary, and future sections) */
+/* Split section: reusable text + media layout for report sections */
 .split-section {
-  margin-left: calc(24px + max(0px, (100vw - 1200px) / 2));
-  margin-right: 0;
-  padding: 80px;
+  margin-left: var(--gutter);
+  padding: var(--split-pad-top, 80px) 80px 80px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 48px;
   align-items: center;
   border-left: 1px solid var(--border);
+}
+
+/*Fixed text alignment for top-aligned sections*/
+.split-section--top {
+  align-items: start;
+}
+
+/* A column that runs to the section's top, right and bottom edges by
+   cancelling its padding (e.g. the edge-to-edge accordion). */
+.split-section__bleed {
+  margin: calc(-1 * var(--split-pad-top, 80px)) -80px -80px 0;
 }
 
 .split-section__text {
@@ -387,11 +421,21 @@ a {
   gap: 20px;
 }
 
-.split-section__title {
+/* Section and page titles; each block below sets its own spacing. */
+.split-section__title,
+.chapters__title,
+.figures__title {
+  margin: 0;
   font-size: 42px;
   font-weight: 400;
   letter-spacing: -0.02em;
-  margin: 0;
+}
+
+/* Intro paragraph under a page title; each page sets its own spacing. */
+.chapters__intro,
+.figures__intro {
+  max-width: 640px;
+  opacity: 0.75;
 }
 
 .split-section__body {
@@ -410,15 +454,6 @@ a {
     transparent 50%,
     color-mix(in srgb, #3d2394 75%, transparent) 100%
   );
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: color-mix(in srgb, var(--panel-text, var(--text)) 35%, transparent);
-}
-
-.split-section__media svg {
-  width: 72px;
-  height: 72px;
 }
 
 .split-section__media img {
@@ -452,25 +487,129 @@ a {
 @media (max-width: 768px) {
   .split-section {
     grid-template-columns: 1fr;
-    margin-left: 20px;
-    padding: 48px 20px 48px 0;
+    padding: var(--split-pad-top, 48px) 20px 48px 0;
   }
 
   .split-section__media {
     aspect-ratio: 16 / 10;
     order: -1;
   }
+
+  /* Stacked under the text on phones: bleed right and bottom only. */
+  .split-section__bleed {
+    margin: 0 -20px -48px 0;
+  }
+}
+
+/* Drawn lines: 1px lines that draw themselves in when their section
+   scrolls into view (.draw-lines in main.js)*/
+.spacer.draw-lines::after,
+.chapters::after,
+.chapters__list::before,
+.chapters__item::after,
+.accordion::before,
+.accordion::after,
+.accordion__item::after {
+  content: '';
+  position: absolute;
+  background: var(--panel-text, var(--border));
+  pointer-events: none;
+}
+
+/* Vertical lines draw top to bottom. */
+.spacer.draw-lines::after,
+.chapters::after,
+.accordion::after {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  transform: scaleY(0);
+  transform-origin: top;
+}
+
+/* Horizontal lines draw left to right. */
+.chapters__list::before,
+.chapters__item::after,
+.accordion::before,
+.accordion__item::after {
+  left: 0;
+  right: 0;
+  height: 1px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Drawn state. Vertical lines wait for .line-drawing (added in sequence
+   by main.js); the chapters rows draw as soon as the section is visible. */
+.spacer.draw-lines.line-drawing::after,
+.chapters.line-drawing::after,
+.chapters.is-visible .chapters__list::before,
+.chapters.is-visible .chapters__item::after,
+.accordion.line-drawing::before,
+.accordion.line-drawing::after,
+.accordion.line-drawing .accordion__item::after {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spacer.draw-lines::after,
+  .chapters::after,
+  .chapters__list::before,
+  .chapters__item::after,
+  .accordion::before,
+  .accordion::after,
+  .accordion__item::after {
+    transform: none;
+    transition: none;
+  }
 }
 
 /* Accordion (expandable info list) */
 .accordion {
+  position: relative;
   display: flex;
   flex-direction: column;
-  border-top: 1px solid var(--border);
 }
 
+
 .accordion__item {
-  border-bottom: 1px solid var(--border);
+  position: relative;
+    transition: background 0.2s ease;
+}
+
+.accordion__item:hover {
+  background: color-mix(in srgb, var(--text) 45%, transparent);
+}
+
+/* Accordion lines */
+.accordion::after {
+  transition: transform 0.9s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.accordion::before {
+  top: 0;
+}
+
+.accordion__item::after {
+  bottom: 0;
+  /* Roughly when the left edge reaches this item. */
+  transition-delay: calc(0.15s + var(--i, 0) * 110ms);
+}
+
+/* When the accordion bleeds to the section's edges, its top and bottom
+   lines sit on the panel's own edges and would close it into a box, so
+   drop them. On phones it sits under the text rather than at the top,
+   so the top line stays there as the divider. */
+.split-section__bleed .accordion__item:last-child::after {
+  display: none;
+}
+
+@media (min-width: 769px) {
+  .split-section__bleed.accordion::before {
+    display: none;
+  }
 }
 
 .accordion__question {
@@ -479,7 +618,7 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 20px 4px;
+  padding: 20px;   /* inset from the accordion's left line */
   background: none;
   border: none;
   font: inherit;
@@ -517,50 +656,33 @@ a {
 
 .accordion__answer p {
   margin: 0;
-  padding: 0 4px 20px;
+  padding: 0 20px 20px;
   opacity: 0.75;
 }
 
 /* Spacer: empty vertical rhythm block between sections */
 .spacer {
-  margin-left: calc(24px + max(0px, (100vw - 1200px) / 2));
-  margin-right: 0;
+  margin-left: var(--gutter);
   border-left: 1px solid var(--border);
-}
-
-.spacer--sm {
-  height: 40px;
-}
-
-.spacer--md {
-  height: 80px;
-}
-
-.spacer--lg {
-  height: 240px;
 }
 
 .spacer--xl {
   height: 800px;
 }
 
+/* A spacer whose left line draws in (see .draw-lines in main.js) as the
+   first segment of a stroke that continues into the next section. */
+.spacer.draw-lines {
+  position: relative;
+  border-left: none;
+}
+
+.spacer.draw-lines::after {
+  /* Eases in: ends at full speed, where the next segment picks up. */
+  transition: transform var(--line-duration, 1s) cubic-bezier(0.11, 0, 0.5, 0);
+}
+
 @media (max-width: 768px) {
-  .spacer {
-    margin-left: 20px;
-  }
-
-  .spacer--sm {
-    height: 24px;
-  }
-
-  .spacer--md {
-    height: 48px;
-  }
-
-  .spacer--lg {
-    height: 72px;
-  }
-
   .spacer--xl {
     height: 120px;
   }
@@ -569,8 +691,7 @@ a {
 /* Chapters list */
 .chapters {
   position: relative;
-  margin-left: calc(24px + max(0px, (100vw - 1200px) / 2));
-  margin-right: 0;
+  margin-left: var(--gutter);
   padding: 80px 0 0 80px;
 }
 
@@ -586,46 +707,50 @@ a {
   background: inherit;
 }
 
-/* Drawn as its own layer (instead of border-left) so it paints above
+/* Left line (base styles under "Drawn lines"). z-index so it paints above
    .chapters__list's bled-out content instead of being covered by it. */
 .chapters::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 1px;
-  background: var(--border);
   z-index: 1;
-  pointer-events: none;
+  /* Eases out from full speed, continuing the spacer's line above.
+     Duration set by main.js from the section's height. */
+  transition: transform var(--line-duration, 1.8s) cubic-bezier(0.5, 1, 0.89, 1);
 }
 
 .chapters__title {
-  font-size: 42px;
-  font-weight: 400;
-  letter-spacing: -0.02em;
-  margin: 0 0 32px;
+  margin-bottom: 32px;
 }
 
 .chapters__list {
+  position: relative;
   list-style: none;
   margin: 0 0 0 -80px;
   width: calc(100% + 80px);
-  padding: 0;
-  border-top: 1px solid var(--border);
+  padding: 1px 0 0;   /* room for the ::before top line */
 }
 
 .chapters__item {
-  max-height: 100px;
+  position: relative;
+  max-height: 120px;
   overflow: hidden;
-  border-bottom: 1px solid var(--border);
+}
+
+/* Row lines (base styles under "Drawn lines"). */
+.chapters__list::before {
+  top: 0;
+  transition-delay: 0.2s;
+}
+
+.chapters__item::after {
+  bottom: 0;
+  /* Rows draw one after another, starting just after the top line. */
+  transition-delay: calc(0.3s + var(--i, 0) * 80ms);
 }
 
 .chapters__link {
   display: flex;
   align-items: center;
-  gap: 20px;
-  padding: 8px 120px 8px 80px;
+  gap: 30px;
+  padding: 8px 160px 8px 100px;
   text-decoration: none;
   color: var(--text);
   transition: background 0.2s ease;
@@ -638,6 +763,7 @@ a {
 .chapters__thumb {
   flex-shrink: 0;
   align-self: stretch;
+  max-width: 120px;
   aspect-ratio: 1 / 1;
   margin: -8px 0;
   overflow: hidden;
@@ -647,6 +773,7 @@ a {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center 10%;
   display: block;
 }
 
@@ -657,69 +784,14 @@ a {
 
 .chapters__tag {
   flex-shrink: 0;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 200;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  opacity: 0.6;
-}
-
-.site-footer {
-  padding: 80px 24px 80px 0;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.footer-container {
-  margin-left: calc(24px + max(0px, (100vw - 1200px) / 2));
-  margin-right: 0;
-  display: flex;
-  justify-content: space-between; /* Pushes Col 1 to left, Col 2 to right */
-  align-items: flex-start;
-  gap: 20px;
-}
-
-.footer-column {
-  flex: 0 1 auto;
-}
-
-.footer-column h3 {
-  font-size: 16px;
-  margin: 0;
-  letter-spacing: 1px;
-  font-weight: 400;
-}
-
-.footer-column p {
-  margin: 0;
-}
-
-.footer-column a {
-  color: var(--panel-text, var(--text));
-  text-decoration: none;
-}
-
-.footer-column a:hover {
-  text-decoration: underline;
-}
-
-.footer-copyright {
-  padding-top: 12px;
-  color: #b3b3b3;
-  font-size: 12px;
-  line-height: 1.4;
-}
-
-/* Mobile responsive layout adjustment */
-@media (max-width: 600px) {
-  .footer-container {
-    flex-direction: column;
-  }
 }
 
 @media (max-width: 768px) {
   .chapters {
-    margin-left: 20px;
     padding: 0 20px 72px 0;
   }
 
@@ -746,6 +818,10 @@ a {
 .chapters--page {
   padding: 80px 80px 120px;
 }
+/* Hide the reused lines from chapters list */
+.chapters--page .chapters__list::before {
+  display: none;
+}
 
 .chapters--page::after {
   display: none;
@@ -756,19 +832,15 @@ a {
 }
 
 .chapters__intro {
-  max-width: 640px;
   margin: 0 0 16px;
   font-size: 18px;
-  opacity: 0.75;
 }
 
 .chapters--page .chapters__list {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 0;
   width: auto;
   margin: 48px 0 0;
-  border-top: none;
 }
 
 /* The whole card is one link to its chapter. */
@@ -814,12 +886,11 @@ a {
   min-height: 35%;
   display: flex;
   flex-direction: column;
-  justify-content: start;
   gap: 4px;
   padding: 12px 16px;
   background: #1d1f3f;
   color: #ffffff;
-  transition:all 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .chapter-entry__tag {
@@ -879,22 +950,16 @@ a {
 
 /* Figures (Statistics page) */
 .figures {
-  margin-left: calc(24px + max(0px, (100vw - 1200px) / 2));
-  margin-right: 0;
+  margin-left: var(--gutter);
   padding: 80px 24px 120px 80px;
 }
 
 .figures__title {
-  font-size: 42px;
-  font-weight: 400;
-  letter-spacing: -0.02em;
-  margin: 0 0 16px;
+  margin-bottom: 16px;
 }
 
 .figures__intro {
-  max-width: 640px;
   margin: 0 0 40px;
-  opacity: 0.75;
 }
 
 .figures__chapter {
@@ -919,7 +984,6 @@ a {
 .figures__layout {
   display: flex;
   align-items: flex-start;
-  gap: 0;
 }
 
 .figures__sidebar {
@@ -979,7 +1043,6 @@ a {
 
 @media (max-width: 768px) {
   .figures {
-    margin-left: 20px;
     padding: 40px 20px 72px 0;
   }
 
@@ -1012,7 +1075,6 @@ a {
   font: inherit;
   color: inherit;
   background: var(--bg);
-  border-collapse: collapse;
   border-top: 1px solid var(--border);
   border-right: 1px solid var(--border);
   cursor: pointer;
@@ -1191,4 +1253,52 @@ a {
 .figure-modal__caption {
   margin: 0;
   opacity: 0.75;
+}
+
+/* Footer */
+.site-footer {
+  padding: 80px 24px 80px 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.footer-container {
+  margin-left: var(--gutter);
+  display: flex;
+  justify-content: space-between; /* Pushes Col 1 to left, Col 2 to right */
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.footer-column h3 {
+  font-size: 16px;
+  margin: 0;
+  letter-spacing: 1px;
+  font-weight: 400;
+}
+
+.footer-column p {
+  margin: 0;
+}
+
+.footer-column a {
+  color: var(--panel-text, var(--text));
+  text-decoration: none;
+}
+
+.footer-column a:hover {
+  text-decoration: underline;
+}
+
+.footer-copyright {
+  padding-top: 12px;
+  color: #b3b3b3;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+@media (max-width: 600px) {
+  .footer-container {
+    flex-direction: column;
+  }
 }
