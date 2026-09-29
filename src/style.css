@@ -65,7 +65,28 @@ a {
   background: transparent;
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
-  transition: background 0.3s ease, backdrop-filter 0.3s ease;
+  transition:
+    background 0.3s ease,
+    backdrop-filter 0.3s ease,
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Toggled by main.js while the user scrolls down; removed on scroll up. */
+.nav--hidden {
+  transform: translateY(-100%);
+  /* Transitions use the destination state's timing, so this delay applies
+     only to sliding up; sliding back down (plain .nav) stays immediate. */
+  transition:
+    background 0.3s ease,
+    backdrop-filter 0.3s ease,
+    transform 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.2s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav,
+  .nav--hidden {
+    transition: background 0.3s ease, backdrop-filter 0.3s ease;
+  }
 }
 
 /* Toggled by main.js (via IntersectionObserver on #scroll-sentinel) once
@@ -198,28 +219,6 @@ a {
   margin: 0;
 }
 
-.hero__line {
-  display: block;
-  overflow: hidden;
-}
-
-.hero__line span {
-  display: block;
-  animation: hero-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.hero__line:nth-child(1) span {
-  animation-delay: 0.1s;
-}
-
-.hero__line:nth-child(2) span {
-  animation-delay: 0.22s;
-}
-
-.hero__line:nth-child(3) span {
-  animation-delay: 0.34s;
-}
-
 .hero__nowrap {
   white-space: nowrap;
 }
@@ -228,8 +227,7 @@ a {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  animation: hero-fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: 0.55s;
+  --page-intro-delay: 0.55s;   /* after all three title lines */
 }
 
 .hero__body {
@@ -237,7 +235,40 @@ a {
   opacity: 0.75;
 }
 
-@keyframes hero-reveal {
+/* Page title entrance, shared by the top <h1> on every page: each
+   .line-reveal__line slides its text up from behind a mask, one line
+   after another, then .page-intro fades up underneath. Headings further
+   down the page use the scroll .reveal instead. */
+.line-reveal__line {
+  display: block;
+  overflow: hidden;
+  /* Room for descenders (p, g, y) so the mask doesn't clip them. */
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
+}
+
+.line-reveal__line > span {
+  display: block;
+  animation: line-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.1s;
+}
+
+.line-reveal__line:nth-child(2) > span {
+  animation-delay: 0.22s;
+}
+
+.line-reveal__line:nth-child(3) > span {
+  animation-delay: 0.34s;
+}
+
+/* Starts once a single-line title is mostly in; the three-line
+   homepage title waits longer via --page-intro-delay. */
+.page-intro {
+  animation: fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--page-intro-delay, 0.3s);
+}
+
+@keyframes line-reveal {
   from {
     transform: translateY(100%);
   }
@@ -246,7 +277,7 @@ a {
   }
 }
 
-@keyframes hero-fade-up {
+@keyframes fade-up {
   from {
     opacity: 0;
     transform: translateY(16px);
@@ -258,15 +289,16 @@ a {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero__line span,
-  .hero__text-group {
+  .line-reveal__line > span,
+  .page-intro {
     animation: none;
   }
 }
 
 /* Scroll reveal: fade + slide up as an element enters the viewport.
    main.js toggles .is-visible via IntersectionObserver on any .reveal
-   element; .reveal--delay-1 staggers a second element slightly behind. */
+   element; .reveal--delay-1 staggers a second element slightly behind.
+   .reveal--stagger items get a cascading delay set by main.js. */
 .reveal {
   opacity: 0;
   transform: translateY(32px);
@@ -702,6 +734,142 @@ a {
   }
 }
 
+/* Chapters page: card grid version of the homepage chapters list. Builds on
+   .chapters for spacing but drops its left rule and the list's row borders. */
+.chapters--page {
+  padding: 80px 80px 120px;
+}
+
+.chapters--page::after {
+  display: none;
+}
+
+.chapters--page .chapters__title {
+  margin-bottom: 16px;
+}
+
+.chapters__intro {
+  max-width: 640px;
+  margin: 0 0 16px;
+  font-size: 18px;
+  opacity: 0.75;
+}
+
+.chapters--page .chapters__list {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0;
+  width: auto;
+  margin: 48px 0 0;
+  border-top: none;
+}
+
+/* The whole card is one link to its chapter. */
+.chapter-entry__link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Drawn inside the card: with no gaps, an outside outline would be
+   hidden under the neighbouring covers. */
+.chapter-entry__link:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: -2px;
+}
+
+.chapter-entry__cover {
+  position: relative;
+  aspect-ratio: 17 / 24;   /* matches the cover thumbnails */
+  overflow: hidden;
+}
+
+.chapter-entry__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.chapter-entry__link:hover .chapter-entry__cover img,
+.chapter-entry__link:focus-visible .chapter-entry__cover img {
+  transform: scale(1.04);
+}
+
+/* Solid band across the bottom quarter of the cover holding the chapter
+   number and name. It grows upward if a long name wraps. */
+.chapter-entry__band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  min-height: 35%;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  gap: 4px;
+  padding: 12px 16px;
+  background: #1d1f3f;
+  color: #ffffff;
+  transition:all 0.3s ease;
+}
+
+.chapter-entry__tag {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.chapter-entry__name {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.chapter-entry__link:hover .chapter-entry__band {
+  background: #ae91cc;
+  color: black;
+}
+
+/* Five columns get too narrow for the cover text below ~1100px. */
+@media (max-width: 1100px) {
+  .chapters--page .chapters__list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .chapters--page {
+    padding: 48px 20px 72px 0;
+  }
+
+  .chapters__intro {
+    font-size: 16px;
+  }
+
+  .chapters--page .chapters__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 40px;
+  }
+
+  .chapter-entry__band {
+    padding: 10px 12px;
+  }
+
+  .chapter-entry__tag {
+    font-size: 16px;
+  }
+
+  .chapter-entry__name {
+    font-size: 10px;
+  }
+}
+
 /* Figures (Statistics page) */
 .figures {
   margin-left: calc(24px + max(0px, (100vw - 1200px) / 2));
@@ -720,6 +888,12 @@ a {
   max-width: 640px;
   margin: 0 0 40px;
   opacity: 0.75;
+}
+
+.figures__chapter {
+  margin: 0 0 16px;
+  font-size: 20px;
+  font-weight: 400;
 }
 
 .figures__search {
@@ -774,12 +948,12 @@ a {
 }
 
 .figures__filter:hover:not(.is-active) {
-  background: color-mix(in srgb, var(--bg), var(--text) 12%);
+  background: color-mix(in srgb, var(--bg), var(--text) 20%);
 }
 
 .figures__filter.is-active {
-  background: var(--text);
-  color: var(--bg);
+  background: color-mix(in srgb, var(--bg), var(--text) 10%);
+  color: var(--text);
 }
 
 .figures__grid {
@@ -811,7 +985,7 @@ a {
   }
 
   .figures__filters {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);   /* All + 8 chapters = 3×3 */
   }
 
   .figures__grid {
@@ -822,13 +996,12 @@ a {
 .figure-card {
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content:center;
-  text-align: center;
+  text-align: left;
   width: 100%;
-  min-height: 160px;
+  min-height: 100px;
   margin-bottom: -1px;
-  padding: 32px 24px;
+  padding: 12px 24px;
   font: inherit;
   color: inherit;
   background: var(--bg);
@@ -837,6 +1010,7 @@ a {
   border-right: 1px solid var(--border);
   cursor: pointer;
   transition: background-color 0.2s ease;
+  view-transition-class: figure-card;
 }
 
 .figure-card:hover {
@@ -867,6 +1041,48 @@ a {
   line-height: 1.4;
   opacity: 0;
   transition: opacity 0.2s ease, max-height 0.2s ease, margin-top 0.2s ease;
+}
+
+/* Figure grid filter animation (see applyFilters in statistics.js) */
+:root {
+  view-transition-name: none;
+}
+
+.nav {
+  view-transition-name: site-nav;
+}
+
+::view-transition-group(site-nav) {
+  z-index: 1;
+}
+
+/* Staying cards slide to their new position */
+::view-transition-group(.figure-card) {
+  animation-duration: 0.3s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Entering cards fade and scale up, starting just after the slide */
+::view-transition-new(.figure-card):only-child {
+  animation: figure-card-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+}
+
+/* Leaving cards fade out quickly */
+::view-transition-old(.figure-card):only-child {
+  animation: figure-card-out 0.15s ease both;
+}
+
+@keyframes figure-card-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+@keyframes figure-card-out {
+  to {
+    opacity: 0;
+  }
 }
 
 /* Figure modal */
