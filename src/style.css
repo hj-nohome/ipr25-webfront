@@ -7,8 +7,8 @@
   --border: #ffffff;
   --nav-height: 72px;
   /* Left edge of the page content: centres a 1200px column on wide
-     screens, with a 24px minimum (20px on phones, below). */
-  --gutter: calc(24px + max(0px, (100vw - 1200px) / 2));
+     screens, with a 12px minimum (20px on phones, below). */
+  --gutter: calc(12px + max(0px, (100vw - 1200px) / 2));
   color-scheme: dark;
   font: 16px/1.5 var(--font-family);
   color: var(--text);
@@ -485,9 +485,21 @@ a {
 }
 
 @media (max-width: 768px) {
+  /* Equal side padding, so text sits centred between the section's left
+     line and the screen edge. */
   .split-section {
     grid-template-columns: 1fr;
-    padding: var(--split-pad-top, 48px) 20px 48px 0;
+    padding: var(--split-pad-top, 48px) 20px 48px;
+  }
+
+  .split-section__title,
+  .chapters__title,
+  .figures__title {
+    font-size: 32px;
+  }
+
+  .split-section__body {
+    font-size: 16px;
   }
 
   .split-section__media {
@@ -495,9 +507,15 @@ a {
     order: -1;
   }
 
-  /* Stacked under the text on phones: bleed right and bottom only. */
+  /* Stacked under the text on phones: bleed left, right and bottom so the
+     rows span the section. Its own left line would then sit on top of the
+     section's, so it's dropped. */
   .split-section__bleed {
-    margin: 0 -20px -48px 0;
+    margin: 0 -20px -48px;
+  }
+
+  .split-section__bleed.accordion::after {
+    display: none;
   }
 }
 
@@ -791,17 +809,21 @@ a {
 }
 
 @media (max-width: 768px) {
+  /* Title inset evenly; the list below still runs edge to edge. */
   .chapters {
-    padding: 0 20px 72px 0;
+    padding: 48px 20px 72px;
   }
 
   .chapters__list {
-    margin-left: 0;
-    width: 100%;
+    margin-left: -20px;
+    width: calc(100% + 40px);
   }
 
+  /* Replaces the desktop padding (160px on the right), which squeezed the
+     chapter names into a narrow column on phones. */
   .chapters__link {
-    padding-left: 4px;
+    gap: 16px;
+    padding: 8px 20px 8px 4px;
   }
 
   .chapters__name {
