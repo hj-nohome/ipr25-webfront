@@ -7,26 +7,21 @@ export const figures = [
     chapter: 1,
     chapterName: 'Licensing',
     caption: 'Individual licences by category, 2016-2025',
-    chart: { type: 'bar', 
+    chart: { type: 'bar',
+      stacked: true,
       labels: ['2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025'], 
       datasets:[
         {
           label: 'NFP (I)',
           data: [176, 209, 220, 213, 220, 239, 248, 257, 265, 269],
-          backgroundColor: 'rgba(169, 155, 255, 0.6)',
-          borderColor: '#a99bff',
         },
         {
           label: 'NFP (II)',
           data: [156, 176, 183, 176, 170, 173, 171, 175, 178, 181],
-          backgroundColor: 'rgba(123, 110, 246, 0.6)',
-          borderColor: '#7b6ef6',
         },
         {
           label: 'CASP (I)',
           data: [48, 52, 56, 52, 48, 42, 40, 38, 37, 35],
-          backgroundColor: 'rgba(227, 223, 246, 0.6)',
-          borderColor: '#e3dff6',
         }
       ]
     },

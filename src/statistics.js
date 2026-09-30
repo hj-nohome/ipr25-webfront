@@ -4,9 +4,14 @@ import { Chart, registerables } from 'chart.js'
 import { figures } from './data/figures.js'
 
 Chart.register(...registerables)
-Chart.defaults.color = 'rgba(255, 255, 255, 0.75)'
-Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.15)'
+// Charts only render in the light modal panel, so use dark text and grid lines.
+Chart.defaults.color = 'rgba(23, 19, 31, 0.75)'
+Chart.defaults.borderColor = 'rgba(23, 19, 31, 0.12)'
 Chart.defaults.font.family = "system-ui, 'Segoe UI', Roboto, sans-serif"
+
+// Series colours, in order. Datasets in figures.js that don't set their own
+// colours take the next one from this list.
+const palette = ['#1e9a8b', '#6fcfc7', '#c8c8c8', '#0e6b62']
 
 const figuresGrid = document.querySelector('#figures-grid')
 
@@ -45,8 +50,11 @@ const modalMedia = document.querySelector('#figure-modal-media')
 const modalTag = document.querySelector('#figure-modal-tag')
 const modalTitle = document.querySelector('#figure-modal-title')
 const modalCaption = document.querySelector('#figure-modal-caption')
+const modalPrev = document.querySelector('#figure-modal-prev')
+const modalNext = document.querySelector('#figure-modal-next')
 
 let activeChart = null
+let activeFigure = null
 
 const renderChart = (figure) => {
   if (activeChart) {
@@ -58,11 +66,17 @@ const renderChart = (figure) => {
   const isDoughnut = figure.chart.type === 'doughnut'
   const isLine = figure.chart.type === 'line'
   const isBar = figure.chart.type === 'bar'
+  // Opt-in per figure (chart.stacked: true); otherwise bars sit side by side.
+  const isStacked = isBar && figure.chart.stacked === true
 
    let finalDatasets;
 
    if (figure.chart.datasets) {
-    finalDatasets = figure.chart.datasets;
+    finalDatasets = figure.chart.datasets.map((dataset, i) => ({
+      backgroundColor: palette[i % palette.length],
+      borderColor: palette[i % palette.length],
+      ...dataset,
+    }));
   } else {
     // Fallback: Convert the old single 'values' array format into a Chart.js dataset format
     finalDatasets = [
@@ -70,13 +84,16 @@ const renderChart = (figure) => {
         label: figure.id,
         data: figure.chart.values,
         backgroundColor: isDoughnut
-          ? ['#a99bff', '#7b6ef6', '#e3dff6', '#5a4fc7']
-          : 'rgba(169, 155, 255, 0.6)',
-        borderColor: '#a99bff',
-        borderWidth: isLine ? 2 : 1,
+          ? palette
+          : isLine
+            ? 'rgba(30, 154, 139, 0.12)'
+            : palette[0],
+        borderColor: isDoughnut ? '#ffffff' : palette[0],
+        borderWidth: isLine ? 2 : isDoughnut ? 2 : 0,
         tension: 0.35,
         fill: isLine,
         pointRadius: isLine ? 3 : undefined,
+        pointBackgroundColor: isLine ? palette[0] : undefined,
       },
     ];
   }
@@ -94,25 +111,48 @@ const renderChart = (figure) => {
       scales: isDoughnut ? {} : { 
         x: { 
           grid: { display: false },
-          stacked: isBar // Stacks the bar chart horizontally
-        }, 
-        y: { 
+          stacked: isStacked
+        },
+        y: {
           beginAtZero: true,
-          stacked: isBar // Stacks the bar chart vertically
+          stacked: isStacked
         } 
     },
   },
 })
 }
 
+// The pager steps through the figures currently shown in the grid,
+// so it follows the active chapter filter and search.
+const visibleFigures = () =>
+  Array.from(figuresGrid.querySelectorAll('.figure-card:not([hidden])'), (card) =>
+    figures.find((item) => item.id === card.dataset.figureId)
+  )
+
 const openModal = (figure) => {
+  activeFigure = figure
   renderChart(figure)
   modalTag.textContent = `Chapter ${figure.chapter} — ${figure.chapterName}`
   modalTitle.textContent = `Figure ${figure.id}`
   modalCaption.textContent = figure.caption
+
+  const siblings = visibleFigures()
+  const index = siblings.indexOf(figure)
+  modalPrev.disabled = index <= 0
+  modalNext.disabled = index === -1 || index >= siblings.length - 1
+
   modal.classList.add('is-open')
   modal.setAttribute('aria-hidden', 'false')
 }
+
+const stepModal = (offset) => {
+  const siblings = visibleFigures()
+  const next = siblings[siblings.indexOf(activeFigure) + offset]
+  if (next) openModal(next)
+}
+
+modalPrev.addEventListener('click', () => stepModal(-1))
+modalNext.addEventListener('click', () => stepModal(1))
 
 const closeModal = () => {
   modal.classList.remove('is-open')
