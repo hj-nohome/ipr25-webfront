@@ -75,14 +75,38 @@ export const figures = [
     },
   },
   {
-    id: '2.2',
+    id: '2.10',
     chapter: 2,
     chapterName: 'Economic Performance of the C&M Industry',
-    caption: 'Market capitalisation of listed companies',
+    caption: 'Capex-to-revenue ratio (capital intensity), 2023–2025',
+    source: 'Industry',
+    note: 'Capital intensity from major publicly listed companies only',
+    // Horizontal bars; the latest year comes first so it sits at the top.
     chart: {
-      type: 'line',
-      labels: ['2021', '2022', '2023', '2024', '2025'],
-      values: [88.2, 94.5, 101.3, 106.8, 110.63],
+      type: 'bar',
+      horizontal: true,
+      unit: '%',
+      labels: ['2025', '2024', '2023'],
+      datasets: [
+        {
+          label: 'Total',
+          data: [12.9, 13.4, 13.0],
+          backgroundColor: '#0e6b62',
+          borderColor: '#0e6b62',
+        },
+        {
+          label: 'Mobile',
+          data: [10.8, 13.1, 11.2],
+          backgroundColor: '#1e9a8b',
+          borderColor: '#1e9a8b',
+        },
+        {
+          label: 'Fixed',
+          data: [16.4, 13.9, 16.0],
+          backgroundColor: '#6fcfc7',
+          borderColor: '#6fcfc7',
+        },
+      ],
     },
   },
   {
@@ -105,6 +129,89 @@ export const figures = [
       type: 'line',
       labels: ['2021', '2022', '2023', '2024', '2025'],
       values: [8.1, 8.6, 9.0, 9.4, 9.81],
+    },
+  },
+  {
+    id: '3.13',
+    chapter: 3,
+    chapterName: 'Services and Connectivity',
+    caption: 'Mobile cellular subscription market share by service provider, 2021–2025',
+    source: 'MCMC',
+    // Brand colours, matching the report. `yMin` starts the axis at 10 so the
+    // lines aren't squashed; `unit` is added to axis ticks and tooltips.
+    chart: {
+      type: 'line',
+      yMin: 10,
+      unit: '%',
+      labels: ['2021', '2022', '2023', '2024', '2025'],
+      datasets: [
+        {
+          label: 'Maxis',
+          data: [27.4, 27.1, 27.7, 28.6, 29.6],
+          backgroundColor: '#1f7a3a',
+          borderColor: '#1f7a3a',
+        },
+        {
+          label: 'Digi',
+          data: [21.6, 21.7, 21.8, 21.8, 21.0],
+          backgroundColor: '#f2b705',
+          borderColor: '#f2b705',
+        },
+        {
+          label: 'Celcom',
+          data: [18.7, 17.7, 16.8, 16.7, 17.0],
+          backgroundColor: '#2f5fb3',
+          borderColor: '#2f5fb3',
+        },
+        {
+          label: 'UMobile',
+          data: [16.0, 18.0, 17.9, 16.8, 16.0],
+          backgroundColor: '#f26b1d',
+          borderColor: '#f26b1d',
+        },
+        {
+          label: 'Others/MVNOs',
+          data: [16.3, 15.5, 15.7, 16.1, 16.3],
+          backgroundColor: '#ffffff',
+          borderColor: '#17131f',
+          pointBorderWidth: 2,
+        },
+      ],
+    },
+  },
+  {
+    id: '3.16',
+    chapter: 3,
+    chapterName: 'Services and Connectivity',
+    caption: 'Deployment of 5G sites by Digital Nasional Berhad (DNB)',
+    source: 'MCMC, DNB',
+    // Table figure: the first column labels each row; the others are numbers,
+    // shown with `decimals` places. `total` is the bold footer row.
+    table: {
+      columns: [
+        { label: 'State' },
+        { label: '5G Sites' },
+        { label: 'Coverage of Populated Areas (%)', decimals: 1 },
+      ],
+      rows: [
+        ['W.P. Kuala Lumpur', 760, 97.8],
+        ['W.P. Putrajaya', 108, 97.3],
+        ['Selangor', 1829, 96.9],
+        ['Kedah', 390, 80.2],
+        ['Pulau Pinang', 446, 91.9],
+        ['Perak', 502, 81.0],
+        ['Perlis', 44, 91.4],
+        ['Pahang', 358, 66.4],
+        ['Kelantan', 232, 67.0],
+        ['Terengganu', 228, 73.2],
+        ['Johor', 923, 84.1],
+        ['Melaka', 216, 89.9],
+        ['Negeri Sembilan', 233, 77.8],
+        ['Sarawak', 575, 63.8],
+        ['Sabah', 595, 68.9],
+        ['W.P. Labuan', 42, 96.3],
+      ],
+      total: ['Total', 7481, 82.4],
     },
   },
   {
@@ -133,11 +240,24 @@ export const figures = [
     id: '6.1',
     chapter: 6,
     chapterName: 'Postal and Courier',
-    caption: 'Parcel delivery volume, 2021–2025',
+    caption: 'Parcel delivery volume and courier revenue, 2021–2025',
+    // Sample multi-axis chart: yAxisID 'y1' plots a series against a second
+    // axis on the right. Revenue figures are placeholders.
     chart: {
       type: 'line',
       labels: ['2021', '2022', '2023', '2024', '2025'],
-      values: [210, 245, 280, 310, 335],
+      datasets: [
+        {
+          label: 'Parcel volume (million)',
+          data: [210, 245, 280, 310, 335],
+        },
+        {
+          label: 'Courier revenue (RM billion)',
+          data: [5.8, 6.4, 6.9, 7.5, 8.1],
+          yAxisID: 'y1',
+          borderDash: [6, 4],
+        },
+      ],
     },
   },
   {

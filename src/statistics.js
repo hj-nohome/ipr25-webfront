@@ -140,16 +140,51 @@ const modalMedia = document.querySelector('#figure-modal-media')
 const modalTag = document.querySelector('#figure-modal-tag')
 const modalTitle = document.querySelector('#figure-modal-title')
 const modalCaption = document.querySelector('#figure-modal-caption')
+const modalNote = document.querySelector('#figure-modal-note')
+const modalSource = document.querySelector('#figure-modal-source')
 const modalPrev = document.querySelector('#figure-modal-prev')
 const modalNext = document.querySelector('#figure-modal-next')
 
 let activeChart = null
 let activeFigure = null
 
+// Table figures: the first cell of each row is its label, the rest are
+// numbers formatted per column. Rows fade in top to bottom (see
+// .figure-table--enter), after the panel's slide-in on first open.
+const renderTable = (table, isStepping) => {
+  const formatCell = (value, i) =>
+    typeof value === 'number'
+      ? value.toLocaleString('en-MY', {
+          minimumFractionDigits: table.columns[i].decimals ?? 0,
+          maximumFractionDigits: table.columns[i].decimals ?? 0,
+        })
+      : value
+  const rowCells = (row) =>
+    row.map((value, i) => (i === 0 ? `<th scope="row">${value}</th>` : `<td>${formatCell(value, i)}</td>`)).join('')
+
+  modalMedia.innerHTML = `
+    <table class="figure-table figure-table--enter" style="--wait: ${entranceTiming(isStepping).wait}ms">
+      <thead>
+        <tr>${table.columns.map((column) => `<th scope="col">${column.label}</th>`).join('')}</tr>
+      </thead>
+      <tbody>
+        ${table.rows.map((row, i) => `<tr style="--row: ${i}">${rowCells(row)}</tr>`).join('')}
+      </tbody>
+      ${table.total ? `<tfoot><tr style="--row: ${table.rows.length}">${rowCells(table.total)}</tr></tfoot>` : ''}
+    </table>
+  `
+}
+
 const renderChart = (figure, isStepping) => {
   if (activeChart) {
     activeChart.destroy()
     activeChart = null
+  }
+
+  modalMedia.classList.toggle('figure-modal__media--table', Boolean(figure.table))
+  if (figure.table) {
+    renderTable(figure.table, isStepping)
+    return
   }
 
   modalMedia.innerHTML = '<canvas></canvas>'
@@ -188,6 +223,32 @@ const renderChart = (figure, isStepping) => {
     ];
   }
 
+  // A dataset with yAxisID: 'y1' reads against a second y axis on the right.
+  // With two axes, each is titled with its series so it's clear which line
+  // reads against which scale.
+  const hasSecondAxis = finalDatasets.some((dataset) => dataset.yAxisID === 'y1')
+  const axisTitle = (axisId) => ({
+    display: hasSecondAxis,
+    text: finalDatasets.find((dataset) => (dataset.yAxisID ?? 'y') === axisId)?.label,
+  })
+
+  // Optional per figure: chart.unit (e.g. '%') follows the values on the
+  // value axis and in tooltips; chart.yMin starts the value axis above zero.
+  // chart.horizontal turns bars sideways, putting the values on the x axis.
+  const unit = figure.chart.unit
+  const isHorizontal = figure.chart.horizontal === true
+  const categoryScale = {
+    grid: { display: false },
+    stacked: isStacked,
+  }
+  const valueScale = {
+    beginAtZero: figure.chart.yMin === undefined,
+    min: figure.chart.yMin,
+    stacked: isStacked,
+    title: axisTitle('y'),
+    ...(unit && { ticks: { callback: (value) => `${value}${unit}` } }),
+  }
+
   activeChart = new Chart(modalMedia.querySelector('canvas'), {
     type: figure.chart.type,
     data: {
@@ -198,16 +259,28 @@ const renderChart = (figure, isStepping) => {
       responsive: true,
       maintainAspectRatio: false,
       ...chartAnimation(figure.chart.type, isStepping),
-      plugins: { legend: { display: figure.chart.datasets ? true : !isDoughnut } }, 
-      scales: isDoughnut ? {} : { 
-        x: { 
-          grid: { display: false },
-          stacked: isStacked
+      indexAxis: isHorizontal ? 'y' : 'x',
+      ...(unit && {
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: (ctx) => `${isDoughnut ? ctx.label : ctx.dataset.label}: ${ctx.formattedValue}${unit}`,
+            },
+          },
         },
-        y: {
-          beginAtZero: true,
-          stacked: isStacked
-        }
+      }),
+      scales: isDoughnut ? {} : {
+        x: isHorizontal ? valueScale : categoryScale,
+        y: isHorizontal ? categoryScale : valueScale,
+        ...(hasSecondAxis && {
+          y1: {
+            position: 'right',
+            beginAtZero: true,
+            // Only the left axis draws grid lines, so the two don't clash.
+            grid: { drawOnChartArea: false },
+            title: axisTitle('y1'),
+          },
+        }),
     },
   },
   plugins: [revealPlugin],
@@ -229,6 +302,10 @@ const openModal = (figure) => {
   modalTag.textContent = `Chapter ${figure.chapter} — ${figure.chapterName}`
   modalTitle.textContent = `Figure ${figure.id}`
   modalCaption.textContent = figure.caption
+  modalNote.textContent = figure.note ? `Note: ${figure.note}` : ''
+  modalNote.hidden = !figure.note
+  modalSource.textContent = figure.source ? `Source: ${figure.source}` : ''
+  modalSource.hidden = !figure.source
   renderChart(figure, modal.classList.contains('is-open'))
 
   const siblings = visibleFigures()
