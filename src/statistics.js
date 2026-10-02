@@ -13,6 +13,96 @@ Chart.defaults.font.family = "system-ui, 'Segoe UI', Roboto, sans-serif"
 // colours take the next one from this list.
 const palette = ['#1e9a8b', '#6fcfc7', '#c8c8c8', '#0e6b62']
 
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+
+const easeOutQuart = (t) => 1 - (1 - t) ** 4
+
+// Entrance timing. On first open the chart waits for the modal panel's 0.5s
+// slide-in to settle; stepping with prev/next starts straight away and runs
+// shorter.
+const entranceTiming = (isStepping) => ({
+  wait: isStepping ? 0 : 300,
+  duration: isStepping ? 400 : 700,
+})
+
+// Chart.js options for the entrance. Bars rise from the axis one after
+// another; doughnuts keep Chart.js's clockwise sweep. Lines don't use this,
+// they're uncovered by revealPlugin instead.
+const chartAnimation = (type, isStepping) => {
+  if (reducedMotion.matches) return { animation: false }
+
+  const stagger = type === 'bar' ? 40 : 0
+
+  return {
+    animation: {
+      duration: entranceTiming(isStepping).duration,
+      easing: 'easeOutQuart',
+      // Resizes and legend toggles use other modes, so they don't stagger.
+      delay: (ctx) => (ctx.type === 'data' && ctx.mode === 'default' ? ctx.dataIndex * stagger : 0),
+    },
+  }
+}
+
+// Clips the datasets to a strip that widens from the left as chart.$reveal
+// goes from 0 to 1, so lines draw themselves left to right. Unlike animating
+// the points, this can't be disturbed by a resize mid-way.
+const revealPlugin = {
+  id: 'reveal',
+  beforeDatasetsDraw(chart) {
+    if (chart.$reveal === undefined) return
+    const { left, right } = chart.chartArea
+    // The extra 8px keeps the last point whole at the end.
+    const edge = left + (right + 8 - left) * chart.$reveal
+    chart.ctx.save()
+    chart.ctx.beginPath()
+    chart.ctx.rect(0, 0, edge, chart.height)
+    chart.ctx.clip()
+  },
+  afterDatasetsDraw(chart) {
+    if (chart.$reveal !== undefined) chart.ctx.restore()
+  },
+}
+
+const revealLine = (chart, duration) => {
+  const start = performance.now()
+  const frame = (now) => {
+    if (chart !== activeChart) return
+    const t = Math.min((now - start) / duration, 1)
+    chart.$reveal = easeOutQuart(t)
+    if (t === 1) delete chart.$reveal
+    chart.render()
+    if (t < 1) requestAnimationFrame(frame)
+  }
+  requestAnimationFrame(frame)
+}
+
+// Chart.js sizes a new chart with 'resize' updates, which skip animation and
+// leave it fully drawn. So the chart stays hidden until those have landed
+// (the ResizeObserver reports a frame after creation) and, on first open, the
+// panel has slid in; then it plays from its starting state.
+const playEntrance = (chart, type, isStepping) => {
+  if (reducedMotion.matches) return
+
+  const { wait, duration } = entranceTiming(isStepping)
+  chart.canvas.style.visibility = 'hidden'
+
+  const start = () => {
+    if (chart !== activeChart) return
+    chart.canvas.style.visibility = ''
+    if (type === 'line') {
+      chart.update('none')
+      revealLine(chart, duration)
+    } else {
+      chart.reset()
+      chart.update()
+    }
+  }
+  const afterLayout = () => requestAnimationFrame(() => requestAnimationFrame(start))
+
+  if (wait) setTimeout(afterLayout, wait)
+  else afterLayout()
+}
+
 const figuresGrid = document.querySelector('#figures-grid')
 
 figuresGrid.innerHTML = figures
@@ -24,8 +114,8 @@ figuresGrid.innerHTML = figures
         data-figure-id="${figure.id}"
         style="view-transition-name: fig-${figure.id.replace('.', '-')}"
       >
-        <h3 class="figure-card__name">Figure ${figure.id}</h3>
         <p class="figure-card__caption">${figure.caption}</p>
+        <h3 class="figure-card__name">Figure ${figure.id}</h3>
       </button>
     `
   )
@@ -56,7 +146,7 @@ const modalNext = document.querySelector('#figure-modal-next')
 let activeChart = null
 let activeFigure = null
 
-const renderChart = (figure) => {
+const renderChart = (figure, isStepping) => {
   if (activeChart) {
     activeChart.destroy()
     activeChart = null
@@ -107,6 +197,7 @@ const renderChart = (figure) => {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      ...chartAnimation(figure.chart.type, isStepping),
       plugins: { legend: { display: figure.chart.datasets ? true : !isDoughnut } }, 
       scales: isDoughnut ? {} : { 
         x: { 
@@ -116,10 +207,13 @@ const renderChart = (figure) => {
         y: {
           beginAtZero: true,
           stacked: isStacked
-        } 
+        }
     },
   },
+  plugins: [revealPlugin],
 })
+
+  playEntrance(activeChart, figure.chart.type, isStepping)
 }
 
 // The pager steps through the figures currently shown in the grid,
@@ -131,10 +225,11 @@ const visibleFigures = () =>
 
 const openModal = (figure) => {
   activeFigure = figure
-  renderChart(figure)
+  // Text first, so the panel's layout is final before the chart sizes itself.
   modalTag.textContent = `Chapter ${figure.chapter} — ${figure.chapterName}`
   modalTitle.textContent = `Figure ${figure.id}`
   modalCaption.textContent = figure.caption
+  renderChart(figure, modal.classList.contains('is-open'))
 
   const siblings = visibleFigures()
   const index = siblings.indexOf(figure)
@@ -176,7 +271,6 @@ document.addEventListener('keydown', (event) => {
 
 const searchInput = document.querySelector('#figures-search')
 const emptyState = document.querySelector('#figures-empty')
-const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
 
 const updateGrid = () => {
   const query = searchInput.value.trim().toLowerCase()

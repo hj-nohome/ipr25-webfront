@@ -16,7 +16,7 @@ export const figures = [
           data: [176, 209, 220, 213, 220, 239, 248, 257, 265, 269],
         },
         {
-          label: 'NFP (II)',
+          label: 'NSP (I)',
           data: [156, 176, 183, 176, 170, 173, 171, 175, 178, 181],
         },
         {
@@ -30,11 +30,37 @@ export const figures = [
     id: '1.2',
     chapter: 1,
     chapterName: 'Licensing',
-    caption: 'Licence renewal trends, 2021–2025',
+    caption: 'Class licences by category, 2016–2025',
     chart: {
-      type: 'line',
-      labels: ['2021', '2022', '2023', '2024', '2025'],
-      values: [3100, 3250, 3400, 3600, 3800],
+      type: 'bar',
+      labels: ['2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025'],
+      // Colours set per series to match the report's legend order.
+      datasets: [
+        {
+          label: 'NFP (C)',
+          data: [15, 9, 8, 11, 17, 11, 11, 15, 18, 19],
+          backgroundColor: '#c8c8c8',
+          borderColor: '#c8c8c8',
+        },
+        {
+          label: 'NSP (C)',
+          data: [15, 11, 8, 11, 17, 11, 11, 15, 18, 23],
+          backgroundColor: '#6fcfc7',
+          borderColor: '#6fcfc7',
+        },
+        {
+          label: 'CASP (C)',
+          data: [12, 10, 11, 10, 15, 9, 11, 15, 14, 12],
+          backgroundColor: '#1e9a8b',
+          borderColor: '#1e9a8b',
+        },
+        {
+          label: 'ASP (C)',
+          data: [456, 433, 370, 420, 450, 465, 513, 522, 536, 539],
+          backgroundColor: '#215f5c',
+          borderColor: '#215f5c',
+        },
+      ],
     },
   },
   {

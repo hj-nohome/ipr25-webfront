@@ -1187,31 +1187,49 @@ a {
 .figure-card:hover {
   background: color-mix(in srgb, var(--text) 8%, transparent);
 }
-.figure-card:hover .figure-card__caption,
-.figure-card:focus-visible .figure-card__caption {
-  opacity: 1;
-  max-height: 100px;
-  margin-top: 12px;
+.figure-card:hover .figure-card__name,
+.figure-card:focus-visible .figure-card__name {
+  opacity: 0.6;
+  transform: none;
 }
 
 .figure-card[hidden] {
   display: none;
 }
 
+/* A small muted label under the caption. It always keeps its space and only
+   fades in, so the caption doesn't shift on hover. */
 .figure-card__name {
-  margin: 0;
-  font-size: 18px;
+  margin: 8px 0 0;
+  font-size: 12px;
   font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .figure-card__caption {
   margin: 0;
-  max-height: 0;
-  overflow: hidden;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.4;
-  opacity: 0;
-  transition: opacity 0.2s ease, max-height 0.2s ease, margin-top 0.2s ease;
+}
+
+/* No hover on touch screens, so the label is always shown. */
+@media (hover: none) {
+  .figure-card__name {
+    opacity: 0.6;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .figure-card__name {
+    transform: none;
+  }
 }
 
 /* Figure grid filter animation (see applyFilters in statistics.js) */
