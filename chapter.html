@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter | ipr25-testing</title>
+</head>
+
+<body data-bg="image">
+  <!-- Per-chapter background in place of the video loop, set by src/chapter.js. -->
+  <img class="page-bg" id="chapter-bg" alt="" aria-hidden="true" />
+  <div id="scroll-sentinel" aria-hidden="true"></div>
+  <header class="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__brand">
+        <img src="images/mcmc-logo.png" alt="MCMC" />
+      </a>
+      <nav id="nav-links" class="nav__links">
+        <a href="chapters.html" class="nav__link" aria-current="page">CHAPTERS</a>
+        <a href="statistics.html" class="nav__link">STATISTICS</a>
+        <!-- replace url if MCMC hosts the report -->
+        <a href="ipr25-report.pdf" class="nav__link" download="MCMC-Industry-Performance-Report-2025.pdf" target="_blank">
+          DOWNLOAD
+        </a>
+      </nav>
+      <button id="nav-toggle" class="nav__toggle" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Filled in per chapter by src/chapter.js from src/data/chapters.js. -->
+    <section class="chapter-detail">
+      <div class="chapter-detail__bar">
+        <a href="chapters.html" class="chapter-detail__back">
+          <svg viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path d="M11 6H1m4-4L1 6l4 4" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          All chapters
+        </a>
+      </div>
+
+      <div class="chapter-detail__body panel panel--purple-light">
+        <div class="chapter-detail__text">
+          <h1 class="chapter-detail__title">
+            <span class="line-reveal__line"><span id="chapter-title"></span></span>
+          </h1>
+          <div class="page-intro">
+            <p class="chapter-detail__name" id="chapter-name"></p>
+            <div class="chapter-detail__intro" id="chapter-intro"></div>
+
+            <h2 class="chapter-detail__label">Key Highlights 2025</h2>
+            <!-- Key highlights stats go here. -->
+            <div class="chapter-detail__highlights" id="chapter-highlights"></div>
+          </div>
+        </div>
+
+        <div class="chapter-detail__media reveal">
+          <img id="chapter-image" alt="" />
+        </div>
+
+        <div class="chapter-detail__cta reveal reveal--delay-1">
+          <a href="statistics.html" class="button" id="chapter-explore">Explore figures</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer panel panel--purple-dark">
+    <div class="footer-container">
+
+      <!-- Column 1: Contact Info -->
+      <div class="footer-column">
+        <h3>Contact us:</h3>
+        <p>T: +603 8688 8000</p>
+        <p>F: +603 8688 1000</p>
+        <p>Email: <a href="#">www.mcmc.gov.my</a></p>
+
+        <p class="footer-copyright">&copy; 2026 Malaysian Communications and Multimedia Commission. All rights reserved.
+        </p>
+      </div>
+
+      <!-- Column 2: Address -->
+      <div class="footer-column" style="padding-top:48px;">
+        <p>MCMC HQ Tower 1<br>
+          Jalan Impact, Cyber 6 63000 Cyberjaya<br>
+          Selangor Darul Ehsan, Malaysia</p>
+      </div>
+
+    </div>
+  </footer>
+
+  <script type="module" src="/src/chapter.js"></script>
+</body>
+
+</html>

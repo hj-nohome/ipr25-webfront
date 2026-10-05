@@ -89,6 +89,38 @@ body.bg-loaded::before {
   opacity: 1;
 }
 
+/* Still background image used instead of the video on pages with
+   <body data-bg="image"> (chapter.html, set by chapter.js). Unlike the
+   video it covers the whole page and scrolls with it. Pinned to the
+   image's top edge so the top of each shot sits behind the nav. */
+.page-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+
+body.bg-loaded .page-bg {
+  opacity: 1;
+}
+
+/* Photos are shown as they are, without the video's dark overlay. */
+body[data-bg='image']::before {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-bg {
+    transition: none;
+  }
+}
+
 a {
   color: inherit;
 }
@@ -402,7 +434,7 @@ a {
 }
 
 .panel--purple-light {
-  --panel-bg: #E2E2FF;
+  --panel-bg: #F0F0FF;
   --panel-text: #17131f;
 }
 
@@ -758,6 +790,11 @@ a {
   opacity: 0.75;
 }
 
+/* "Read more" links to each chapter's page. */
+.accordion__answer a {
+  font-weight: 600;
+}
+
 /* Spacer: empty vertical rhythm block between sections */
 .spacer {
   margin-left: var(--gutter);
@@ -1047,6 +1084,164 @@ a {
 
   .chapter-entry__name {
     font-size: 10px;
+  }
+}
+
+/* Chapter detail page (chapter.html, filled in by chapter.js). A back bar
+   over a light panel: text on the left; the chapter image and its figures
+   link on the right, running to the screen's right edge. */
+.chapter-detail {
+  /* Chapter accent and the text that sits on it. Chapters without their
+     own rule below use the default; chapter.js sets data-chapter. */
+  --chapter-accent: #31346b;
+  --chapter-accent-text: #ffffff;
+  margin: 24px 0 0 var(--gutter);
+}
+
+/* Darkened from the design's #418b4e so white text reaches 4.5:1. */
+.chapter-detail[data-chapter='2'] {
+  --chapter-accent: #3d834a;
+}
+
+/* White is unreadable on this orange (2:1), so its text is dark. */
+.chapter-detail[data-chapter='3'] {
+  --chapter-accent: #ff9c73;
+  --chapter-accent-text: #17131f;
+}
+
+.chapter-detail__bar {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 32px;
+  background: var(--chapter-accent);
+  color: var(--chapter-accent-text);
+}
+
+.chapter-detail__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.chapter-detail__back svg {
+  width: 12px;
+  height: 12px;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.chapter-detail__back:hover svg,
+.chapter-detail__back:focus-visible svg {
+  transform: translateX(-4px);
+}
+
+/* The image sits in the top right corner; the button takes the space
+   under it, however tall the text column grows. */
+.chapter-detail__body {
+  display: grid;
+  grid-template-columns: minmax(0, 11fr) minmax(0, 9fr);
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    'text media'
+    'text cta';
+}
+
+.chapter-detail__text {
+  grid-area: text;
+  padding: 64px 80px 96px;
+}
+
+.chapter-detail__title {
+  margin: 0;
+  font-size: 48px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+.chapter-detail__name {
+  margin: 8px 0 32px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.chapter-detail__intro p {
+  margin: 0 0 16px;
+  opacity: 0.8;
+}
+
+.chapter-detail__label {
+  margin: 32px 0 16px;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.chapter-detail__media {
+  grid-area: media;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+}
+
+.chapter-detail__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.chapter-detail__cta {
+  grid-area: cta;
+  padding: 40px 32px 80px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chapter-detail__back svg {
+    transition: none;
+  }
+}
+
+@media (max-width: 1100px) {
+  .chapter-detail__text {
+    padding: 48px 48px 72px;
+  }
+}
+
+/* Stacked on phones: image first, then the text, then the button. */
+@media (max-width: 768px) {
+  .chapter-detail__bar {
+    padding: 0 20px;
+  }
+
+  .chapter-detail__body {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    grid-template-areas:
+      'media'
+      'text'
+      'cta';
+  }
+
+  .chapter-detail__media {
+    aspect-ratio: 16 / 10;
+  }
+
+  .chapter-detail__text {
+    padding: 40px 20px 24px;
+  }
+
+  .chapter-detail__title {
+    font-size: 32px;
+  }
+
+  .chapter-detail__cta {
+    padding: 0 20px 48px;
   }
 }
 

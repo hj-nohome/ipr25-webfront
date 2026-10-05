@@ -11,6 +11,9 @@ const BG_CROSSFADE_MS = 1000
 // margin to finish before the outgoing copy reaches its last frame.
 const BG_CROSSFADE_MARGIN_S = 0.3
 const saveData = navigator.connection?.saveData === true
+// Pages with their own still background (chapter.html) opt out of the
+// video with <body data-bg="image">.
+const hasImageBg = document.body.dataset.bg === 'image'
 
 const createBgVideo = () => {
   const video = document.createElement('video')
@@ -24,7 +27,7 @@ const createBgVideo = () => {
   return video
 }
 
-if (!saveData) {
+if (!saveData && !hasImageBg) {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   document.documentElement.style.setProperty('--bg-crossfade', `${BG_CROSSFADE_MS}ms`)
 

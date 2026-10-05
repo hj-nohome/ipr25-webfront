@@ -13,6 +13,7 @@ export default defineConfig({
         main: resolve(import.meta.dirname, 'index.html'),
         statistics: resolve(import.meta.dirname, 'statistics.html'),
         chapters: resolve(import.meta.dirname, 'chapters.html'),
+        chapter: resolve(import.meta.dirname, 'chapter.html'),
       },
     },
   },
