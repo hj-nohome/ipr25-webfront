@@ -27,7 +27,27 @@ const createBgVideo = () => {
   return video
 }
 
-if (!saveData && !hasImageBg) {
+// Still image shown when the video can't play: Data Saver, no WebM
+// support, a load error, or no frame yet after BG_FALLBACK_MS (a slow
+// connection, or an iPhone blocking autoplay). It sits under the video, so
+// a video that turns up late still fades in over it. style.css picks the
+// image: the video's first frame on desktop, bg-cover on phones.
+const BG_FALLBACK_MS = 4000
+
+const showBgFallback = () => {
+  if (document.querySelector('.bg-fallback')) return
+  const fallback = document.createElement('div')
+  fallback.className = 'bg-fallback'
+  fallback.setAttribute('aria-hidden', 'true')
+  document.body.prepend(fallback)
+  document.body.classList.add('bg-fallback-shown')
+}
+
+const canPlayWebm = document.createElement('video').canPlayType('video/webm') !== ''
+
+if (!hasImageBg && (saveData || !canPlayWebm)) showBgFallback()
+
+if (!saveData && !hasImageBg && canPlayWebm) {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   document.documentElement.style.setProperty('--bg-crossfade', `${BG_CROSSFADE_MS}ms`)
 
@@ -35,7 +55,12 @@ if (!saveData && !hasImageBg) {
   current.classList.add('is-visible', 'is-front')
   current.autoplay = !reducedMotion
   current.addEventListener('loadeddata', () => document.body.classList.add('bg-loaded'), { once: true })
+  current.addEventListener('error', showBgFallback)
   document.body.prepend(current)
+
+  setTimeout(() => {
+    if (!document.body.classList.contains('bg-loaded')) showBgFallback()
+  }, BG_FALLBACK_MS)
 
   if (!reducedMotion) {
     let next = createBgVideo()

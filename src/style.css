@@ -89,6 +89,41 @@ body.bg-loaded::before {
   opacity: 1;
 }
 
+/* Still fallback for the video, added by main.js when the video can't
+   play. Desktop shows the video's first frame, so a late video takes over
+   seamlessly; phones show bg-cover. Each size only downloads its own
+   image. It sits below both video copies, so a video that loads late
+   fades in over it, and gets the same dark overlay. */
+.bg-fallback {
+  position: fixed;
+  inset: 0;
+  z-index: -4;
+  background: url('../images/bg-video-still.jpg') center / cover no-repeat;
+  animation: bg-fallback-in 0.6s ease both;
+}
+
+@media (max-width: 768px) {
+  .bg-fallback {
+    background-image: url('../images/bg-cover-mobile.jpg');
+  }
+}
+
+body.bg-fallback-shown::before {
+  opacity: 1;
+}
+
+@keyframes bg-fallback-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-fallback {
+    animation: none;
+  }
+}
+
 /* Still background image used instead of the video on pages with
    <body data-bg="image"> (chapter.html, set by chapter.js). Unlike the
    video it covers the whole page and scrolls with it. Pinned to the
