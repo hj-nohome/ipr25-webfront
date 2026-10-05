@@ -303,6 +303,12 @@ a {
   .nav {
     --menu-duration: 0.6s;
     --menu-ease: cubic-bezier(0.76, 0, 0.24, 1);
+    /* The closed drawer waits just off the right edge. Without this it
+       counts as page width: mobile browsers widen the page to fit it, so
+       the page pans sideways and the fixed background video resizes as
+       the drawer moves. clip (unlike hidden) leaves the drawer free to
+       run below the bar and doesn't affect the sticky nav. */
+    overflow-x: clip;
   }
 
   /* Backdrop: dims the page (and the logo) beside the drawer. Tapping it
