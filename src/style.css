@@ -193,7 +193,7 @@ a {
 }
 
 .nav__brand img {
-  height: 32px;
+  height: 42px;
   width: auto;
   display: block;
 }
@@ -213,6 +213,14 @@ a {
 
 .nav__link:hover {
   opacity: 0.7;
+}
+
+/* Phone menu only (shown again under 769px): on desktop the logo is the
+   way home, and the bar has no room for the file size or the note. */
+.nav__link--home,
+.nav__link-meta,
+.nav__note {
+  display: none;
 }
 
 /* Underline that draws in from the left on hover/focus (same easing as
@@ -266,34 +274,261 @@ a {
   width: 22px;
   height: 2px;
   background: var(--text);
+  transition:
+    transform 0.3s ease,
+    opacity 0.2s ease;
 }
 
+/* Open: the outer bars move to the middle (5px gap + 2px bar) and cross
+   into an X. */
+.nav__toggle[aria-expanded='true'] span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.nav__toggle[aria-expanded='true'] span:nth-child(2) {
+  opacity: 0;
+}
+
+.nav__toggle[aria-expanded='true'] span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Phone menu: a drawer that slides in from the right over a dimmed page.
+   Its leading edge bulges out in a curve (::before) that flattens as the
+   drawer arrives, and the links follow it in one after another. The drawer
+   and backdrop are absolute, not fixed, because .nav--scrolled's
+   backdrop-filter would trap a fixed child inside the bar; the sticky nav
+   is at the top of the viewport whenever the toggle can be tapped. */
 @media (max-width: 768px) {
+  .nav {
+    --menu-duration: 0.6s;
+    --menu-ease: cubic-bezier(0.76, 0, 0.24, 1);
+  }
+
+  /* Backdrop: dims the page (and the logo) beside the drawer. Tapping it
+     closes the menu; main.js listens for clicks that land on .nav itself. */
+  .nav::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--menu-duration) var(--menu-ease);
+  }
+
+  html.menu-open .nav::after {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
   .nav__links {
     position: absolute;
-    top: var(--nav-height);
-    left: 0;
+    top: 0;
     right: 0;
+    z-index: 1;
+    /* About 70% of the screen: wide enough for the links on a 320px
+       phone, and no wider than they need on a tablet. */
+    width: min(100%, clamp(280px, 70%, 420px));
+    height: 100vh;
+    height: 100dvh;
+    padding: calc(var(--nav-height) + 32px) 24px 32px 28px;
     flex-direction: column;
     gap: 0;
     background: var(--bg);
-    border-bottom: 1px solid var(--border);
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.25s ease;
+    /* The curve sticks out 100px past the panel, so move that much further. */
+    transform: translateX(calc(100% + 100px));
+    /* Hidden once closed, so its links drop out of the tab order. */
+    visibility: hidden;
+    transition:
+      transform var(--menu-duration) var(--menu-ease),
+      visibility 0s linear var(--menu-duration);
   }
 
   .nav__links.is-open {
-    max-height: 200px;
+    transform: none;
+    visibility: visible;
+    transition: transform var(--menu-duration) var(--menu-ease);
   }
 
-  .nav__link {
-    padding: 16px 24px;
-    border-top: 1px solid var(--border);
+  /* The curve: a half-ellipse on the panel's left edge, squashed flat as
+     the menu opens (slightly slower than the slide, so it settles last). */
+  .nav__links::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    /* Overlaps the drawer by 1px, so no seam shows between them. */
+    right: calc(100% - 1px);
+    width: 100px;
+    height: 100%;
+    background: inherit;
+    border-radius: 100% 0 0 100% / 50% 0 0 50%;
+    transform-origin: right;
+    transition: transform calc(var(--menu-duration) * 1.25) var(--menu-ease);
   }
 
-  .nav__toggle {
+  .nav__links.is-open::before {
+    transform: scaleX(0);
+  }
+
+  .nav__link,
+  .nav__note {
+    transform: translateX(80px);
+    transition:
+      transform var(--menu-duration) var(--menu-ease),
+      opacity 0.2s ease;
+  }
+
+  /* --i (set by main.js) staggers the links on the way in. */
+  .nav__links.is-open .nav__link,
+  .nav__links.is-open .nav__note {
+    transform: none;
+    transition-delay: calc(var(--i, 0) * 50ms), 0s;
+  }
+
+  /* Page links: rows divided by 1px lines, like the site's other drawn
+     lines. */
+  .nav__link:not(.nav__link--download) {
+    display: block;
+    position: relative;
+    padding: 16px 0 16px 24px;
+    font-size: 28px;
+    line-height: 1.2;
+  }
+
+  /* Each row's line draws in left to right once the drawer has mostly
+     landed, one row after another; closing wipes them at once. */
+  .nav__link:not(.nav__link--download)::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: var(--border);
+    opacity: 0.4;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.2s ease;
+  }
+
+  .nav__links.is-open .nav__link:not(.nav__link--download)::after {
+    transform: none;
+    transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--menu-duration) * 0.6 + var(--i, 0) * 80ms);
+  }
+
+  /* Download: a file, not a page, so a bordered button at the foot of the
+     drawer with its format and size. */
+  .nav__link--download {
+    margin-top: auto;
     display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    font-size: 15px;
+  }
+
+  .nav__link--download:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .nav__link-meta {
+    display: inline;
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+    opacity: 0.7;
+  }
+
+  .nav__note {
+    display: block;
+    margin: 12px 0 0;
+    font-size: 13px;
+    opacity: 0.6;
+  }
+
+  /* Dot beside the current page's link, popping in once the panel lands. */
+  .nav__link::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    margin-top: -4px;
+    border-radius: 50%;
+    background: currentColor;
+    transform: scale(0);
+    transition: transform 0.3s ease;
+  }
+
+  .nav__links.is-open .nav__link[aria-current='page']::before {
+    transform: none;
+    transition-delay: var(--menu-duration);
+  }
+
+  /* The X stays on top of the open drawer. */
+  .nav__toggle {
+    position: relative;
+    z-index: 2;
+    display: flex;
+  }
+
+  /* Set by main.js while the menu is open: the page behind doesn't scroll. */
+  html.menu-open {
+    overflow: hidden;
+  }
+}
+
+/* Reduced motion: the drawer fades in and out in place. */
+@media (max-width: 768px) and (prefers-reduced-motion: reduce) {
+  .nav::after {
+    transition: opacity 0.2s ease;
+  }
+
+  .nav__links {
+    transform: none;
+    opacity: 0;
+    transition:
+      opacity 0.2s ease,
+      visibility 0s linear 0.2s;
+  }
+
+  .nav__links.is-open {
+    opacity: 1;
+    transition: opacity 0.2s ease;
+  }
+
+  .nav__links::before {
+    display: none;
+  }
+
+  .nav__link,
+  .nav__note,
+  .nav__links.is-open .nav__link,
+  .nav__links.is-open .nav__note {
+    transform: none;
+    transition: opacity 0.2s ease;
+  }
+
+  /* Row lines are simply there, as with the site's other drawn lines. */
+  .nav__link:not(.nav__link--download)::after,
+  .nav__links.is-open .nav__link:not(.nav__link--download)::after {
+    transform: none;
+    transition: none;
+  }
+
+  .nav__link::before,
+  .nav__links.is-open .nav__link[aria-current='page']::before,
+  .nav__toggle span {
+    transition: none;
   }
 }
 
@@ -895,11 +1130,12 @@ a {
   background: color-mix(in srgb, var(--text) 5%, transparent);
 }
 
+/* Fixed size rather than taken from the image, so rows are 120px tall from
+   the first frame in every browser, before the lazy image loads too. */
 .chapters__thumb {
   flex-shrink: 0;
-  align-self: stretch;
-  max-width: 120px;
-  aspect-ratio: 1 / 1;
+  width: 120px;
+  height: 120px;
   margin: -8px 0;
   overflow: hidden;
 }

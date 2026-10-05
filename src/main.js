@@ -88,10 +88,47 @@ if (!saveData && !hasImageBg) {
 const toggle = document.querySelector('#nav-toggle')
 const links = document.querySelector('#nav-links')
 
-toggle.addEventListener('click', () => {
-  const isOpen = links.classList.toggle('is-open')
-  toggle.setAttribute('aria-expanded', String(isOpen))
+// Phone menu (styled as a full-screen panel below 769px). While it's open
+// the page behind is inert and doesn't scroll, so keyboard focus stays on
+// the nav.
+const setMenuOpen = (open) => {
+  links.classList.toggle('is-open', open)
+  toggle.setAttribute('aria-expanded', String(open))
+  document.documentElement.classList.toggle('menu-open', open)
+  for (const el of document.body.children) {
+    if (!el.contains(toggle)) el.inert = open
+  }
+}
+
+toggle.addEventListener('click', () => setMenuOpen(!links.classList.contains('is-open')))
+
+// Choosing a link closes the menu (Download opens in a new tab, so the
+// page stays behind it).
+links.addEventListener('click', (event) => {
+  if (event.target.closest('a')) setMenuOpen(false)
 })
+
+// Tapping the backdrop beside the drawer (.nav::after) closes it. Clicks on
+// a pseudo-element target its element, and only the backdrop covers .nav
+// directly: everything else in the bar is inside .nav__inner.
+toggle.closest('.nav').addEventListener('click', (event) => {
+  if (event.target === event.currentTarget) setMenuOpen(false)
+})
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && links.classList.contains('is-open')) {
+    setMenuOpen(false)
+    toggle.focus()
+  }
+})
+
+// Widening past the phone layout drops the menu, along with its scroll lock.
+window.matchMedia('(min-width: 769px)').addEventListener('change', (event) => {
+  if (event.matches) setMenuOpen(false)
+})
+
+// Link index, for staggering the links as the menu slides in.
+;[...links.children].forEach((el, i) => el.style.setProperty('--i', i))
 
 document.querySelectorAll('.accordion__question').forEach((question) => {
   question.addEventListener('click', () => {
