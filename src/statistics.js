@@ -1,17 +1,13 @@
 // Statistics page: figure grid + search + click-to-expand modal.
 import './main.js'
 import { Chart, registerables } from 'chart.js'
-import { figures } from './data/figures.js'
+import { chapterPalettes, figures } from './data/figures.generated.js'
 
 Chart.register(...registerables)
 // Charts only render in the light modal panel, so use dark text and grid lines.
 Chart.defaults.color = 'rgba(23, 19, 31, 0.75)'
 Chart.defaults.borderColor = 'rgba(23, 19, 31, 0.12)'
 Chart.defaults.font.family = "system-ui, 'Segoe UI', Roboto, sans-serif"
-
-// Series colours, in order. Datasets in figures.js that don't set their own
-// colours take the next one from this list.
-const palette = ['#1e9a8b', '#6fcfc7', '#c8c8c8', '#0e6b62']
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
 
@@ -194,31 +190,37 @@ const renderChart = (figure, isStepping) => {
   // Opt-in per figure (chart.stacked: true); otherwise bars sit side by side.
   const isStacked = isBar && figure.chart.stacked === true
 
+  // Colours come from the report: a dataset's color (one per series, or one
+  // per bar) or chart.colors (one per doughnut slice). Anything without its
+  // own takes the chapter's palette in order.
+  const palette = chapterPalettes[figure.chapter]
+
    let finalDatasets;
 
    if (figure.chart.datasets) {
-    finalDatasets = figure.chart.datasets.map((dataset, i) => ({
-      backgroundColor: palette[i % palette.length],
-      borderColor: palette[i % palette.length],
+    finalDatasets = figure.chart.datasets.map(({ color = palette[i % palette.length], ...dataset }, i) => ({
+      backgroundColor: color,
+      borderColor: color,
       ...dataset,
     }));
   } else {
     // Fallback: Convert the old single 'values' array format into a Chart.js dataset format
+    const colors = figure.chart.colors ?? palette
     finalDatasets = [
       {
         label: figure.id,
         data: figure.chart.values,
         backgroundColor: isDoughnut
-          ? palette
+          ? colors
           : isLine
-            ? 'rgba(30, 154, 139, 0.12)'
-            : palette[0],
-        borderColor: isDoughnut ? '#ffffff' : palette[0],
+            ? `${colors[0]}1f` // ~12% alpha under the line
+            : colors[0],
+        borderColor: isDoughnut ? '#ffffff' : colors[0],
         borderWidth: isLine ? 2 : isDoughnut ? 2 : 0,
         tension: 0.35,
         fill: isLine,
         pointRadius: isLine ? 3 : undefined,
-        pointBackgroundColor: isLine ? palette[0] : undefined,
+        pointBackgroundColor: isLine ? colors[0] : undefined,
       },
     ];
   }
@@ -260,15 +262,19 @@ const renderChart = (figure, isStepping) => {
       maintainAspectRatio: false,
       ...chartAnimation(figure.chart.type, isStepping),
       indexAxis: isHorizontal ? 'y' : 'x',
-      ...(unit && {
-        plugins: {
+      plugins: {
+        // A single series is named by the figure caption, and its bars may
+        // each have their own colour, so it gets no legend. Doughnuts keep
+        // theirs, since it names the slices.
+        legend: { display: isDoughnut || finalDatasets.length > 1 },
+        ...(unit && {
           tooltip: {
             callbacks: {
               label: (ctx) => `${isDoughnut ? ctx.label : ctx.dataset.label}: ${ctx.formattedValue}${unit}`,
             },
           },
-        },
-      }),
+        }),
+      },
       scales: isDoughnut ? {} : {
         x: isHorizontal ? valueScale : categoryScale,
         y: isHorizontal ? categoryScale : valueScale,
