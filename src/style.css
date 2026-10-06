@@ -89,6 +89,41 @@ body.bg-loaded::before {
   opacity: 1;
 }
 
+/* Still fallback for the video, added by main.js when the video can't
+   play. Desktop shows the video's first frame, so a late video takes over
+   seamlessly; phones show bg-cover. Each size only downloads its own
+   image. It sits below both video copies, so a video that loads late
+   fades in over it, and gets the same dark overlay. */
+.bg-fallback {
+  position: fixed;
+  inset: 0;
+  z-index: -4;
+  background: url('../images/bg-video-still.jpg') center / cover no-repeat;
+  animation: bg-fallback-in 0.6s ease both;
+}
+
+@media (max-width: 768px) {
+  .bg-fallback {
+    background-image: url('../images/bg-cover-mobile.jpg');
+  }
+}
+
+body.bg-fallback-shown::before {
+  opacity: 1;
+}
+
+@keyframes bg-fallback-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-fallback {
+    animation: none;
+  }
+}
+
 /* Still background image used instead of the video on pages with
    <body data-bg="image"> (chapter.html, set by chapter.js). Unlike the
    video it covers the whole page and scrolls with it. Pinned to the
@@ -303,6 +338,12 @@ a {
   .nav {
     --menu-duration: 0.6s;
     --menu-ease: cubic-bezier(0.76, 0, 0.24, 1);
+    /* The closed drawer waits just off the right edge. Without this it
+       counts as page width: mobile browsers widen the page to fit it, so
+       the page pans sideways and the fixed background video resizes as
+       the drawer moves. clip (unlike hidden) leaves the drawer free to
+       run below the bar and doesn't affect the sticky nav. */
+    overflow-x: clip;
   }
 
   /* Backdrop: dims the page (and the logo) beside the drawer. Tapping it
@@ -1025,7 +1066,7 @@ a {
   opacity: 0.75;
 }
 
-/* "Read more" links to each chapter's page. */
+/* "Read more" links to the PDF report. */
 .accordion__answer a {
   font-weight: 600;
 }
@@ -1334,15 +1375,36 @@ a {
   margin: 24px 0 0 var(--gutter);
 }
 
-/* Darkened from the design's #418b4e so white text reaches 4.5:1. */
-.chapter-detail[data-chapter='2'] {
-  --chapter-accent: #3d834a;
+.chapter-detail[data-chapter='1'] {
+  --chapter-accent: #209491;
 }
 
-/* White is unreadable on this orange (2:1), so its text is dark. */
+.chapter-detail[data-chapter='2'] {
+  --chapter-accent: #418b4e;
+}
+
 .chapter-detail[data-chapter='3'] {
-  --chapter-accent: #ff9c73;
-  --chapter-accent-text: #17131f;
+  --chapter-accent: #ba491d;
+}
+
+.chapter-detail[data-chapter='4'] {
+  --chapter-accent: #ff6692;
+}
+
+.chapter-detail[data-chapter='5'] {
+  --chapter-accent: #b52f54;
+}
+
+.chapter-detail[data-chapter='6'] {
+  --chapter-accent: #3e7fc3;
+}
+
+.chapter-detail[data-chapter='7'] {
+  --chapter-accent: #0e3c9b;
+}
+
+.chapter-detail[data-chapter='8'] {
+  --chapter-accent: #606467;
 }
 
 .chapter-detail__bar {
