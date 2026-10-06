@@ -1803,6 +1803,14 @@ a {
   height: 100% !important;
 }
 
+/* Phones: a taller box, so charts with many bars and their value labels
+   have room. */
+@media (max-width: 600px) {
+  .figure-modal__media {
+    aspect-ratio: 4 / 5;
+  }
+}
+
 /* Table figures (see renderTable in statistics.js). The box drops its 16:9
    shape and scrolls when the table is taller than the room left, with the
    header and total rows pinned. */
@@ -1810,6 +1818,81 @@ a {
   aspect-ratio: auto;
   overflow-y: auto;
   padding: 0 16px;
+}
+
+/* Figures with several charts and tables (see renderPanels in
+   statistics.js). Like tables, the box takes its content's height and
+   scrolls when that's taller than the room left. */
+.figure-modal__media--panels {
+  aspect-ratio: auto;
+  overflow-y: auto;
+}
+
+/* At most --cols columns, each at least --min wide, so narrow screens get
+   fewer. */
+.figure-panels {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(max(var(--min), calc((100% - (var(--cols) - 1) * 24px) / var(--cols))), 1fr)
+  );
+  gap: 20px 24px;
+  color: var(--panel-text);
+}
+
+.figure-panel {
+  min-width: 0;
+}
+
+.figure-panel--wide,
+.figure-panels__legend {
+  grid-column: 1 / -1;
+}
+
+.figure-panel__title {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.figure-panel__chart {
+  position: relative;
+  aspect-ratio: var(--ratio);
+}
+
+/* Tables inside panels scroll with the rest, so their header and total
+   rows don't pin. */
+.figure-panel .figure-table thead th,
+.figure-panel .figure-table tfoot th,
+.figure-panel .figure-table tfoot td {
+  position: static;
+}
+
+.figure-panel .figure-table thead th {
+  padding-top: 4px;
+}
+
+.figure-panels__legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  color: rgba(23, 19, 31, 0.75);
+}
+
+.figure-panels__legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.figure-panels__legend span {
+  width: 28px;
+  height: 10px;
 }
 
 .figure-table {
@@ -1836,6 +1919,17 @@ a {
 .figure-table th:last-child,
 .figure-table td:last-child {
   padding-right: 0;
+}
+
+/* Text columns (column align: 'left' in the figure data). */
+.figure-table .figure-table__cell--left {
+  text-align: left;
+}
+
+/* A merged cell (column merge: true) spans the rows of its group. */
+.figure-table td[rowspan],
+.figure-table th[rowspan] {
+  vertical-align: top;
 }
 
 /* Borders don't stick with the cells in a collapsed table, so the

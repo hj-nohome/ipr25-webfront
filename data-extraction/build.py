@@ -34,18 +34,63 @@ WRAP = Alignment(wrap_text=True, vertical="top")
 HEX = re.compile(r"#[0-9a-f]{6}")
 
 
-def figure_kind(fig):
-    if "skipped" in fig:
-        return "skipped"
-    if "table" in fig:
+def bodies(fig):
+    """(title, body) for each chart or table in the figure: its panels, or the figure itself."""
+    if "panels" in fig:
+        return [(panel.get("title"), panel) for panel in fig["panels"]]
+    return [(None, fig)]
+
+
+def body_kind(body):
+    if "table" in body:
         return "table"
-    chart = fig["chart"]
+    chart = body["chart"]
     kind = chart["type"]
     if chart.get("horizontal"):
         kind = "horizontal " + kind
     if chart.get("stacked"):
         kind = "stacked " + kind
     return kind
+
+
+def figure_kind(fig):
+    if "skipped" in fig:
+        return "skipped"
+    kinds = [body_kind(body) for _, body in bodies(fig)]
+    if len(kinds) == 1:
+        return kinds[0]
+    return "panels: " + " + ".join(kinds)
+
+
+def chart_problems(where, chart):
+    problems = []
+    n = len(chart["labels"])
+    if "values" in chart and len(chart["values"]) != n:
+        problems.append(f"{where}: {len(chart['values'])} values for {n} labels")
+    for ds in chart.get("datasets", []):
+        if len(ds["data"]) != n:
+            problems.append(f"{where}: dataset '{ds['label']}' has {len(ds['data'])} points for {n} labels")
+        # color is one colour for the series, or one per data point.
+        color = ds.get("color")
+        if isinstance(color, list) and len(color) != n:
+            problems.append(f"{where}: dataset '{ds['label']}' has {len(color)} colours for {n} labels")
+        for c in color if isinstance(color, list) else [color] if color else []:
+            if not HEX.fullmatch(c):
+                problems.append(f"{where}: dataset '{ds['label']}' has bad colour {c!r}")
+    if "colors" in chart:
+        if len(chart["colors"]) != n:
+            problems.append(f"{where}: {len(chart['colors'])} colours for {n} labels")
+        problems += [f"{where}: bad colour {c!r}" for c in chart["colors"] if not HEX.fullmatch(c)]
+    return problems
+
+
+def table_problems(where, table):
+    n = len(table["columns"])
+    return [
+        f"{where}: row {row[0]!r} has {len(row)} cells for {n} columns"
+        for row in table["rows"] + ([table["total"]] if "total" in table else [])
+        if len(row) != n
+    ]
 
 
 def validate(figures):
@@ -57,65 +102,62 @@ def validate(figures):
         if fid in seen:
             problems.append(f"{fid}: duplicate id")
         seen.add(fid)
-        if "chart" in fig:
-            chart = fig["chart"]
-            n = len(chart["labels"])
-            if "values" in chart and len(chart["values"]) != n:
-                problems.append(f"{fid}: {len(chart['values'])} values for {n} labels")
-            for ds in chart.get("datasets", []):
-                if len(ds["data"]) != n:
-                    problems.append(f"{fid}: dataset '{ds['label']}' has {len(ds['data'])} points for {n} labels")
-                # color is one colour for the series, or one per data point.
-                color = ds.get("color")
-                if isinstance(color, list) and len(color) != n:
-                    problems.append(f"{fid}: dataset '{ds['label']}' has {len(color)} colours for {n} labels")
-                for c in color if isinstance(color, list) else [color] if color else []:
-                    if not HEX.fullmatch(c):
-                        problems.append(f"{fid}: dataset '{ds['label']}' has bad colour {c!r}")
-            if "colors" in chart:
-                if len(chart["colors"]) != n:
-                    problems.append(f"{fid}: {len(chart['colors'])} colours for {n} labels")
-                problems += [f"{fid}: bad colour {c!r}" for c in chart["colors"] if not HEX.fullmatch(c)]
-        if "table" in fig:
-            table = fig["table"]
-            n = len(table["columns"])
-            for row in table["rows"] + ([table["total"]] if "total" in table else []):
-                if len(row) != n:
-                    problems.append(f"{fid}: row {row[0]!r} has {len(row)} cells for {n} columns")
+        if "skipped" not in fig and sum(k in fig for k in ("chart", "table", "panels")) != 1:
+            problems.append(f"{fid}: needs exactly one of chart, table or panels")
+        for title, body in bodies(fig):
+            where = f"{fid} [{title}]" if title else fid
+            if "chart" in body:
+                problems += chart_problems(where, body["chart"])
+            elif "table" in body:
+                problems += table_problems(where, body["table"])
+            elif "skipped" not in fig:
+                problems.append(f"{where}: no chart or table")
     if problems:
         raise SystemExit("figures-data.json has problems:\n  " + "\n  ".join(problems))
 
 
-def figure_rows(fig):
-    """The figure's data as a header row plus body rows (and an optional total row)."""
-    if "table" in fig:
-        table = fig["table"]
+def body_rows(body):
+    """A chart's or table's data as a header row plus body rows (and an optional total row)."""
+    if "table" in body:
+        table = body["table"]
         return [c["label"] for c in table["columns"]], table["rows"], table.get("total")
-    chart = fig["chart"]
+    chart = body["chart"]
     if "values" in chart:
         return ["Category", "Value"], [[l, v] for l, v in zip(chart["labels"], chart["values"])], None
     header = ["Category"] + [ds["label"] for ds in chart["datasets"]]
-    body = [[label] + [ds["data"][i] for ds in chart["datasets"]] for i, label in enumerate(chart["labels"])]
-    return header, body, None
+    rows = [[label] + [ds["data"][i] for ds in chart["datasets"]] for i, label in enumerate(chart["labels"])]
+    return header, rows, None
 
 
-def long_rows(fig):
+def body_long_rows(body, default_series):
     """One row per value: (series, category, value). Tables use column label as series."""
-    if "table" in fig:
-        table = fig["table"]
+    if "table" in body:
+        table = body["table"]
         rows = table["rows"] + ([table["total"]] if "total" in table else [])
+        # A leading "No." column is just numbering; the next column names the row.
+        key = 1 if table["columns"][0]["label"] == "No." and len(table["columns"]) > 2 else 0
         for row in rows:
-            for col, value in zip(table["columns"][1:], row[1:]):
-                yield col["label"], row[0], value
+            category = row[key] or row[0]
+            for col, value in zip(table["columns"][key + 1:], row[key + 1:]):
+                yield col["label"], category, value
         return
-    chart = fig["chart"]
+    chart = body["chart"]
     if "values" in chart:
         for label, value in zip(chart["labels"], chart["values"]):
-            yield fig["caption"], label, value
+            yield default_series, label, value
         return
     for ds in chart["datasets"]:
         for label, value in zip(chart["labels"], ds["data"]):
             yield ds["label"], label, value
+
+
+def long_rows(fig):
+    """One row per value across the figure; a panel's title prefixes its series."""
+    for title, body in bodies(fig):
+        for series, category, value in body_long_rows(body, title or fig["caption"]):
+            if title and series != title:
+                series = f"{title}: {series}"
+            yield series, category, value
 
 
 def sheet_name(fid):
@@ -194,19 +236,27 @@ def build_xlsx(master):
             if key == "Flag":
                 cell.font = FLAG_FONT
 
-        header, body, total = figure_rows(fig)
-        start = len(meta) + 3
-        write_header(ws, start, header)
-        for r, row in enumerate(body, start=start + 1):
-            for c, value in enumerate(row, start=1):
-                ws.cell(row=r, column=c, value=value)
-        if total:
-            r = start + 1 + len(body)
-            for c, value in enumerate(total, start=1):
-                ws.cell(row=r, column=c, value=value).font = BOLD
+        # One block per chart or table; panels each get their title above.
+        r = len(meta) + 3
+        first_header = None
+        for title, body in bodies(fig):
+            if title:
+                ws.cell(row=r, column=1, value=title).font = BOLD
+                r += 1
+            header, rows, total = body_rows(body)
+            write_header(ws, r, header)
+            first_header = first_header or r
+            for row in rows + ([total] if total else []):
+                r += 1
+                for c, value in enumerate(row, start=1):
+                    cell = ws.cell(row=r, column=c, value=value)
+                    if row is total:
+                        cell.font = BOLD
+            r += 2
         autosize(ws)
         ws.column_dimensions["B"].width = max(ws.column_dimensions["B"].width, 40)
-        ws.freeze_panes = ws.cell(row=start + 1, column=2)
+        if "panels" not in fig:
+            ws.freeze_panes = ws.cell(row=first_header + 1, column=2)
 
     long = wb.create_sheet("All data (long)")
     write_header(long, 1, ["Figure ID", "Caption", "Series", "Category", "Value", "Estimated"])
@@ -262,7 +312,10 @@ def js_value(value, indent=0):
     raise TypeError(type(value))
 
 
-SITE_KEYS = ("id", "chapter", "chapterName", "caption", "source", "note", "chart", "table")
+SITE_KEYS = (
+    "id", "chapter", "chapterName", "caption", "source", "note", "chart", "table",
+    "sharedLegend", "panelColumns", "panelMinWidth", "panelRatio", "panels",
+)
 
 
 def build_js(master):

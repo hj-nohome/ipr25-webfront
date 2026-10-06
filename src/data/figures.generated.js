@@ -275,47 +275,78 @@ export const figures = [
     chapterName: 'Economic Performance of the Industry',
     caption: 'C&M Industry Market Capitalisation by Sector, 2023–2025',
     source: 'Bloomberg',
-    note: 'RM billion. The report shows two panels: total Bursa Malaysia market capitalisation (C&M vs others, with C&M\'s share) and C&M market capitalisation by sector.',
-    table: {
-      columns: [
-        {
-          label: 'Year',
+    note: 'RM billion.',
+    panelRatio: '1',
+    panels: [
+      {
+        title: 'Bursa Malaysia market capitalisation',
+        chart: {
+          type: 'bar',
+          stacked: true,
+          stackTotals: true,
+          yTitle: 'RM billion',
+          yMax: 3000,
+          y1Min: -5,
+          y1Max: 7.5,
+          y1Unit: '%',
+          y1Display: false,
+          labels: ['2023', '2024', '2025'],
+          datasets: [
+            {
+              label: 'Others on Bursa Malaysia',
+              data: [1682.21, 1971.46, 1953.78],
+              color: '#9db49e',
+            },
+            {
+              label: 'C&M',
+              data: [114.19, 109.05, 110.63],
+              color: '#265437',
+            },
+            {
+              label: 'C&M as % of Bursa Malaysia',
+              data: [6.4, 5.2, 5.4],
+              type: 'line',
+              yAxisID: 'y1',
+              color: '#265437',
+              backgroundColor: '#41b75a4d',
+              fill: 'start',
+              tension: 0,
+              borderWidth: 2,
+              pointRadius: 6,
+              pointHoverRadius: 7,
+              pointBackgroundColor: '#ffffff',
+              pointBorderWidth: 3,
+            },
+          ],
         },
-        {
-          label: 'Telecommunications (RM bn)',
-          decimals: 2,
+      },
+      {
+        title: 'C&M market capitalisation by sector',
+        chart: {
+          type: 'bar',
+          stacked: true,
+          stackTotals: true,
+          labels: ['2023', '2024', '2025'],
+          datasets: [
+            {
+              label: 'Telecommunications',
+              data: [109.82, 105.91, 108.62],
+              color: '#84c463',
+            },
+            {
+              label: 'Broadcasting',
+              data: [2.9, 1.97, 1.14],
+              color: '#428c4e',
+            },
+            {
+              label: 'Postal & Courier',
+              data: [1.47, 1.17, 0.87],
+              color: '#44b757',
+            },
+          ],
         },
-        {
-          label: 'Broadcasting (RM bn)',
-          decimals: 2,
-        },
-        {
-          label: 'Postal & Courier (RM bn)',
-          decimals: 2,
-        },
-        {
-          label: 'C&M total (RM bn)',
-          decimals: 2,
-        },
-        {
-          label: 'Others on Bursa Malaysia (RM bn)',
-          decimals: 2,
-        },
-        {
-          label: 'Bursa Malaysia total (RM bn)',
-          decimals: 2,
-        },
-        {
-          label: 'C&M as % of Bursa Malaysia',
-          decimals: 1,
-        },
-      ],
-      rows: [
-        ['2023', 109.82, 2.9, 1.47, 114.19, 1682.21, 1796.4, 6.4],
-        ['2024', 105.91, 1.97, 1.17, 109.05, 1971.46, 2080.51, 5.2],
-        ['2025', 108.62, 1.14, 0.87, 110.63, 1953.78, 2064.41, 5.4],
-      ],
-    },
+      },
+    ],
   },
   {
     id: '2.2',
@@ -390,47 +421,6 @@ export const figures = [
     },
   },
   {
-    id: '2.4',
-    chapter: 2,
-    chapterName: 'Economic Performance of the Industry',
-    caption: 'Top 10 Companies by Market Capitalisation, 2024–2025',
-    source: 'Bloomberg',
-    note: 'The 10 largest stocks were selected from the 30 largest companies in the FTSE Bursa Malaysia KLCI by market capitalisation.',
-    table: {
-      columns: [
-        {
-          label: 'Rank',
-        },
-        {
-          label: '2025 company',
-        },
-        {
-          label: '2025 (RM bn)',
-          decimals: 2,
-        },
-        {
-          label: '2024 company',
-        },
-        {
-          label: '2024 (RM bn)',
-          decimals: 2,
-        },
-      ],
-      rows: [
-        ['1', 'Maybank', 126.61, 'Maybank', 123.57],
-        ['2', 'CIMB Bank', 89.03, 'Public Bank', 88.51],
-        ['3', 'Public Bank', 88.12, 'CIMB Bank', 87.98],
-        ['4', 'TNB', 79.98, 'TNB', 86.85],
-        ['5', 'IHH Healthcare', 77.32, 'IHH Healthcare', 64.34],
-        ['6', 'Press Metal Aluminium', 58.67, 'Hong Leong Bank', 44.57],
-        ['7', 'Hong Leong Bank', 47.99, 'CelcomDigi', 42.47],
-        ['8', 'SD Guthrie', 39.63, 'PETRONAS Chemicals', 41.36],
-        ['9', 'Sunway', 37.99, 'Press Metal Aluminium', 40.37],
-        ['10', 'CelcomDigi', 37.42, 'YTL Power', 36.29],
-      ],
-    },
-  },
-  {
     id: '2.5',
     chapter: 2,
     chapterName: 'Economic Performance of the Industry',
@@ -466,44 +456,70 @@ export const figures = [
     chapterName: 'Economic Performance of the Industry',
     caption: 'Telecommunications Sector Revenue, 2024–2025',
     source: 'Industry',
-    note: 'Others comprise non-public listed mobile operators and MVNOs. Revenue includes retail and wholesale revenue. Total: RM43.56 billion (2025), RM42.55 billion (2024).',
-    table: {
-      columns: [
-        {
-          label: 'Operator',
+    note: 'Others comprise non-public listed mobile operators and MVNOs. Revenue includes retail and wholesale revenue.',
+    sharedLegend: true,
+    panelRatio: '1',
+    panels: [
+      {
+        title: '2025 (RM43.56 billion)',
+        chart: {
+          type: 'doughnut',
+          unit: '%',
+          labels: ['TM', 'TIME', 'Redtone', 'CelcomDigi', 'Maxis', 'Others'],
+          values: [27.2, 4.1, 0.6, 29.8, 24.4, 13.9],
         },
-        {
-          label: 'Segment',
+      },
+      {
+        title: '2024 (RM42.55 billion)',
+        chart: {
+          type: 'doughnut',
+          unit: '%',
+          labels: ['TM', 'TIME', 'Redtone', 'CelcomDigi', 'Maxis', 'Others'],
+          values: [27.5, 4.0, 0.9, 29.8, 24.8, 13.0],
         },
-        {
-          label: '2025 (RM bn)',
-          decimals: 2,
+      },
+      {
+        title: 'Revenue (RM billion) and share',
+        wide: true,
+        table: {
+          columns: [
+            {
+              label: 'Operator',
+            },
+            {
+              label: 'Segment',
+            },
+            {
+              label: '2025 (RM bn)',
+              decimals: 2,
+            },
+            {
+              label: '2025 share (%)',
+              decimals: 1,
+            },
+            {
+              label: '2024 (RM bn)',
+              decimals: 2,
+            },
+            {
+              label: '2024 share (%)',
+              decimals: 1,
+            },
+          ],
+          rows: [
+            ['TM', 'Fixed', 11.87, 27.2, 11.71, 27.5],
+            ['TIME', 'Fixed', 1.79, 4.1, 1.69, 4.0],
+            ['Redtone', 'Fixed', 0.24, 0.6, 0.39, 0.9],
+            ['CelcomDigi', 'Mobile', 12.96, 29.8, 12.68, 29.8],
+            ['Maxis', 'Mobile', 10.64, 24.4, 10.54, 24.8],
+            ['Others', 'Mobile', 6.06, 13.9, 5.54, 13.0],
+            ['Fixed subtotal', 'Fixed', 13.9, '', 13.79, ''],
+            ['Mobile subtotal', 'Mobile', 29.66, '', 28.76, ''],
+          ],
+          total: ['Total', '', 43.56, 100, 42.55, 100],
         },
-        {
-          label: '2025 share (%)',
-          decimals: 1,
-        },
-        {
-          label: '2024 (RM bn)',
-          decimals: 2,
-        },
-        {
-          label: '2024 share (%)',
-          decimals: 1,
-        },
-      ],
-      rows: [
-        ['TM', 'Fixed', 11.87, 27.2, 11.71, 27.5],
-        ['TIME', 'Fixed', 1.79, 4.1, 1.69, 4.0],
-        ['Redtone', 'Fixed', 0.24, 0.6, 0.39, 0.9],
-        ['CelcomDigi', 'Mobile', 12.96, 29.8, 12.68, 29.8],
-        ['Maxis', 'Mobile', 10.64, 24.4, 10.54, 24.8],
-        ['Others', 'Mobile', 6.06, 13.9, 5.54, 13.0],
-        ['Fixed subtotal', 'Fixed', 13.9, '', 13.79, ''],
-        ['Mobile subtotal', 'Mobile', 29.66, '', 28.76, ''],
-      ],
-      total: ['Total', '', 43.56, 100, 42.55, 100],
-    },
+      },
+    ],
   },
   {
     id: '2.7',
@@ -541,46 +557,64 @@ export const figures = [
     caption: 'EBITDA and EBIT Margins, 2023–2025',
     source: 'Industry',
     note: 'Margins from major publicly listed companies only.',
-    chart: {
-      type: 'line',
-      unit: '%',
-      labels: ['2023', '2024', '2025'],
-      datasets: [
-        {
-          label: 'EBITDA – Total',
-          data: [40.0, 36.3, 39.5],
-          color: '#41b75a',
+    sharedLegend: true,
+    panelRatio: '4/3',
+    panels: [
+      {
+        title: 'EBITDA margin',
+        chart: {
+          type: 'line',
+          unit: '%',
+          yMin: 30,
+          yMax: 46,
+          labels: ['2023', '2024', '2025'],
+          datasets: [
+            {
+              label: 'Total',
+              data: [40.0, 36.3, 39.5],
+              color: '#41b75a',
+            },
+            {
+              label: 'Fixed Service Providers',
+              data: [36.3, 32.2, 37.5],
+              color: '#231f20',
+            },
+            {
+              label: 'Mobile Service Providers',
+              data: [43.7, 42.4, 41.5],
+              color: '#939598',
+            },
+          ],
         },
-        {
-          label: 'EBITDA – Fixed Service Providers',
-          data: [36.3, 32.2, 37.5],
-          color: '#231f20',
+      },
+      {
+        title: 'EBIT margin',
+        chart: {
+          type: 'line',
+          unit: '%',
+          yMin: 16,
+          yMax: 26,
+          labels: ['2023', '2024', '2025'],
+          datasets: [
+            {
+              label: 'Total',
+              data: [21.2, 22.4, 21.2],
+              color: '#41b75a',
+            },
+            {
+              label: 'Fixed Service Providers',
+              data: [22.4, 23.9, 20.6],
+              color: '#231f20',
+            },
+            {
+              label: 'Mobile Service Providers',
+              data: [19.9, 20.2, 22.0],
+              color: '#939598',
+            },
+          ],
         },
-        {
-          label: 'EBITDA – Mobile Service Providers',
-          data: [43.7, 42.4, 41.5],
-          color: '#939598',
-        },
-        {
-          label: 'EBIT – Total',
-          data: [21.2, 22.4, 21.2],
-          color: '#41b75a',
-          borderDash: [6, 4],
-        },
-        {
-          label: 'EBIT – Fixed Service Providers',
-          data: [22.4, 23.9, 20.6],
-          color: '#231f20',
-          borderDash: [6, 4],
-        },
-        {
-          label: 'EBIT – Mobile Service Providers',
-          data: [19.9, 20.2, 22.0],
-          color: '#939598',
-          borderDash: [6, 4],
-        },
-      ],
-    },
+      },
+    ],
   },
   {
     id: '2.9',
@@ -673,36 +707,62 @@ export const figures = [
     chapterName: 'Economic Performance of the Industry',
     caption: 'Broadcasting Sector Revenue, 2024–2025',
     source: 'Industry',
-    note: 'Media Prima excludes print/publishing revenue. ASTRO revenue is adjusted to the calendar year. Star Media refers to radio broadcasting revenue only. Total: RM3.63 billion (2025), RM3.90 billion (2024).',
-    table: {
-      columns: [
-        {
-          label: 'Company',
+    note: 'Media Prima excludes print/publishing revenue. ASTRO revenue is adjusted to the calendar year. Star Media refers to radio broadcasting revenue only.',
+    sharedLegend: true,
+    panelRatio: '1',
+    panels: [
+      {
+        title: '2025 (RM3.63 billion)',
+        chart: {
+          type: 'doughnut',
+          unit: '%',
+          labels: ['ASTRO', 'Media Prima', 'Star Media'],
+          values: [77.1, 22.0, 0.8],
         },
-        {
-          label: '2025 (RM bn)',
-          decimals: 2,
+      },
+      {
+        title: '2024 (RM3.91 billion)',
+        chart: {
+          type: 'doughnut',
+          unit: '%',
+          labels: ['ASTRO', 'Media Prima', 'Star Media'],
+          values: [79.0, 20.3, 0.8],
         },
-        {
-          label: '2025 share (%)',
-          decimals: 1,
+      },
+      {
+        title: 'Revenue (RM billion) and share',
+        wide: true,
+        table: {
+          columns: [
+            {
+              label: 'Company',
+            },
+            {
+              label: '2025 (RM bn)',
+              decimals: 2,
+            },
+            {
+              label: '2025 share (%)',
+              decimals: 1,
+            },
+            {
+              label: '2024 (RM bn)',
+              decimals: 2,
+            },
+            {
+              label: '2024 share (%)',
+              decimals: 1,
+            },
+          ],
+          rows: [
+            ['ASTRO', 2.8, 77.1, 3.08, 79.0],
+            ['Media Prima', 0.8, 22.0, 0.8, 20.3],
+            ['Star Media', 0.03, 0.8, 0.03, 0.8],
+          ],
+          total: ['Total', 3.63, 100, 3.91, 100],
         },
-        {
-          label: '2024 (RM bn)',
-          decimals: 2,
-        },
-        {
-          label: '2024 share (%)',
-          decimals: 1,
-        },
-      ],
-      rows: [
-        ['ASTRO', 2.8, 77.1, 3.08, 79.0],
-        ['Media Prima', 0.8, 22.0, 0.8, 20.3],
-        ['Star Media', 0.03, 0.8, 0.03, 0.8],
-      ],
-      total: ['Total', 3.63, 100, 3.9, 100],
-    },
+      },
+    ],
   },
   {
     id: '2.13',
@@ -710,34 +770,60 @@ export const figures = [
     chapterName: 'Economic Performance of the Industry',
     caption: 'Postal and Courier Sector Revenue, 2024–2025',
     source: 'Industry',
-    table: {
-      columns: [
-        {
-          label: 'Company',
+    sharedLegend: true,
+    panelRatio: '1',
+    panels: [
+      {
+        title: '2025 (RM2.26 billion)',
+        chart: {
+          type: 'doughnut',
+          unit: '%',
+          labels: ['Pos Malaysia', 'GDEX'],
+          values: [81.4, 18.6],
         },
-        {
-          label: '2025 (RM bn)',
-          decimals: 2,
+      },
+      {
+        title: '2024 (RM2.27 billion)',
+        chart: {
+          type: 'doughnut',
+          unit: '%',
+          labels: ['Pos Malaysia', 'GDEX'],
+          values: [81.5, 18.5],
         },
-        {
-          label: '2025 share (%)',
-          decimals: 1,
+      },
+      {
+        title: 'Revenue (RM billion) and share',
+        wide: true,
+        table: {
+          columns: [
+            {
+              label: 'Company',
+            },
+            {
+              label: '2025 (RM bn)',
+              decimals: 2,
+            },
+            {
+              label: '2025 share (%)',
+              decimals: 1,
+            },
+            {
+              label: '2024 (RM bn)',
+              decimals: 2,
+            },
+            {
+              label: '2024 share (%)',
+              decimals: 1,
+            },
+          ],
+          rows: [
+            ['Pos Malaysia', 1.84, 81.4, 1.85, 81.5],
+            ['GDEX', 0.42, 18.6, 0.42, 18.5],
+          ],
+          total: ['Total', 2.26, 100, 2.27, 100],
         },
-        {
-          label: '2024 (RM bn)',
-          decimals: 2,
-        },
-        {
-          label: '2024 share (%)',
-          decimals: 1,
-        },
-      ],
-      rows: [
-        ['Pos Malaysia', 1.84, 81.4, 1.85, 81.5],
-        ['GDEX', 0.42, 18.6, 0.42, 18.5],
-      ],
-      total: ['Total', 2.26, 100, 2.27, 100],
-    },
+      },
+    ],
   },
   {
     id: '2.14',
@@ -889,6 +975,7 @@ export const figures = [
     source: 'MCMC',
     chart: {
       type: 'bar',
+      yMax: 100,
       labels: ['2023', '2024', '2025'],
       datasets: [
         {
@@ -915,6 +1002,7 @@ export const figures = [
     chart: {
       type: 'bar',
       unit: '%',
+      yMax: 100,
       labels: ['2023', '2024', '2025'],
       datasets: [
         {
@@ -950,106 +1038,6 @@ export const figures = [
     },
   },
   {
-    id: '3.8',
-    chapter: 3,
-    chapterName: 'Services and Connectivity',
-    caption: 'Overall JENDELA Achievements as at 31 December 2025',
-    source: 'MCMC',
-    note: 'Internet coverage achievement represents the combined coverage for Q4 2025 by each service provider, excluding 5G coverage. The speed target is a mean; the achievement is a median.',
-    table: {
-      columns: [
-        {
-          label: 'Indicator',
-        },
-        {
-          label: 'Baseline (August 2020)',
-        },
-        {
-          label: 'Target',
-        },
-        {
-          label: 'Achievement (2025)',
-        },
-      ],
-      rows: [
-        ['Premises passed with fibre connectivity', '4.96 mil premises', '9 mil premises', '9.81 mil premises'],
-        ['Mobile broadband speed', '25 Mbps', '100 Mbps (mean)', '143.70 Mbps (median)'],
-        ['Internet coverage in populated areas', '91.8%', '100%', '99.71%'],
-      ],
-    },
-  },
-  {
-    id: '3.9',
-    chapter: 3,
-    chapterName: 'Services and Connectivity',
-    caption: 'Overall JENDELA Achievements by Industry Players, 2025',
-    source: 'MCMC',
-    note: 'Completion as % of each player\'s planned target. Operators are identified by logo in the report.',
-    table: {
-      columns: [
-        {
-          label: 'Category',
-        },
-        {
-          label: 'Industry player',
-        },
-        {
-          label: 'Completed (% of planned)',
-          decimals: 1,
-        },
-      ],
-      rows: [
-        ['Premises Passed', 'TM', 109.2],
-        ['Premises Passed', 'TIME', 450.9],
-        ['Premises Passed', 'Maxis', 161.1],
-        ['Premises Passed', 'Celcom Timur', 129.7],
-        ['Premises Passed', 'allo', 114.7],
-        ['Premises Passed', 'YTL Communications', 1502.7],
-        ['Premises Passed', 'All players (774,790 completed / 357,450 target)', 216.7],
-        ['Sites Upgraded', 'CelcomDigi', 97.9],
-        ['Sites Upgraded', 'Maxis', 107.2],
-        ['Sites Upgraded', 'U Mobile', 86.2],
-        ['Sites Upgraded', 'Yes', 100.0],
-        ['Sites Upgraded', 'All players (2,816 completed / 2,843 target)', 99.1],
-        ['New 4G Sites', 'CelcomDigi', 132.7],
-        ['New 4G Sites', 'Maxis', 90.4],
-        ['New 4G Sites', 'U Mobile', 163.5],
-        ['New 4G Sites', 'Yes', 165.3],
-        ['New 4G Sites', 'REDtone', 37.1],
-        ['New 4G Sites', 'All players (954 completed / 853 target)', 105.9],
-      ],
-    },
-  },
-  {
-    id: '3.10',
-    chapter: 3,
-    chapterName: 'Services and Connectivity',
-    caption: 'Progress of the Point of Presence (PoP) Project, 2025',
-    source: 'MCMC',
-    note: '4,323 Points of Presence planned to improve internet access in schools; 3,143 completed as at 31 December 2025.',
-    table: {
-      columns: [
-        {
-          label: 'Measure',
-        },
-        {
-          label: 'Progress (%)',
-        },
-        {
-          label: 'Achieved',
-        },
-        {
-          label: 'Planned',
-        },
-      ],
-      rows: [
-        ['Rural villages (new coverage)', 57, '8,500', '15,090'],
-        ['Premises passed (new premises)', 38, '868,000', '2.3 million'],
-        ['Rural population (new coverage)', 30, '2.7 million', '9.0 million'],
-      ],
-    },
-  },
-  {
     id: '3.11',
     chapter: 3,
     chapterName: 'Services and Connectivity',
@@ -1059,6 +1047,7 @@ export const figures = [
     chart: {
       type: 'bar',
       stacked: true,
+      yMax: 80,
       labels: ['2023', '2024', '2025'],
       datasets: [
         {
@@ -1087,47 +1076,228 @@ export const figures = [
     chapterName: 'Services and Connectivity',
     caption: 'Prepaid and Postpaid Subscription Market Share by Country, 2023–2025',
     source: 'MCMC, Omdia',
-    table: {
-      columns: [
-        {
-          label: 'Country',
+    sharedLegend: true,
+    panelColumns: 4,
+    panelMinWidth: 120,
+    panelRatio: '1',
+    panels: [
+      {
+        title: 'Malaysia',
+        chart: {
+          type: 'bar',
+          stacked: true,
+          unit: '%',
+          yMax: 100,
+          labels: ['2023', '2024', '2025'],
+          datasets: [
+            {
+              label: 'Postpaid',
+              data: [29.6, 31.7, 33.9],
+              color: '#dd642b',
+              barPercentage: 0.9,
+              categoryPercentage: 0.9,
+            },
+            {
+              label: 'Prepaid',
+              data: [70.4, 68.3, 66.1],
+              color: '#f3ad74',
+              barPercentage: 0.9,
+              categoryPercentage: 0.9,
+            },
+          ],
+          labelSize: 9,
         },
-        {
-          label: 'Postpaid 2023 (%)',
-          decimals: 1,
+      },
+      {
+        title: 'Indonesia',
+        chart: {
+          type: 'bar',
+          stacked: true,
+          unit: '%',
+          yMax: 100,
+          labels: ['2023', '2024', '2025'],
+          datasets: [
+            {
+              label: 'Postpaid',
+              data: [3.1, 3.4, 3.4],
+              color: '#dd642b',
+              barPercentage: 0.9,
+              categoryPercentage: 0.9,
+            },
+            {
+              label: 'Prepaid',
+              data: [96.9, 96.6, 96.6],
+              color: '#f3ad74',
+              barPercentage: 0.9,
+              categoryPercentage: 0.9,
+            },
+          ],
+          labelSize: 9,
         },
-        {
-          label: 'Postpaid 2024 (%)',
-          decimals: 1,
+      },
+      {
+        title: 'Philippines',
+        chart: {
+          type: 'bar',
+          stacked: true,
+          unit: '%',
+          yMax: 100,
+          labels: ['2023', '2024', '2025'],
+          datasets: [
+            {
+              label: 'Postpaid',
+              data: [3.8, 4.0, 3.5],
+              color: '#dd642b',
+              barPercentage: 0.9,
+              categoryPercentage: 0.9,
+            },
+            {
+              label: 'Prepaid',
+              data: [96.2, 96.0, 96.5],
+              color: '#f3ad74',
+              barPercentage: 0.9,
+              categoryPercentage: 0.9,
+            },
+          ],
+          labelSize: 9,
         },
-        {
-          label: 'Postpaid 2025 (%)',
-          decimals: 1,
+      },
+      {
+        title: 'Thailand',
+        chart: {
+          type: 'bar',
+          stacked: true,
+          unit: '%',
+          yMax: 100,
+          labels: ['2023', '2024', '2025'],
+          datasets: [
+            {
+              label: 'Postpaid',
+              data: [28.8, 28.6, 29.5],
+              color: '#dd642b',
+              barPercentage: 0.9,
+              categoryPercentage: 0.9,
+            },
+            {
+              label: 'Prepaid',
+              data: [71.2, 71.4, 70.5],
+              color: '#f3ad74',
+              barPercentage: 0.9,
+              categoryPercentage: 0.9,
+            },
+          ],
+          labelSize: 9,
         },
-        {
-          label: 'Prepaid 2023 (%)',
-          decimals: 1,
+      },
+      {
+        title: 'Vietnam',
+        chart: {
+          type: 'bar',
+          stacked: true,
+          unit: '%',
+          yMax: 100,
+          labels: ['2023', '2024', '2025'],
+          datasets: [
+            {
+              label: 'Postpaid',
+              data: [9.1, 9.4, 10.8],
+              color: '#dd642b',
+              barPercentage: 0.9,
+              categoryPercentage: 0.9,
+            },
+            {
+              label: 'Prepaid',
+              data: [90.9, 90.6, 89.2],
+              color: '#f3ad74',
+              barPercentage: 0.9,
+              categoryPercentage: 0.9,
+            },
+          ],
+          labelSize: 9,
         },
-        {
-          label: 'Prepaid 2024 (%)',
-          decimals: 1,
+      },
+      {
+        title: 'Singapore',
+        chart: {
+          type: 'bar',
+          stacked: true,
+          unit: '%',
+          yMax: 100,
+          labels: ['2023', '2024', '2025'],
+          datasets: [
+            {
+              label: 'Postpaid',
+              data: [67.1, 67.5, 68.5],
+              color: '#dd642b',
+              barPercentage: 0.9,
+              categoryPercentage: 0.9,
+            },
+            {
+              label: 'Prepaid',
+              data: [32.9, 32.5, 31.5],
+              color: '#f3ad74',
+              barPercentage: 0.9,
+              categoryPercentage: 0.9,
+            },
+          ],
+          labelSize: 9,
         },
-        {
-          label: 'Prepaid 2025 (%)',
-          decimals: 1,
+      },
+      {
+        title: 'South Korea',
+        chart: {
+          type: 'bar',
+          stacked: true,
+          unit: '%',
+          yMax: 100,
+          labels: ['2023', '2024', '2025'],
+          datasets: [
+            {
+              label: 'Postpaid',
+              data: [97.7, 97.8, 98.3],
+              color: '#dd642b',
+              barPercentage: 0.9,
+              categoryPercentage: 0.9,
+            },
+            {
+              label: 'Prepaid',
+              data: [2.3, 2.2, 1.7],
+              color: '#f3ad74',
+              barPercentage: 0.9,
+              categoryPercentage: 0.9,
+            },
+          ],
+          labelSize: 9,
         },
-      ],
-      rows: [
-        ['Malaysia', 29.6, 31.7, 33.9, 70.4, 68.3, 66.1],
-        ['Indonesia', 3.1, 3.4, 3.4, 96.9, 96.6, 96.6],
-        ['Philippines', 3.8, 4.0, 3.5, 96.2, 96.0, 96.5],
-        ['Thailand', 28.8, 28.6, 29.5, 71.2, 71.4, 70.5],
-        ['Vietnam', 9.1, 9.4, 10.8, 90.9, 90.6, 89.2],
-        ['Singapore', 67.1, 67.5, 68.5, 32.9, 32.5, 31.5],
-        ['South Korea', 97.7, 97.8, 98.3, 2.3, 2.2, 1.7],
-        ['Japan', 97.7, 97.6, 97.4, 2.3, 2.4, 2.6],
-      ],
-    },
+      },
+      {
+        title: 'Japan',
+        chart: {
+          type: 'bar',
+          stacked: true,
+          unit: '%',
+          yMax: 100,
+          labels: ['2023', '2024', '2025'],
+          datasets: [
+            {
+              label: 'Postpaid',
+              data: [97.7, 97.6, 97.4],
+              color: '#dd642b',
+              barPercentage: 0.9,
+              categoryPercentage: 0.9,
+            },
+            {
+              label: 'Prepaid',
+              data: [2.3, 2.4, 2.6],
+              color: '#f3ad74',
+              barPercentage: 0.9,
+              categoryPercentage: 0.9,
+            },
+          ],
+          labelSize: 9,
+        },
+      },
+    ],
   },
   {
     id: '3.13',
@@ -1308,6 +1478,7 @@ export const figures = [
     source: 'MCMC',
     chart: {
       type: 'bar',
+      yMax: 40,
       labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
       datasets: [
         {
@@ -1326,29 +1497,6 @@ export const figures = [
     },
   },
   {
-    id: '4.2',
-    chapter: 4,
-    chapterName: 'Content Services',
-    caption: 'Audience Share of Media Prima Television Channels, 2025',
-    source: 'Media Prima',
-    table: {
-      columns: [
-        {
-          label: 'Measure',
-        },
-        {
-          label: 'Audience share (%)',
-          decimals: 1,
-        },
-      ],
-      rows: [
-        ['Media Prima total (TV3, 8TV, TV9, ntv7) – total audience 4+', 57],
-        ['TV3 – Malay audience 4+', 47.3],
-        ['8TV – Chinese audience 4+', 70.8],
-      ],
-    },
-  },
-  {
     id: '4.3',
     chapter: 4,
     chapterName: 'Content Services',
@@ -1356,6 +1504,7 @@ export const figures = [
     source: 'MCMC',
     chart: {
       type: 'bar',
+      yMax: 10,
       labels: ['2020', '2021', '2022', '2023', '2024', '2025'],
       datasets: [
         {
@@ -1374,109 +1523,35 @@ export const figures = [
     },
   },
   {
-    id: '4.4',
-    chapter: 4,
-    chapterName: 'Content Services',
-    caption: 'MYTV Television and Radio Channels, 2025',
-    source: 'MYTV',
-    note: '16 TV channels and 14 radio channels. Channel names are read from the logos in the report.',
-    table: {
-      columns: [
-        {
-          label: 'Type',
-        },
-        {
-          label: 'Channel',
-        },
-      ],
-      rows: [
-        ['TV', 'TV1'],
-        ['TV', 'TV2'],
-        ['TV', 'TV3'],
-        ['TV', 'Enjoy TV5'],
-        ['TV', 'ntv7'],
-        ['TV', '8TV'],
-        ['TV', 'TV9'],
-        ['TV', 'TV Okey'],
-        ['TV', 'Sukan RTM'],
-        ['TV', 'TV Awesome'],
-        ['TV', 'TV6'],
-        ['TV', 'TV Alhijrah'],
-        ['TV', 'Suke TV'],
-        ['TV', 'Bernama TV'],
-        ['TV', 'TVS'],
-        ['TV', 'Berita RTM'],
-        ['Radio', 'Nasional FM'],
-        ['Radio', 'TraXX FM'],
-        ['Radio', 'Minnal FM'],
-        ['Radio', 'Ai FM'],
-        ['Radio', 'Radio Klasik'],
-        ['Radio', 'Asyik FM'],
-        ['Radio', 'Sabah FM'],
-        ['Radio', 'Sabah V FM'],
-        ['Radio', 'Sarawak FM'],
-        ['Radio', 'Wai FM'],
-        ['Radio', 'Bernama (logo reads \'Bernama TV\')'],
-        ['Radio', 'Hot FM'],
-        ['Radio', 'Molek FM'],
-        ['Radio', 'Kool FM'],
-      ],
-    },
-  },
-  {
     id: '4.6',
     chapter: 4,
     chapterName: 'Content Services',
     caption: 'Media Consumption Patterns and Usage Frequency of Television and Radio Services Among Persons with Disabilities (PwD)',
     source: 'Universiti Sains Islam Malaysia (USIM)',
     note: 'Other media includes social media platforms and internet-based streaming.',
-    table: {
-      columns: [
-        {
-          label: 'Question',
+    panelRatio: '1',
+    panels: [
+      {
+        title: 'Frequency of using TV & radio services',
+        chart: {
+          type: 'doughnut',
+          unit: '%',
+          labels: ['Daily', 'Weekly', 'Monthly', 'Rarely'],
+          values: [30, 28, 22, 20],
+          colors: ['#d72d78', '#f38ebb', '#750f38', '#f5bcd4'],
         },
-        {
-          label: 'Response',
+      },
+      {
+        title: 'Primary source of media usage',
+        chart: {
+          type: 'doughnut',
+          unit: '%',
+          labels: ['Radio', 'Both radio & television', 'Television', 'Other media'],
+          values: [38, 28, 23, 11],
+          colors: ['#d72d78', '#f38ebb', '#750f38', '#f5bcd4'],
         },
-        {
-          label: 'Respondents (%)',
-        },
-      ],
-      rows: [
-        ['Primary source of media usage', 'Radio', 38],
-        ['Primary source of media usage', 'Both radio & television', 28],
-        ['Primary source of media usage', 'Television', 23],
-        ['Primary source of media usage', 'Other media', 11],
-        ['Frequency of using TV & radio services', 'Daily', 30],
-        ['Frequency of using TV & radio services', 'Weekly', 28],
-        ['Frequency of using TV & radio services', 'Monthly', 22],
-        ['Frequency of using TV & radio services', 'Rarely', 20],
-      ],
-    },
-  },
-  {
-    id: '4.7',
-    chapter: 4,
-    chapterName: 'Content Services',
-    caption: 'Key Challenges and Barriers in Accessing Television and Radio Services for Persons with Disabilities',
-    source: 'Universiti Sains Islam Malaysia (USIM)',
-    table: {
-      columns: [
-        {
-          label: 'Challenge',
-        },
-        {
-          label: 'Description',
-        },
-      ],
-      rows: [
-        ['Disparities in Accessibility Features', 'Accessibility features like subtitles, audio descriptions, and sign language were inconsistently applied, limiting their usefulness for PWDs.'],
-        ['Low Relevance and Engagement of Provided Content', 'News and entertainment were moderately accessible but not tailored to PWDs, while advertisements were the least accessible and engaging.'],
-        ['Digital Experience Not Yet Seamless', 'The transition to digital broadcasting has yet to yield substantial improvements in accessibility for PWDs.'],
-        ['Gaps in Addressing Varied Accessibility Requirements', 'Media accessibility often relies on a one-size-fits-all approach, overlooking the diverse and complex needs of individuals with different types of disabilities, who require more tailored solutions.'],
-        ['Complexity in Navigating Setting Options', 'Although basic accessibility features such as volume, brightness, and subtitle settings were available, they were not intuitive or user-friendly for persons with disabilities.'],
-      ],
-    },
+      },
+    ],
   },
   {
     id: '4.8',
@@ -1487,6 +1562,10 @@ export const figures = [
     note: '2025 data up to October. Totals 2021–2025: 52 raids; RM656,500 in fines.',
     chart: {
       type: 'bar',
+      yMax: 20,
+      yStep: 2,
+      y1Max: 250,
+      y1Step: 25,
       labels: ['2021', '2022', '2023', '2024', '2025*'],
       datasets: [
         {
@@ -1505,56 +1584,6 @@ export const figures = [
     },
   },
   {
-    id: '4.9',
-    chapter: 4,
-    chapterName: 'Content Services',
-    caption: 'Radio Listenership and Listening Behaviour in Malaysia, 2025',
-    source: 'GfK Radio Audience Measurement (RAM) Survey 2025',
-    note: 'Malaysia\'s first nationwide radio survey (including Peninsular Malaysia and East Malaysia).',
-    table: {
-      columns: [
-        {
-          label: 'Measure',
-        },
-        {
-          label: 'Value',
-        },
-      ],
-      rows: [
-        ['Malaysians who listen to radio', '93%'],
-        ['Weekly listeners', '21.9 million'],
-        ['Weekly time spent listening', '12 hours 47 minutes'],
-        ['Top listening location', 'Car (17.1 million weekly listeners)'],
-      ],
-    },
-  },
-  {
-    id: '4.10',
-    chapter: 4,
-    chapterName: 'Content Services',
-    caption: 'Preferred Platforms for Accessing Radio Services, 2025',
-    source: 'MCMC',
-    note: 'The report shows a ranking only (nested circles), with no percentages.',
-    table: {
-      columns: [
-        {
-          label: 'Rank',
-        },
-        {
-          label: 'Platform',
-        },
-      ],
-      rows: [
-        ['1', 'Car radio'],
-        ['2', 'Traditional radio'],
-        ['3', 'Television'],
-        ['4', 'Connected devices'],
-        ['5', 'Computer'],
-        ['6', 'Others'],
-      ],
-    },
-  },
-  {
     id: '4.11',
     chapter: 4,
     chapterName: 'Content Services',
@@ -1563,7 +1592,12 @@ export const figures = [
     note: 'RM billion. 2025F refers to forecast figures based on Kenanga Research estimates.',
     chart: {
       type: 'bar',
+      tooltip: false,
       stacked: true,
+      yTitle: 'RM billion',
+      y1Min: -20,
+      y1Max: 20,
+      y1Unit: '%',
       labels: ['2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025F'],
       datasets: [
         {
@@ -1595,6 +1629,13 @@ export const figures = [
           label: 'Cinema',
           data: [0.12, 0.19, 0.26, 0.08, 0.05, 0.16, 0.18, 0.12, 0.1],
           color: '#750f38',
+        },
+        {
+          label: 'Total Adex Growth (%)',
+          data: [-8, -6, 3, -13, 18, 7, 2, -6, -17],
+          type: 'line',
+          yAxisID: 'y1',
+          color: '#d72d78',
         },
       ],
     },
@@ -1643,35 +1684,69 @@ export const figures = [
     caption: 'NADI User Demographics, 2025',
     source: 'MCMC',
     note: '1.9 million total NADI users.',
-    table: {
-      columns: [
-        {
-          label: 'Measure',
+    panelRatio: '16/10',
+    panels: [
+      {
+        title: 'Coverage / location (centres)',
+        chart: {
+          type: 'bar',
+          unit: '%',
+          labels: ['Urban', 'Suburban', 'Rural', 'Remote'],
+          datasets: [
+            {
+              label: 'Share',
+              data: [79, 13, 7, 1],
+              color: '#b62e54',
+            },
+          ],
         },
-        {
-          label: 'Category',
+      },
+      {
+        title: 'Users by area',
+        chart: {
+          type: 'bar',
+          unit: '%',
+          labels: ['Urban', 'Suburban', 'Rural', 'Remote'],
+          datasets: [
+            {
+              label: 'Share',
+              data: [29, 33, 27, 11],
+              color: '#b62e54',
+            },
+          ],
         },
-        {
-          label: 'Share (%)',
+      },
+      {
+        title: 'Users by gender',
+        chart: {
+          type: 'bar',
+          unit: '%',
+          labels: ['Female', 'Male'],
+          datasets: [
+            {
+              label: 'Share',
+              data: [53, 47],
+              color: '#b62e54',
+            },
+          ],
         },
-      ],
-      rows: [
-        ['Coverage / location (centres)', 'Urban', 79],
-        ['Coverage / location (centres)', 'Suburban', 13],
-        ['Coverage / location (centres)', 'Rural', 7],
-        ['Coverage / location (centres)', 'Remote', 1],
-        ['Users by area', 'Urban', 29],
-        ['Users by area', 'Suburban', 33],
-        ['Users by area', 'Rural', 27],
-        ['Users by area', 'Remote', 11],
-        ['Users by gender', 'Female', 53],
-        ['Users by gender', 'Male', 47],
-        ['Age group distribution', 'Below 7', 2],
-        ['Age group distribution', '7–17 years', 37],
-        ['Age group distribution', '18–60 years', 57],
-        ['Age group distribution', 'Above 60', 4],
-      ],
-    },
+      },
+      {
+        title: 'Age group distribution',
+        chart: {
+          type: 'bar',
+          unit: '%',
+          labels: ['Below 7', '7–17 years', '18–60 years', 'Above 60'],
+          datasets: [
+            {
+              label: 'Share',
+              data: [2, 37, 57, 4],
+              color: '#b62e54',
+            },
+          ],
+        },
+      },
+    ],
   },
   {
     id: '5.3',
@@ -1690,36 +1765,6 @@ export const figures = [
           data: [638848, 278394, 240158, 69747],
           color: '#b72953',
         },
-      ],
-    },
-  },
-  {
-    id: '5.9',
-    chapter: 5,
-    chapterName: 'Online and Community Services',
-    caption: 'Cashless Society Roadmap 2025',
-    source: 'MCMC',
-    note: 'Phase 3 (2025) rollout calendar. The schedule is subject to change; Phase 4 (planned for Q4) states are subject to MCMC approval. In 2025: 56 touchpoints over 63 programme days (target 45), 18,372 visitors, 352 merchants onboarded, 8,459 cashless transactions, 793 awareness activities.',
-    table: {
-      columns: [
-        {
-          label: 'Period',
-        },
-        {
-          label: 'State',
-        },
-        {
-          label: 'Activities',
-        },
-      ],
-      rows: [
-        ['February–March', 'Perak', 'Cashless Programme at NADI Perak; Cashless Carnival'],
-        ['March–April', 'Perak', 'Cashless Programme at State Level, Perak'],
-        ['May–June', 'Sabah', 'Cashless Programme at NADI Sabah; Cashless Carnival'],
-        ['June–July', 'Sabah', 'Cashless Programme at State Level, Sabah'],
-        ['August–September', 'Sarawak', 'Cashless Programme at NADI Sarawak; Cashless Carnival'],
-        ['September–October', 'Sarawak', 'Cashless Programme at State Level, Sarawak'],
-        ['Quarter 4', '—', 'Phase 4 planning'],
       ],
     },
   },
@@ -1745,30 +1790,6 @@ export const figures = [
           data: [67, 50, 34, 33, 29, 20, 15, 15],
           color: '#6c0d28',
         },
-      ],
-    },
-  },
-  {
-    id: '5.12',
-    chapter: 5,
-    chapterName: 'Online and Community Services',
-    caption: 'Kempen Internet Selamat Implementation Strategies',
-    source: 'MCMC',
-    note: 'Approach: Whole of Government, Whole of Society.',
-    table: {
-      columns: [
-        {
-          label: 'Strategy',
-        },
-        {
-          label: 'Activities',
-        },
-      ],
-      rows: [
-        ['Targeted Development', 'Module Development by Age Group; Train of Trainers; Pilot Program; Monitoring and Evaluation'],
-        ['Targeted Implementation', 'TV & Radio interviews; Social Media; Outdoor Promotions; Public Service Announcements; Others'],
-        ['Ground Activation', 'State-level Carnivals; District-level Programs; Small Scale Programs; Special Programs with YB Minister/YB Deputy Minister'],
-        ['Collaboration Strategic Partners', 'NADI; Komuniti Madani; Civil Society Organisations; Industry; Government Agencies; Media and Academicians'],
       ],
     },
   },
@@ -1900,35 +1921,6 @@ export const figures = [
     },
   },
   {
-    id: '6.5',
-    chapter: 6,
-    chapterName: 'Postal and Courier',
-    caption: 'Other Postal Services, 2023–2025',
-    source: 'Pos Malaysia',
-    note: 'Thousand items.',
-    chart: {
-      type: 'bar',
-      labels: ['Express Item', 'Post Free Item', 'Ordinary Parcel', 'Insured Parcel'],
-      datasets: [
-        {
-          label: '2023',
-          data: [1184.6, 1646.4, 290.3, 1.6],
-          color: '#bbbaba',
-        },
-        {
-          label: '2024',
-          data: [1413.52, 1583.2, 1720.46, 1.4],
-          color: '#96c6eb',
-        },
-        {
-          label: '2025',
-          data: [1717.8, 1273.0, 7553.27, 1.02],
-          color: '#6294cc',
-        },
-      ],
-    },
-  },
-  {
     id: '6.6',
     chapter: 6,
     chapterName: 'Postal and Courier',
@@ -1988,7 +1980,7 @@ export const figures = [
         {
           label: 'Total Employment',
           data: [19821, 17428, 16112, 16261, 15039],
-          color: '#6294cc',
+          color: ['#aeacac', '#aeacac', '#aeacac', '#aeacac', '#6294cc'],
         },
       ],
     },
@@ -1999,40 +1991,30 @@ export const figures = [
     chapterName: 'Postal and Courier',
     caption: 'Postal Employment by Category, 2024–2025',
     source: 'Pos Malaysia',
-    chart: {
-      type: 'bar',
-      stacked: true,
-      horizontal: true,
-      unit: '%',
-      labels: ['2024', '2025'],
-      datasets: [
-        {
-          label: 'Administrative',
-          data: [31.82, 31.83],
-          color: '#417ebf',
+    sharedLegend: true,
+    panelRatio: '1',
+    panels: [
+      {
+        title: '2024',
+        chart: {
+          type: 'doughnut',
+          unit: '%',
+          labels: ['Administrative', 'Call Centre', 'Pick-up and Despatch', 'Sorting Crew', 'Others'],
+          values: [31.82, 0.83, 43.69, 7.52, 16.14],
+          colors: ['#417ebf', '#0b5493', '#5d94ce', '#9d9b9b', '#8fbae4'],
         },
-        {
-          label: 'Call Centre',
-          data: [0.83, 0.7],
-          color: '#0b5493',
+      },
+      {
+        title: '2025',
+        chart: {
+          type: 'doughnut',
+          unit: '%',
+          labels: ['Administrative', 'Call Centre', 'Pick-up and Despatch', 'Sorting Crew', 'Others'],
+          values: [31.83, 0.7, 45.99, 7.41, 14.07],
+          colors: ['#417ebf', '#0b5493', '#5d94ce', '#9d9b9b', '#8fbae4'],
         },
-        {
-          label: 'Pick-up and Despatch',
-          data: [43.69, 45.99],
-          color: '#5d94ce',
-        },
-        {
-          label: 'Sorting Crew',
-          data: [7.52, 7.41],
-          color: '#9d9b9b',
-        },
-        {
-          label: 'Others',
-          data: [16.14, 14.07],
-          color: '#8fbae4',
-        },
-      ],
-    },
+      },
+    ],
   },
   {
     id: '6.10',
@@ -2048,7 +2030,7 @@ export const figures = [
         {
           label: 'Courier Service Licences',
           data: [112, 128, 119, 116, 106, 121, 120, 116, 100, 101],
-          color: '#6294cc',
+          color: ['#aeacac', '#aeacac', '#aeacac', '#aeacac', '#aeacac', '#aeacac', '#aeacac', '#aeacac', '#aeacac', '#6294cc'],
         },
       ],
     },
@@ -2077,25 +2059,6 @@ export const figures = [
           label: 'Class C',
           data: [17, 19],
           color: '#c2c0c0',
-        },
-      ],
-    },
-  },
-  {
-    id: '6.12',
-    chapter: 6,
-    chapterName: 'Postal and Courier',
-    caption: 'Herfindahl-Hirschman Index for the Courier Sector, 2022–2025',
-    source: 'MCMC',
-    note: 'Not concentrated: below 1,500. Moderately concentrated: 1,500–2,500. Highly concentrated: above 2,500.',
-    chart: {
-      type: 'line',
-      labels: ['2023', '2024', '2025'],
-      datasets: [
-        {
-          label: 'HHI',
-          data: [1739.36, 2166.61, 3113.61],
-          color: '#417ec0',
         },
       ],
     },
@@ -2287,7 +2250,7 @@ export const figures = [
         {
           label: 'Total Employees',
           data: [154322, 161986, 102243, 121580, 120256],
-          color: '#83bee8',
+          color: ['#aeacac', '#aeacac', '#aeacac', '#aeacac', '#83bee8'],
         },
       ],
     },
@@ -2379,37 +2342,6 @@ export const figures = [
     },
   },
   {
-    id: '6.24',
-    chapter: 6,
-    chapterName: 'Postal and Courier',
-    caption: 'PAKEJ Initiatives',
-    source: 'MCMC',
-    note: 'True North: delivering Quality of Service and Seamless Coverage to all Malaysians sustainably, to support the projected e-commerce growth from 14 parcels per capita in 2020 to 30 by 2025. Sustainability pillars: Environment, Social, Governance.',
-    table: {
-      columns: [
-        {
-          label: 'Code',
-        },
-        {
-          label: 'Pillar',
-        },
-        {
-          label: 'Initiative',
-        },
-      ],
-      rows: [
-        ['B1', 'Business', 'Rangkaian PAKEJ'],
-        ['B2', 'Business', 'Collaborative Efforts towards Cost Efficiency'],
-        ['B3', 'Business', 'Postal Commercial Vehicle Enhancement Proposal'],
-        ['B4', 'Business', 'Courier Infrastructure & Analytics'],
-        ['B5', 'Business', 'National Address System'],
-        ['R1', 'Policy & Regulatory', 'Implementation of Pricing Guidelines for Parcels'],
-        ['R2', 'Policy & Regulatory', 'Postal Services Act 2012 Review'],
-        ['R3', 'Policy & Regulatory', 'QoS Mechanism & Consumer Protection'],
-      ],
-    },
-  },
-  {
     id: '6.25',
     chapter: 6,
     chapterName: 'Postal and Courier',
@@ -2449,46 +2381,6 @@ export const figures = [
     },
   },
   {
-    id: '6.26',
-    chapter: 6,
-    chapterName: 'Postal and Courier',
-    caption: 'Rangkaian PAKEJ@NADI with PUDO by State, 2025',
-    source: 'MCMC',
-    note: 'Coverage = number of PUDO at NADI divided by number of NADI in each state. 511 of 1,098 NADI sites had PUDO facilities (weighted coverage 56.1%). W.P. Labuan is not shown.',
-    table: {
-      columns: [
-        {
-          label: 'State',
-        },
-        {
-          label: 'PUDO at NADI',
-        },
-        {
-          label: 'Coverage (%)',
-          decimals: 1,
-        },
-      ],
-      rows: [
-        ['Pahang', 104, 91.2],
-        ['Terengganu', 54, 75.0],
-        ['W.P. Putrajaya', 3, 75.0],
-        ['Melaka', 29, 74.4],
-        ['Perlis', 12, 70.6],
-        ['Kedah', 57, 70.4],
-        ['Kelantan', 54, 68.4],
-        ['Perak', 55, 61.1],
-        ['Negeri Sembilan', 33, 53.2],
-        ['Johor', 52, 51.5],
-        ['Selangor', 38, 45.2],
-        ['W.P. Kuala Lumpur', 3, 12.5],
-        ['Pulau Pinang', 3, 7.1],
-        ['Sabah', 7, 5.3],
-        ['Sarawak', 7, 4.5],
-      ],
-      total: ['Total', 511, 56.1],
-    },
-  },
-  {
     id: '7.1',
     chapter: 7,
     chapterName: 'Quality of Services',
@@ -2510,34 +2402,59 @@ export const figures = [
     id: '7.2',
     chapter: 7,
     chapterName: 'Quality of Services',
-    caption: 'Consumer Complaints Overview, 2025 (Monthly Trend)',
+    caption: 'Consumer Complaints Overview, 2025',
     source: 'MCMC',
-    note: 'Monthly average: 5,993. The report shows the monthly trend and the distribution by sector in one figure; the sector split is in figure 7.2b.',
-    chart: {
-      type: 'bar',
-      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-      datasets: [
-        {
-          label: 'Complaints',
-          data: [4724, 4884, 5851, 5386, 5431, 4810, 6293, 6550, 5879, 7698, 6958, 7455],
-          color: '#666261',
+    note: 'Monthly average: 5,993.',
+    panelRatio: '1',
+    panels: [
+      {
+        title: 'Monthly trend',
+        wide: true,
+        ratio: '2.4',
+        chart: {
+          type: 'bar',
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+          datasets: [
+            {
+              label: 'Complaints',
+              data: [4724, 4884, 5851, 5386, 5431, 4810, 6293, 6550, 5879, 7698, 6958, 7455],
+              color: '#666261',
+            },
+          ],
         },
-      ],
-    },
-  },
-  {
-    id: '7.2b',
-    chapter: 7,
-    chapterName: 'Quality of Services',
-    caption: 'Consumer Complaints Overview, 2025 (Distribution by Sector)',
-    source: 'MCMC',
-    note: 'Shares: Telecommunications 46%, Online Content 40%, Postal & Courier 12%, Broadcasting 1%, Subsidiary Matters 1%. Split out from figure 7.2.',
-    chart: {
-      type: 'doughnut',
-      labels: ['Telecommunications', 'Online Content', 'Postal & Courier', 'Broadcasting', 'Subsidiary Matters'],
-      values: [32997, 28960, 8702, 860, 400],
-      colors: ['#3f59a8', '#2a3282', '#6c7bbb', '#728cc7', '#131341'],
-    },
+      },
+      {
+        title: 'Distribution by sector',
+        chart: {
+          type: 'doughnut',
+          unit: '%',
+          labels: ['Telecommunications', 'Broadcasting', 'Online Content', 'Subsidiary Matters', 'Postal & Courier'],
+          values: [46, 1, 40, 1, 12],
+          colors: ['#3f59a8', '#728cc7', '#2a3282', '#131341', '#6c7bbb'],
+        },
+      },
+      {
+        title: 'Complaints by sector',
+        table: {
+          columns: [
+            {
+              label: 'Sector',
+            },
+            {
+              label: 'Complaints',
+            },
+          ],
+          rows: [
+            ['Telecommunications', 32997],
+            ['Broadcasting', 860],
+            ['Online Content', 28960],
+            ['Subsidiary Matters', 400],
+            ['Postal & Courier', 8702],
+          ],
+          total: ['Total', 71919],
+        },
+      },
+    ],
   },
   {
     id: '7.3',
@@ -2562,6 +2479,12 @@ export const figures = [
           color: '#253979',
         },
       ],
+      badges: {
+        label: 'Year-on-year increase',
+        color: '#f2c230',
+        dataset: 1,
+        text: ['+17%', '+23%'],
+      },
     },
   },
   {
@@ -2590,16 +2513,10 @@ export const figures = [
     source: 'MCMC',
     note: 'Shares of all 28,960 online content complaints: 19%, 16%, 9%, 9%, 5%.',
     chart: {
-      type: 'bar',
-      horizontal: true,
+      type: 'doughnut',
       labels: ['Personal Content Violations', 'Internet Scam/Fraud', 'Harassment (Offensive)', 'Personal Data Protection', 'Online Hacking'],
-      datasets: [
-        {
-          label: 'Complaints',
-          data: [5494, 4691, 2552, 2475, 1373],
-          color: '#253979',
-        },
-      ],
+      values: [5494, 4691, 2552, 2475, 1373],
+      colors: ['#253979', '#728cc7', '#3f63ae', '#8e8d8c', '#131341'],
     },
   },
   {
@@ -2633,17 +2550,37 @@ export const figures = [
     caption: 'Complaints on MCMC Subsidiary Matters, 2025',
     source: 'MCMC',
     note: 'Labelled \'Table 7.7\' in the report.',
-    chart: {
-      type: 'bar',
-      horizontal: true,
-      labels: ['Tower Service Failure', 'Special Project by MCMC', 'Tower Objection', 'Apparatus Assignment', 'Site Offer (Tower/Structure)', 'Non-Standard Equipment', 'Licence Enquiry', 'Spectrum Interference', 'Radiation', 'Site Rental', 'Pusat Ekonomi Digital Keluarga Malaysia (NADI)', 'Public Phone - USP Area', 'TV Parabola', 'Radio Amateur', 'Radio Amateur Exam (RAE)'],
-      datasets: [
+    table: {
+      columns: [
         {
-          label: 'Complaints',
-          data: [90, 55, 46, 33, 32, 28, 26, 19, 15, 14, 14, 10, 8, 8, 1],
-          color: '#253979',
+          label: 'No.',
+        },
+        {
+          label: 'Type of Service',
+          align: 'left',
+        },
+        {
+          label: '2025',
         },
       ],
+      rows: [
+        ['1', 'Tower Service Failure', 90],
+        ['2', 'Special Project by MCMC', 55],
+        ['3', 'Tower Objection', 46],
+        ['4', 'Apparatus Assignment', 33],
+        ['5', 'Site Offer (Tower/Structure)', 32],
+        ['6', 'Non-Standard Equipment', 28],
+        ['7', 'Licence Enquiry', 26],
+        ['8', 'Spectrum Interference', 19],
+        ['9', 'Radiation', 15],
+        ['10', 'Site Rental', 14],
+        ['11', 'Pusat Ekonomi Digital Keluarga Malaysia (NADI)', 14],
+        ['12', 'Public Phone - USP Area', 10],
+        ['13', 'TV Parabola', 8],
+        ['14', 'Radio Amateur', 8],
+        ['15', 'Radio Amateur Exam (RAE)', 1],
+      ],
+      total: ['Total', '', 399],
     },
   },
   {
@@ -2652,35 +2589,37 @@ export const figures = [
     chapterName: 'Quality of Services',
     caption: 'Complaint Resolution Status as at 31 December 2025',
     source: 'MCMC',
-    chart: {
-      type: 'doughnut',
-      labels: ['Resolved & Closed', 'Investigation'],
-      values: [69070, 2849],
-      colors: ['#728cc7', '#253979'],
-    },
-  },
-  {
-    id: '7.9',
-    chapter: 7,
-    chapterName: 'Quality of Services',
-    caption: 'MCMC MSQoS Two-Pronged Regulatory Approach',
-    source: 'MCMC',
-    note: 'Flowchart. If non-compliance with a Commission Direction persists (not resolved within the stipulated timeline), a Financial Penalty Notice of up to RM500k is issued to SPs under s.105(5) of CMA 1998.',
-    table: {
-      columns: [
-        {
-          label: 'Situation',
+    panelRatio: '1',
+    panels: [
+      {
+        title: 'Share of complaints',
+        chart: {
+          type: 'doughnut',
+          unit: '%',
+          labels: ['Resolved & Closed', 'Investigation'],
+          values: [96.0, 4.0],
+          colors: ['#728cc7', '#253979'],
         },
-        {
-          label: 'Regulatory action',
+      },
+      {
+        title: 'Complaints',
+        table: {
+          columns: [
+            {
+              label: 'Status',
+            },
+            {
+              label: 'Complaints',
+            },
+          ],
+          rows: [
+            ['Resolved & Closed', 69070],
+            ['Investigation', 2849],
+          ],
+          total: ['Total', 71919],
         },
-      ],
-      rows: [
-        ['Non-compliance within SP\'s declared coverage', 'Issuance of First Information Report (FIR) under s.105(3) of CMA 1998 and compound up to RM500k, AND issuance of Notice under subsection 51(2) and Commission Direction (CD); dual action implemented concurrently'],
-        ['Non-compliance outside SP\'s declared coverage / due to other factors', 'Issuance of Notice under subsection 51(2) and Commission Direction (CD)'],
-        ['Non-compliance with Commission Direction (failure to resolve within stipulated timeline)', 'Issuance of Financial Penalty Notice under s.105(5) of CMA 1998, up to RM500k'],
-      ],
-    },
+      },
+    ],
   },
   {
     id: '7.10',
@@ -2692,6 +2631,7 @@ export const figures = [
       columns: [
         {
           label: 'Service',
+          merge: true,
         },
         {
           label: 'Service Provider',
@@ -2720,6 +2660,7 @@ export const figures = [
     chart: {
       type: 'bar',
       horizontal: true,
+      reverse: true,
       labels: ['Sabah', 'Sarawak', 'Melaka', 'Perak', 'Selangor', 'Pahang', 'Johor', 'Terengganu', 'Kedah', 'Pulau Pinang', 'Kelantan', 'Negeri Sembilan', 'W.P. Kuala Lumpur', 'Perlis', 'W.P. Labuan', 'W.P. Putrajaya'],
       datasets: [
         {
@@ -2740,18 +2681,22 @@ export const figures = [
     table: {
       columns: [
         {
+          label: 'No.',
+        },
+        {
           label: 'Parameter',
+          align: 'left',
         },
         {
           label: 'Value',
         },
       ],
       rows: [
-        ['Total non-compliances', 5861],
-        ['Resolved non-compliances', 1654],
-        ['Issued with Commission Direction', 329],
-        ['Cases under evaluation for Commission Direction', 1839],
-        ['Cases currently under evaluation', 2039],
+        ['1', 'Total non-compliances', 5861],
+        ['2', 'Resolved non-compliances', 1654],
+        ['3', 'Issued with Commission Direction', 329],
+        ['4', 'Cases under evaluation for Commission Direction', 1839],
+        ['5', 'Cases currently under evaluation', 2039],
       ],
     },
   },
@@ -2764,6 +2709,7 @@ export const figures = [
     chart: {
       type: 'bar',
       horizontal: true,
+      reverse: true,
       labels: ['YTL', 'TM Tech', 'U Mobile', 'Maxis', 'Digi', 'Celcom'],
       datasets: [
         {
@@ -2784,17 +2730,21 @@ export const figures = [
     table: {
       columns: [
         {
+          label: 'No.',
+        },
+        {
           label: 'Parameter',
+          align: 'left',
         },
         {
           label: 'Value',
         },
       ],
       rows: [
-        ['Total non-compliances', 349],
-        ['Resolved non-compliances', 341],
-        ['Issued with Commission Direction', 0],
-        ['Cases currently under evaluation', 8],
+        ['1', 'Total non-compliances', 349],
+        ['2', 'Resolved non-compliances', 341],
+        ['3', 'Issued with Commission Direction', 0],
+        ['4', 'Cases currently under evaluation', 8],
       ],
     },
   },
@@ -2807,6 +2757,7 @@ export const figures = [
     chart: {
       type: 'bar',
       horizontal: true,
+      reverse: true,
       labels: ['YTL', 'TM Tech', 'Maxis', 'Celcom', 'Digi', 'U Mobile'],
       datasets: [
         {
@@ -2827,6 +2778,7 @@ export const figures = [
     chart: {
       type: 'bar',
       horizontal: true,
+      reverse: true,
       labels: ['TM', 'Maxis', 'Celcom', 'TIME', 'YTL Broadband', 'Digi', 'HighFi', 'SIC Broadband', 'Allo'],
       datasets: [
         {
@@ -2910,25 +2862,6 @@ export const figures = [
     },
   },
   {
-    id: '7.21',
-    chapter: 7,
-    chapterName: 'Quality of Services',
-    caption: 'Number of LDTA Applications by Platform, 2025',
-    source: 'MCMC',
-    note: 'Live or Delayed Telecast Applications received and approved.',
-    chart: {
-      type: 'bar',
-      labels: ['Free-to-Air Television', 'Terrestrial Radio', 'Subscription Television'],
-      datasets: [
-        {
-          label: 'Applications',
-          data: [122, 45, 41],
-          color: '#253979',
-        },
-      ],
-    },
-  },
-  {
     id: '7.24',
     chapter: 7,
     chapterName: 'Quality of Services',
@@ -2941,6 +2874,7 @@ export const figures = [
         },
         {
           label: 'Technical Code',
+          align: 'left',
         },
       ],
       rows: [
@@ -3004,29 +2938,76 @@ export const figures = [
     chapterName: 'Outlook',
     caption: 'Malaysia Mobile Subscriptions by Technology Generation, 2025–2030 (\'000 subscriptions)',
     source: '2025 (MCMC), 2026–2030 (GlobalData)',
-    note: 'Totals: 49,800; 51,037; 52,320; 53,644; 55,008; 56,419. Shares of total (2G/4G/5G): 2025 9.9/31.8/58.3%, 2026 1.6/31.6/66.9%, 2027 1.4/24.4/74.2%, 2028 1.3/19.3/79.4%, 2029 1.1/15.0/83.8%, 2030 1.0/10.7/88.3%.',
-    chart: {
-      type: 'bar',
-      stacked: true,
-      labels: ['2025', '2026', '2027', '2028', '2029', '2030'],
-      datasets: [
-        {
-          label: '2G',
-          data: [4930, 803, 740, 682, 629, 581],
-          color: '#171514',
+    note: 'Shares of total (2G/4G/5G): 2025 9.9/31.8/58.3%, 2026 1.6/31.6/66.9%, 2027 1.4/24.4/74.2%, 2028 1.3/19.3/79.4%, 2029 1.1/15.0/83.8%, 2030 1.0/10.7/88.3%.',
+    panels: [
+      {
+        wide: true,
+        ratio: '2',
+        chart: {
+          type: 'bar',
+          stacked: true,
+          labels: ['2025', '2026', '2027', '2028', '2029', '2030'],
+          datasets: [
+            {
+              label: '2G',
+              data: [4930, 803, 740, 682, 629, 581],
+              color: '#171514',
+            },
+            {
+              label: '4G',
+              data: [15850, 16110, 12776, 10354, 8267, 6046],
+              color: '#616566',
+            },
+            {
+              label: '5G',
+              data: [29020, 34125, 38804, 42608, 46112, 49792],
+              color: '#acaaaa',
+            },
+          ],
+          stackTotals: true,
         },
-        {
-          label: '4G',
-          data: [15850, 16110, 12776, 10354, 8267, 6046],
-          color: '#616566',
+      },
+      {
+        wide: true,
+        table: {
+          columns: [
+            {
+              label: 'Data',
+            },
+            {
+              label: '2025',
+              decimals: 0,
+            },
+            {
+              label: '2026',
+              decimals: 0,
+            },
+            {
+              label: '2027',
+              decimals: 0,
+            },
+            {
+              label: '2028',
+              decimals: 0,
+            },
+            {
+              label: '2029',
+              decimals: 0,
+            },
+            {
+              label: '2030',
+              decimals: 0,
+            },
+          ],
+          rows: [
+            ['2G', 4930, 803, 740, 682, 629, 581],
+            ['4G', 15850, 16110, 12776, 10354, 8267, 6046],
+            ['5G', 29020, 34125, 38804, 42608, 46112, 49792],
+          ],
+          total: ['Total', 49800, 51038, 52320, 53644, 55008, 56419],
         },
-        {
-          label: '5G',
-          data: [29020, 34125, 38804, 42608, 46112, 49792],
-          color: '#acaaaa',
-        },
-      ],
-    },
+      },
+    ],
   },
   {
     id: '8.3',
@@ -3124,42 +3105,98 @@ export const figures = [
     caption: 'Telecommunications Service Revenue in Selected Southeast Asian Markets, 2023–2030 (USD billion)',
     source: 'GlobalData',
     note: 'CAGR 2025–2030: Indonesia 4.2%, Malaysia 3.2%, Philippines 3.7%, Singapore 0.3%, Thailand -0.5%, Vietnam 2.5%.',
-    chart: {
-      type: 'bar',
-      labels: ['2023', '2024', '2025', '2026', '2027', '2028', '2029', '2030'],
-      datasets: [
-        {
-          label: 'Indonesia',
-          data: [13.82, 13.71, 13.21, 13.65, 14.39, 15.12, 15.73, 16.21],
-          color: '#acaaaa',
+    panels: [
+      {
+        wide: true,
+        ratio: '2',
+        chart: {
+          type: 'bar',
+          labels: ['2023', '2024', '2025', '2026', '2027', '2028', '2029', '2030'],
+          datasets: [
+            {
+              label: 'Indonesia',
+              data: [13.82, 13.71, 13.21, 13.65, 14.39, 15.12, 15.73, 16.21],
+              color: '#acaaaa',
+            },
+            {
+              label: 'Malaysia',
+              data: [6.83, 6.82, 6.97, 7.16, 7.38, 7.62, 7.89, 8.17],
+              color: '#080605',
+            },
+            {
+              label: 'Philippines',
+              data: [7.54, 7.57, 7.93, 8.36, 8.66, 8.94, 9.23, 9.51],
+              color: '#c8c6c5',
+            },
+            {
+              label: 'Singapore',
+              data: [2.77, 2.78, 2.83, 2.84, 2.85, 2.85, 2.86, 2.87],
+              color: '#ffe5b4',
+            },
+            {
+              label: 'Thailand',
+              data: [9.61, 9.28, 9.68, 9.55, 9.5, 9.47, 9.45, 9.45],
+              color: '#acc9e2',
+            },
+            {
+              label: 'Vietnam',
+              data: [5.98, 5.91, 6.03, 6.22, 6.39, 6.55, 6.69, 6.83],
+              color: '#f8bbd3',
+            },
+          ],
         },
-        {
-          label: 'Malaysia',
-          data: [6.83, 6.82, 6.97, 7.16, 7.38, 7.62, 7.89, 8.17],
-          color: '#080605',
+      },
+      {
+        wide: true,
+        table: {
+          columns: [
+            {
+              label: 'Country',
+            },
+            {
+              label: '2023',
+              decimals: 2,
+            },
+            {
+              label: '2024',
+              decimals: 2,
+            },
+            {
+              label: '2025',
+              decimals: 2,
+            },
+            {
+              label: '2026',
+              decimals: 2,
+            },
+            {
+              label: '2027',
+              decimals: 2,
+            },
+            {
+              label: '2028',
+              decimals: 2,
+            },
+            {
+              label: '2029',
+              decimals: 2,
+            },
+            {
+              label: '2030',
+              decimals: 2,
+            },
+          ],
+          rows: [
+            ['Indonesia', 13.82, 13.71, 13.21, 13.65, 14.39, 15.12, 15.73, 16.21],
+            ['Malaysia', 6.83, 6.82, 6.97, 7.16, 7.38, 7.62, 7.89, 8.17],
+            ['Philippines', 7.54, 7.57, 7.93, 8.36, 8.66, 8.94, 9.23, 9.51],
+            ['Singapore', 2.77, 2.78, 2.83, 2.84, 2.85, 2.85, 2.86, 2.87],
+            ['Thailand', 9.61, 9.28, 9.68, 9.55, 9.5, 9.47, 9.45, 9.45],
+            ['Vietnam', 5.98, 5.91, 6.03, 6.22, 6.39, 6.55, 6.69, 6.83],
+          ],
         },
-        {
-          label: 'Philippines',
-          data: [7.54, 7.57, 7.93, 8.36, 8.66, 8.94, 9.23, 9.51],
-          color: '#c8c6c5',
-        },
-        {
-          label: 'Singapore',
-          data: [2.77, 2.78, 2.83, 2.84, 2.85, 2.85, 2.86, 2.87],
-          color: '#ffe5b4',
-        },
-        {
-          label: 'Thailand',
-          data: [9.61, 9.28, 9.68, 9.55, 9.5, 9.47, 9.45, 9.45],
-          color: '#acc9e2',
-        },
-        {
-          label: 'Vietnam',
-          data: [5.98, 5.91, 6.03, 6.22, 6.39, 6.55, 6.69, 6.83],
-          color: '#f8bbd3',
-        },
-      ],
-    },
+      },
+    ],
   },
   {
     id: '8.6',
@@ -3167,49 +3204,104 @@ export const figures = [
     chapterName: 'Outlook',
     caption: 'Malaysia Cloud Market by Service Segment, 2023–2029 (RM billion)',
     source: 'GlobalData',
-    note: 'Totals: 14.5, 16.5, 19.1, 22.3, 26.3, 31.5, 38.3. CAGR 2025–2029: IaaS 26.0%, PaaS 24.1%, SaaS 18.6%, Hybrid 13.3%, Private 15.3%, Managed 13.4%, Cloud Management Platforms 18.0%, Total 19.0%.',
-    chart: {
-      type: 'bar',
-      stacked: true,
-      labels: ['2023', '2024', '2025', '2026', '2027', '2028', '2029'],
-      datasets: [
-        {
-          label: 'IaaS',
-          data: [1.8, 2.1, 2.4, 3.0, 3.7, 4.7, 6.1],
-          color: '#d8d7d6',
+    note: 'CAGR 2025–2029: IaaS 26.0%, PaaS 24.1%, SaaS 18.6%, Hybrid 13.3%, Private 15.3%, Managed 13.4%, Cloud Management Platforms 18.0%, Total 19.0%.',
+    panels: [
+      {
+        wide: true,
+        ratio: '2',
+        chart: {
+          type: 'bar',
+          stacked: true,
+          labels: ['2023', '2024', '2025', '2026', '2027', '2028', '2029'],
+          datasets: [
+            {
+              label: 'IaaS',
+              data: [1.8, 2.1, 2.4, 3.0, 3.7, 4.7, 6.1],
+              color: '#d8d7d6',
+            },
+            {
+              label: 'PaaS',
+              data: [1.7, 2.0, 2.4, 2.9, 3.6, 4.5, 5.7],
+              color: '#8e8d8c',
+            },
+            {
+              label: 'SaaS',
+              data: [5.6, 6.5, 7.5, 8.8, 10.4, 12.4, 14.9],
+              color: '#626161',
+            },
+            {
+              label: 'Hybrid Cloud Services',
+              data: [1.3, 1.5, 1.7, 1.9, 2.1, 2.4, 2.8],
+              color: '#1c1a19',
+            },
+            {
+              label: 'Private Cloud Services',
+              data: [2.3, 2.5, 2.8, 3.2, 3.6, 4.2, 4.9],
+              color: '#ffe5b4',
+            },
+            {
+              label: 'Managed Cloud Services',
+              data: [1.3, 1.5, 1.6, 1.8, 2.1, 2.4, 2.7],
+              color: '#acc9e2',
+            },
+            {
+              label: 'Cloud Management Platforms',
+              data: [0.5, 0.5, 0.6, 0.7, 0.8, 1.0, 1.2],
+              color: '#f8bbd3',
+            },
+          ],
+          stackTotals: true,
         },
-        {
-          label: 'PaaS',
-          data: [1.7, 2.0, 2.4, 2.9, 3.6, 4.5, 5.7],
-          color: '#8e8d8c',
+      },
+      {
+        wide: true,
+        table: {
+          columns: [
+            {
+              label: 'Segment',
+            },
+            {
+              label: '2023',
+              decimals: 1,
+            },
+            {
+              label: '2024',
+              decimals: 1,
+            },
+            {
+              label: '2025',
+              decimals: 1,
+            },
+            {
+              label: '2026',
+              decimals: 1,
+            },
+            {
+              label: '2027',
+              decimals: 1,
+            },
+            {
+              label: '2028',
+              decimals: 1,
+            },
+            {
+              label: '2029',
+              decimals: 1,
+            },
+          ],
+          rows: [
+            ['IaaS', 1.8, 2.1, 2.4, 3.0, 3.7, 4.7, 6.1],
+            ['PaaS', 1.7, 2.0, 2.4, 2.9, 3.6, 4.5, 5.7],
+            ['SaaS', 5.6, 6.5, 7.5, 8.8, 10.4, 12.4, 14.9],
+            ['Hybrid Cloud Services', 1.3, 1.5, 1.7, 1.9, 2.1, 2.4, 2.8],
+            ['Private Cloud Services', 2.3, 2.5, 2.8, 3.2, 3.6, 4.2, 4.9],
+            ['Managed Cloud Services', 1.3, 1.5, 1.6, 1.8, 2.1, 2.4, 2.7],
+            ['Cloud Management Platforms', 0.5, 0.5, 0.6, 0.7, 0.8, 1.0, 1.2],
+          ],
+          total: ['Total', 14.5, 16.6, 19.0, 22.3, 26.3, 31.6, 38.3],
         },
-        {
-          label: 'SaaS',
-          data: [5.6, 6.5, 7.5, 8.8, 10.4, 12.4, 14.9],
-          color: '#626161',
-        },
-        {
-          label: 'Hybrid Cloud Services',
-          data: [1.3, 1.5, 1.7, 1.9, 2.1, 2.4, 2.8],
-          color: '#1c1a19',
-        },
-        {
-          label: 'Private Cloud Services',
-          data: [2.3, 2.5, 2.8, 3.2, 3.6, 4.2, 4.9],
-          color: '#ffe5b4',
-        },
-        {
-          label: 'Managed Cloud Services',
-          data: [1.3, 1.5, 1.6, 1.8, 2.1, 2.4, 2.7],
-          color: '#acc9e2',
-        },
-        {
-          label: 'Cloud Management Platforms',
-          data: [0.5, 0.5, 0.6, 0.7, 0.8, 1.0, 1.2],
-          color: '#f8bbd3',
-        },
-      ],
-    },
+      },
+    ],
   },
   {
     id: '8.7',
@@ -3217,39 +3309,91 @@ export const figures = [
     chapterName: 'Outlook',
     caption: 'Malaysia AI Market by Segment, 2023–2029 (RM billion)',
     source: 'GlobalData',
-    note: 'Totals: 2.0, 2.7, 3.7, 5.2, 7.4, 10.9, 16.4.',
-    chart: {
-      type: 'bar',
-      stacked: true,
-      labels: ['2023', '2024', '2025', '2026', '2027', '2028', '2029'],
-      datasets: [
-        {
-          label: 'AI hardware',
-          data: [0.4, 0.5, 0.6, 0.8, 1.1, 1.5, 2.0],
-          color: '#c3c1c0',
+    panels: [
+      {
+        wide: true,
+        ratio: '2',
+        chart: {
+          type: 'bar',
+          stacked: true,
+          labels: ['2023', '2024', '2025', '2026', '2027', '2028', '2029'],
+          datasets: [
+            {
+              label: 'AI hardware',
+              data: [0.4, 0.5, 0.6, 0.8, 1.1, 1.5, 2.0],
+              color: '#c3c1c0',
+            },
+            {
+              label: 'AI platforms',
+              data: [0.2, 0.2, 0.3, 0.3, 0.5, 0.7, 1.1],
+              color: '#8d8b8b',
+            },
+            {
+              label: 'Generative AI',
+              data: [0.1, 0.1, 0.2, 0.3, 0.6, 1.1, 2.1],
+              color: '#616466',
+            },
+            {
+              label: 'Specialized AI applications',
+              data: [0.7, 1.0, 1.5, 2.1, 3.0, 4.4, 6.5],
+              color: '#efeded',
+            },
+            {
+              label: 'AI consulting and support',
+              data: [0.7, 0.9, 1.2, 1.6, 2.3, 3.2, 4.7],
+              color: '#080605',
+            },
+          ],
+          stackTotals: true,
         },
-        {
-          label: 'AI platforms',
-          data: [0.2, 0.2, 0.3, 0.3, 0.5, 0.7, 1.1],
-          color: '#8d8b8b',
+      },
+      {
+        wide: true,
+        table: {
+          columns: [
+            {
+              label: 'Segment',
+            },
+            {
+              label: '2023',
+              decimals: 1,
+            },
+            {
+              label: '2024',
+              decimals: 1,
+            },
+            {
+              label: '2025',
+              decimals: 1,
+            },
+            {
+              label: '2026',
+              decimals: 1,
+            },
+            {
+              label: '2027',
+              decimals: 1,
+            },
+            {
+              label: '2028',
+              decimals: 1,
+            },
+            {
+              label: '2029',
+              decimals: 1,
+            },
+          ],
+          rows: [
+            ['AI hardware', 0.4, 0.5, 0.6, 0.8, 1.1, 1.5, 2.0],
+            ['AI platforms', 0.2, 0.2, 0.3, 0.3, 0.5, 0.7, 1.1],
+            ['Generative AI', 0.1, 0.1, 0.2, 0.3, 0.6, 1.1, 2.1],
+            ['Specialized AI applications', 0.7, 1.0, 1.5, 2.1, 3.0, 4.4, 6.5],
+            ['AI consulting and support', 0.7, 0.9, 1.2, 1.6, 2.3, 3.2, 4.7],
+          ],
+          total: ['Total', 2.1, 2.7, 3.8, 5.1, 7.5, 10.9, 16.4],
         },
-        {
-          label: 'Generative AI',
-          data: [0.1, 0.1, 0.2, 0.3, 0.6, 1.1, 2.1],
-          color: '#616466',
-        },
-        {
-          label: 'Specialized AI applications',
-          data: [0.7, 1.0, 1.5, 2.1, 3.0, 4.4, 6.5],
-          color: '#efeded',
-        },
-        {
-          label: 'AI consulting and support',
-          data: [0.7, 0.9, 1.2, 1.6, 2.3, 3.2, 4.7],
-          color: '#080605',
-        },
-      ],
-    },
+      },
+    ],
   },
   {
     id: '8.8',
@@ -3259,6 +3403,7 @@ export const figures = [
     source: 'Omdia',
     chart: {
       type: 'bar',
+      tooltip: false,
       labels: ['2020', '2021', '2022', '2023', '2024', '2025', '2026', '2027', '2028', '2029', '2030'],
       datasets: [
         {

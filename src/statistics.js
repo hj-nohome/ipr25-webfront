@@ -2,6 +2,7 @@
 import './main.js'
 import { Chart, registerables } from 'chart.js'
 import { chapterPalettes, figures } from './data/figures.generated.js'
+import { setValueLabels, valueLabelsPlugin } from './value-labels.js'
 
 Chart.register(...registerables)
 // Charts only render in the light modal panel, so use dark text and grid lines.
@@ -62,7 +63,7 @@ const revealPlugin = {
 const revealLine = (chart, duration) => {
   const start = performance.now()
   const frame = (now) => {
-    if (chart !== activeChart) return
+    if (!activeCharts.includes(chart)) return
     const t = Math.min((now - start) / duration, 1)
     chart.$reveal = easeOutQuart(t)
     if (t === 1) delete chart.$reveal
@@ -83,7 +84,7 @@ const playEntrance = (chart, type, isStepping) => {
   chart.canvas.style.visibility = 'hidden'
 
   const start = () => {
-    if (chart !== activeChart) return
+    if (!activeCharts.includes(chart)) return
     chart.canvas.style.visibility = ''
     if (type === 'line') {
       chart.update('none')
@@ -141,75 +142,95 @@ const modalSource = document.querySelector('#figure-modal-source')
 const modalPrev = document.querySelector('#figure-modal-prev')
 const modalNext = document.querySelector('#figure-modal-next')
 
-let activeChart = null
+// Every chart in the open figure: one, or one per chart panel.
+let activeCharts = []
 let activeFigure = null
 
 // Table figures: the first cell of each row is its label, the rest are
 // numbers formatted per column. Rows fade in top to bottom (see
 // .figure-table--enter), after the panel's slide-in on first open.
-const renderTable = (table, isStepping) => {
+// Per column: align: 'left' for text, and merge: true to join a run of
+// repeated values into one cell spanning those rows.
+const tableHtml = (table, isStepping) => {
   const formatCell = (value, i) =>
     typeof value === 'number'
       ? value.toLocaleString('en-MY', {
           minimumFractionDigits: table.columns[i].decimals ?? 0,
           maximumFractionDigits: table.columns[i].decimals ?? 0,
         })
-      : value
-  const rowCells = (row) =>
-    row.map((value, i) => (i === 0 ? `<th scope="row">${value}</th>` : `<td>${formatCell(value, i)}</td>`)).join('')
+      : (value ?? '') // null: no value, e.g. a share on a subtotal row
+  const alignClass = (i) => (table.columns[i].align === 'left' ? ' class="figure-table__cell--left"' : '')
 
-  modalMedia.innerHTML = `
+  // How many rows each merged cell spans; 0 where an earlier row's cell covers it.
+  const spans = table.rows.map(() => table.columns.map(() => 1))
+  table.columns.forEach((column, c) => {
+    if (!column.merge) return
+    table.rows.forEach((row, r) => {
+      if (r === 0 || row[c] !== table.rows[r - 1][c]) return
+      let first = r - 1
+      while (spans[first][c] === 0) first -= 1
+      spans[first][c] += 1
+      spans[r][c] = 0
+    })
+  })
+
+  const rowCells = (row, rowSpans) =>
+    row
+      .map((value, i) => {
+        const span = rowSpans?.[i] ?? 1
+        if (span === 0) return ''
+        const rowspan = span > 1 ? ` rowspan="${span}"` : ''
+        return i === 0
+          ? `<th scope="${span > 1 ? 'rowgroup' : 'row'}"${rowspan}${alignClass(i)}>${value}</th>`
+          : `<td${rowspan}${alignClass(i)}>${formatCell(value, i)}</td>`
+      })
+      .join('')
+
+  return `
     <table class="figure-table figure-table--enter" style="--wait: ${entranceTiming(isStepping).wait}ms">
       <thead>
-        <tr>${table.columns.map((column) => `<th scope="col">${column.label}</th>`).join('')}</tr>
+        <tr>${table.columns.map((column, i) => `<th scope="col"${alignClass(i)}>${column.label}</th>`).join('')}</tr>
       </thead>
       <tbody>
-        ${table.rows.map((row, i) => `<tr style="--row: ${i}">${rowCells(row)}</tr>`).join('')}
+        ${table.rows.map((row, i) => `<tr style="--row: ${i}">${rowCells(row, spans[i])}</tr>`).join('')}
       </tbody>
       ${table.total ? `<tfoot><tr style="--row: ${table.rows.length}">${rowCells(table.total)}</tr></tfoot>` : ''}
     </table>
   `
 }
 
-const renderChart = (figure, isStepping) => {
-  if (activeChart) {
-    activeChart.destroy()
-    activeChart = null
-  }
+// Colours come from the report: a dataset's color (one per series, or one
+// per bar) or chart.colors (one per doughnut slice). Anything without its
+// own takes the chapter's palette in order.
+const seriesColor = (dataset, i, palette) => dataset.color ?? palette[i % palette.length]
 
-  modalMedia.classList.toggle('figure-modal__media--table', Boolean(figure.table))
-  if (figure.table) {
-    renderTable(figure.table, isStepping)
-    return
-  }
-
-  modalMedia.innerHTML = '<canvas></canvas>'
-  const isDoughnut = figure.chart.type === 'doughnut'
-  const isLine = figure.chart.type === 'line'
-  const isBar = figure.chart.type === 'bar'
-  // Opt-in per figure (chart.stacked: true); otherwise bars sit side by side.
-  const isStacked = isBar && figure.chart.stacked === true
-
-  // Colours come from the report: a dataset's color (one per series, or one
-  // per bar) or chart.colors (one per doughnut slice). Anything without its
-  // own takes the chapter's palette in order.
+// Draws one chart spec (figure.chart, or a panel's chart) on the canvas.
+// showLegend: false when the figure shares one legend across its panels.
+const createChart = (canvas, chart, figure, isStepping, showLegend = true) => {
+  const isDoughnut = chart.type === 'doughnut'
+  const isLine = chart.type === 'line'
+  const isBar = chart.type === 'bar'
+  // Opt-in per chart (chart.stacked: true); otherwise bars sit side by side.
+  const isStacked = isBar && chart.stacked === true
   const palette = chapterPalettes[figure.chapter]
 
-   let finalDatasets;
+  let finalDatasets
 
-   if (figure.chart.datasets) {
-    finalDatasets = figure.chart.datasets.map(({ color = palette[i % palette.length], ...dataset }, i) => ({
-      backgroundColor: color,
-      borderColor: color,
+  if (chart.datasets) {
+    finalDatasets = chart.datasets.map(({ color, ...dataset }, i) => ({
+      backgroundColor: seriesColor({ color }, i, palette),
+      borderColor: seriesColor({ color }, i, palette),
+      // Chart.js draws lower orders last, so a line laid over bars stays on top.
+      ...(isBar && dataset.type === 'line' && { order: -1 }),
       ...dataset,
-    }));
+    }))
   } else {
     // Fallback: Convert the old single 'values' array format into a Chart.js dataset format
-    const colors = figure.chart.colors ?? palette
+    const colors = chart.colors ?? palette
     finalDatasets = [
       {
         label: figure.id,
-        data: figure.chart.values,
+        data: chart.values,
         backgroundColor: isDoughnut
           ? colors
           : isLine
@@ -222,77 +243,247 @@ const renderChart = (figure, isStepping) => {
         pointRadius: isLine ? 3 : undefined,
         pointBackgroundColor: isLine ? colors[0] : undefined,
       },
-    ];
+    ]
   }
 
   // A dataset with yAxisID: 'y1' reads against a second y axis on the right.
   // With two axes, each is titled with its series so it's clear which line
-  // reads against which scale.
+  // reads against which scale; chart.yTitle / chart.y1Title override that,
+  // e.g. when several stacked series share the left axis.
   const hasSecondAxis = finalDatasets.some((dataset) => dataset.yAxisID === 'y1')
   const axisTitle = (axisId) => ({
     display: hasSecondAxis,
-    text: finalDatasets.find((dataset) => (dataset.yAxisID ?? 'y') === axisId)?.label,
+    text: chart[`${axisId}Title`] ?? finalDatasets.find((dataset) => (dataset.yAxisID ?? 'y') === axisId)?.label,
   })
 
-  // Optional per figure: chart.unit (e.g. '%') follows the values on the
-  // value axis and in tooltips; chart.yMin starts the value axis above zero.
-  // chart.horizontal turns bars sideways, putting the values on the x axis.
-  const unit = figure.chart.unit
-  const isHorizontal = figure.chart.horizontal === true
+  // Optional per chart: chart.unit (e.g. '%') follows the values on the
+  // value axis and in tooltips; chart.yMin / chart.yMax set its range.
+  // chart.y1Unit, chart.y1Min and chart.y1Max do the same for the right axis.
+  // chart.horizontal turns bars sideways, putting the values on the x axis;
+  // chart.reverse flips the category order (largest bar at the bottom).
+  // chart.tooltip: false turns off hover values and value labels, e.g. for
+  // estimated figures.
+  const unit = chart.unit
+  const y1Unit = chart.y1Unit
+  const unitFor = (dataset) => (dataset.yAxisID === 'y1' ? y1Unit : unit) ?? ''
+  // Tick labels carry the axis's unit; chart.yStep / chart.y1Step fix the
+  // spacing between ticks.
+  const axisTicks = (axisUnit, step) => ({
+    ticks: {
+      ...(axisUnit && { callback: (value) => `${value}${axisUnit}` }),
+      // Every step is drawn; Chart.js would otherwise thin them out.
+      ...(step && { stepSize: step, autoSkip: false }),
+    },
+  })
+  const isHorizontal = chart.horizontal === true
   const categoryScale = {
     grid: { display: false },
     stacked: isStacked,
+    reverse: chart.reverse === true,
+    // Half a step in from each end, so the end points' labels clear the axes.
+    ...(isLine && { offset: true }),
   }
+  // Value labels sit past the ends of bars and above points, so value axes
+  // without a set maximum get headroom for them; more over upright bars,
+  // whose labels may turn to run upwards (see value-labels.js).
+  const showValues = chart.tooltip !== false
+  const grace = !showValues ? 0 : isBar && !isHorizontal ? '15%' : '10%'
   const valueScale = {
-    beginAtZero: figure.chart.yMin === undefined,
-    min: figure.chart.yMin,
+    beginAtZero: chart.yMin === undefined,
+    min: chart.yMin,
+    max: chart.yMax,
+    // A set maximum is kept exactly (headroom would also coarsen the steps).
+    grace: chart.yMax === undefined ? grace : 0,
     stacked: isStacked,
     title: axisTitle('y'),
-    ...(unit && { ticks: { callback: (value) => `${value}${unit}` } }),
+    ...axisTicks(unit, chart.yStep),
   }
 
-  activeChart = new Chart(modalMedia.querySelector('canvas'), {
-    type: figure.chart.type,
+  // chart.labelSize shrinks the value labels for small charts.
+  // chart.badges ({ label, color, dataset, text }) adds a pill after each of
+  // one dataset's bars, with its own legend item that doesn't toggle anything.
+  const badges = chart.badges
+  if (showValues) {
+    setValueLabels(canvas, {
+      units: finalDatasets.map(unitFor),
+      stacked: isStacked,
+      stackTotals: chart.stackTotals,
+      badges,
+      size: chart.labelSize,
+    })
+  }
+  const legendLabels = {
+    ...(!isDoughnut && { sort: (a, b) => a.datasetIndex - b.datasetIndex }),
+    ...(badges && {
+      generateLabels: (legendChart) => [
+        ...Chart.defaults.plugins.legend.labels.generateLabels(legendChart),
+        {
+          text: badges.label,
+          fillStyle: badges.color,
+          strokeStyle: badges.color,
+          lineWidth: 0,
+          datasetIndex: legendChart.data.datasets.length,
+          isBadge: true,
+        },
+      ],
+    }),
+  }
+
+  const instance = new Chart(canvas, {
+    type: chart.type,
     data: {
-      labels: figure.chart.labels,
-      datasets: finalDatasets
+      labels: chart.labels,
+      datasets: finalDatasets,
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      ...chartAnimation(figure.chart.type, isStepping),
+      ...chartAnimation(chart.type, isStepping),
       indexAxis: isHorizontal ? 'y' : 'x',
+      // Without tooltips, hovering does nothing either; clicks still toggle the legend.
+      ...(chart.tooltip === false && { events: ['click'] }),
+      // Room for labels outside small doughnut slices, above bars and
+      // points that reach the top of the axis (so they clear the legend),
+      // past small stacked segments, and for badges.
+      layout: {
+        padding: !showValues
+          ? 0
+          : isDoughnut
+            ? 24
+            : !isHorizontal
+              ? { top: 14 }
+              : isStacked
+                ? { right: 12 }
+                : badges ? { right: 64 } : 0,
+      },
       plugins: {
+        // A filled line laid over bars (e.g. 2.1's share line) shades the
+        // area behind the bars, not over them.
+        ...(isBar && { filler: { drawTime: 'beforeDatasetsDraw' } }),
         // A single series is named by the figure caption, and its bars may
         // each have their own colour, so it gets no legend. Doughnuts keep
         // theirs, since it names the slices.
-        legend: { display: isDoughnut || finalDatasets.length > 1 },
-        ...(unit && {
-          tooltip: {
+        // Legend and tooltip keep the data's order, whatever the draw order.
+        legend: {
+          display: showLegend && (isDoughnut || finalDatasets.length > 1),
+          labels: legendLabels,
+          onClick: (event, item, legend) => {
+            if (!item.isBadge) Chart.defaults.plugins.legend.onClick(event, item, legend)
+          },
+        },
+        tooltip: {
+          enabled: chart.tooltip !== false,
+          itemSort: (a, b) => a.datasetIndex - b.datasetIndex,
+          ...((unit || y1Unit) && {
             callbacks: {
-              label: (ctx) => `${isDoughnut ? ctx.label : ctx.dataset.label}: ${ctx.formattedValue}${unit}`,
+              label: (ctx) =>
+                `${isDoughnut ? ctx.label : ctx.dataset.label}: ${ctx.formattedValue}${unitFor(ctx.dataset)}`,
             },
-          },
-        }),
+          }),
+        },
       },
-      scales: isDoughnut ? {} : {
-        x: isHorizontal ? valueScale : categoryScale,
-        y: isHorizontal ? categoryScale : valueScale,
-        ...(hasSecondAxis && {
-          y1: {
-            position: 'right',
-            beginAtZero: true,
-            // Only the left axis draws grid lines, so the two don't clash.
-            grid: { drawOnChartArea: false },
-            title: axisTitle('y1'),
+      scales: isDoughnut
+        ? {}
+        : {
+            x: isHorizontal ? valueScale : categoryScale,
+            y: isHorizontal ? categoryScale : valueScale,
+            ...(hasSecondAxis && {
+              y1: {
+                // chart.y1Display: false hides the right axis when the
+                // line's own labels carry its values.
+                display: chart.y1Display !== false,
+                position: 'right',
+                beginAtZero: chart.y1Min === undefined,
+                min: chart.y1Min,
+                max: chart.y1Max,
+                grace: chart.y1Max === undefined ? grace : 0,
+                // Only the left axis draws grid lines, so the two don't clash.
+                grid: { drawOnChartArea: false },
+                title: axisTitle('y1'),
+                ...axisTicks(y1Unit, chart.y1Step),
+              },
+            }),
           },
-        }),
     },
-  },
-  plugins: [revealPlugin],
-})
+    // valueLabelsPlugin first, so its labels draw inside revealPlugin's clip.
+    plugins: [valueLabelsPlugin, revealPlugin],
+  })
 
-  playEntrance(activeChart, figure.chart.type, isStepping)
+  activeCharts.push(instance)
+  playEntrance(instance, chart.type, isStepping)
+}
+
+// One legend above the panels, for figures whose panels share their series
+// (figure.sharedLegend): taken from the first chart panel.
+const sharedLegendHtml = (figure) => {
+  const chart = figure.panels.find((panel) => panel.chart).chart
+  const palette = chapterPalettes[figure.chapter]
+  const items = chart.datasets
+    ? chart.datasets.map((dataset, i) => {
+        const color = seriesColor(dataset, i, palette)
+        return [dataset.label, Array.isArray(color) ? color[0] : color]
+      })
+    : chart.labels.map((label, i) => [label, (chart.colors ?? palette)[i % (chart.colors ?? palette).length]])
+  return `
+    <ul class="figure-panels__legend">
+      ${items.map(([label, color]) => `<li><span style="background: ${color}"></span>${label}</li>`).join('')}
+    </ul>
+  `
+}
+
+// Figures with panels show several charts and tables together, each with an
+// optional short title. The grid holds up to figure.panelColumns (default 2) columns,
+// each at least figure.panelMinWidth px (default 240) wide, so it drops to
+// fewer on narrow screens. Charts take figure.panelRatio (or the panel's own
+// ratio) as width / height; a panel with wide: true spans the full row.
+const renderPanels = (figure, isStepping) => {
+  const layout = [
+    `--cols: ${figure.panelColumns ?? 2}`,
+    `--min: ${figure.panelMinWidth ?? 240}px`,
+    `--ratio: ${figure.panelRatio ?? '4/3'}`,
+  ].join('; ')
+
+  modalMedia.innerHTML = `
+    <div class="figure-panels" style="${layout}">
+      ${figure.sharedLegend ? sharedLegendHtml(figure) : ''}
+      ${figure.panels
+        .map(
+          (panel) => `
+            <section class="figure-panel${panel.wide ? ' figure-panel--wide' : ''}">
+              ${panel.title ? `<h3 class="figure-panel__title">${panel.title}</h3>` : ''}
+              ${
+                panel.chart
+                  ? `<div class="figure-panel__chart"${panel.ratio ? ` style="--ratio: ${panel.ratio}"` : ''}><canvas></canvas></div>`
+                  : tableHtml(panel.table, isStepping)
+              }
+            </section>
+          `
+        )
+        .join('')}
+    </div>
+  `
+
+  const canvases = modalMedia.querySelectorAll('.figure-panel canvas')
+  figure.panels
+    .filter((panel) => panel.chart)
+    .forEach((panel, i) => createChart(canvases[i], panel.chart, figure, isStepping, !figure.sharedLegend))
+}
+
+const renderFigure = (figure, isStepping) => {
+  activeCharts.forEach((chart) => chart.destroy())
+  activeCharts = []
+
+  modalMedia.classList.toggle('figure-modal__media--table', Boolean(figure.table))
+  modalMedia.classList.toggle('figure-modal__media--panels', Boolean(figure.panels))
+
+  if (figure.table) {
+    modalMedia.innerHTML = tableHtml(figure.table, isStepping)
+  } else if (figure.panels) {
+    renderPanels(figure, isStepping)
+  } else {
+    modalMedia.innerHTML = '<canvas></canvas>'
+    createChart(modalMedia.querySelector('canvas'), figure.chart, figure, isStepping)
+  }
 }
 
 // The pager steps through the figures currently shown in the grid,
@@ -312,7 +503,7 @@ const openModal = (figure) => {
   modalNote.hidden = !figure.note
   modalSource.textContent = figure.source ? `Source: ${figure.source}` : ''
   modalSource.hidden = !figure.source
-  renderChart(figure, modal.classList.contains('is-open'))
+  renderFigure(figure, modal.classList.contains('is-open'))
 
   const siblings = visibleFigures()
   const index = siblings.indexOf(figure)
