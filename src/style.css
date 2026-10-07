@@ -337,12 +337,20 @@ a {
 @media (max-width: 768px) {
   /* The closed drawer waits just off the right edge. Without this it
      counts as page width: mobile browsers widen the page to fit it, so
-     the page pans sideways and the fixed background video resizes as
-     the drawer moves. Set on html (it applies to the viewport), not on
-     .nav: WebKit clips both axes of an overflow-x: clip box, which cut
-     the drawer and backdrop off at the bottom of the bar on iOS. */
+     the page pans sideways (or Chrome zooms the whole page out) and the
+     fixed background video resizes as the drawer moves. Only clip takes
+     it out of the page width; hidden on the viewport still lets Chrome
+     zoom out to fit it. The clip is on body, not .nav: WebKit clips both
+     axes of an overflow-x: clip box, which cut the drawer and backdrop
+     off at the bottom of the bar on iOS, and body is as tall as the page.
+     html needs an overflow of its own, or body's would pass to the
+     viewport (as hidden) instead of clipping body. */
   html {
     overflow-x: hidden;
+  }
+
+  body {
+    overflow-x: clip;
   }
 
   .nav {
