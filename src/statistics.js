@@ -484,19 +484,32 @@ const renderFigure = (figure, isStepping) => {
     modalMedia.innerHTML = '<canvas></canvas>'
     createChart(modalMedia.querySelector('canvas'), figure.chart, figure, isStepping)
   }
-  updateScrollHint()
+  watchScrollHints()
 }
 
-// Fades the right edge of a figure wider than its box (see .has-more in
+// Fades the right edge of a box that scrolls sideways (see .has-more in
 // style.css) until it's scrolled to the end, so the cut-off column reads
-// as more to see.
-const updateScrollHint = () => {
-  const hiddenRight = modalMedia.scrollWidth - modalMedia.clientWidth - modalMedia.scrollLeft
-  modalMedia.classList.toggle('has-more', hiddenRight > 1)
+// as more to see. The boxes are the figure's own and, in panel figures,
+// each table panel.
+const updateScrollHint = (box) => {
+  const hiddenRight = box.scrollWidth - box.clientWidth - box.scrollLeft
+  box.classList.toggle('has-more', hiddenRight > 1)
 }
 
-modalMedia.addEventListener('scroll', updateScrollHint, { passive: true })
-new ResizeObserver(updateScrollHint).observe(modalMedia)
+const scrollHintObserver = new ResizeObserver((entries) =>
+  entries.forEach((entry) => updateScrollHint(entry.target))
+)
+
+// Observing a box also checks it once straight away.
+const watchScrollHints = () => {
+  const boxes = [modalMedia, ...modalMedia.querySelectorAll('.figure-panel:has(> .figure-table)')]
+  scrollHintObserver.disconnect()
+  boxes.forEach((box) => scrollHintObserver.observe(box))
+}
+
+// Scroll events don't bubble, so this listens in the capture phase to
+// catch the panels' as well as the box's own.
+modalMedia.addEventListener('scroll', (event) => updateScrollHint(event.target), { passive: true, capture: true })
 
 // The pager steps through the figures currently shown in the grid,
 // so it follows the active chapter filter and search.

@@ -1887,19 +1887,21 @@ a {
 
 /* Table figures (see renderTable in statistics.js). The box drops its 16:9
    shape and scrolls when the table is taller than the room left, with the
-   header and total rows pinned. */
+   header and total rows pinned, and sideways when it's wider. Both axes
+   are set: overflow-y: auto alone leaves x at the box's hidden, which
+   blocks swiping sideways. */
 .figure-modal__media--table {
   aspect-ratio: auto;
-  overflow-y: auto;
+  overflow: auto;
   padding: 0 16px;
 }
 
 /* Figures with several charts and tables (see renderPanels in
    statistics.js). Like tables, the box takes its content's height and
-   scrolls when that's taller than the room left. */
+   scrolls when that's taller or wider than the room left. */
 .figure-modal__media--panels {
   aspect-ratio: auto;
-  overflow-y: auto;
+  overflow: auto;
 }
 
 /* At most --cols columns, each at least --min wide, so narrow screens get
@@ -1916,6 +1918,12 @@ a {
 
 .figure-panel {
   min-width: 0;
+}
+
+/* A table too wide for its panel scrolls sideways on its own, so the
+   charts beside it stay put. */
+.figure-panel:has(> .figure-table) {
+  overflow-x: auto;
 }
 
 .figure-panel--wide,
@@ -2037,11 +2045,6 @@ a {
   border-bottom: none;
 }
 
-/* Numbers stay on one line; text columns can still wrap. */
-.figure-table td:not(.figure-table__cell--left) {
-  white-space: nowrap;
-}
-
 /* Wide tables scroll sideways under their row labels, which stay put.
    Labels are the row headers, not the first cell of each row: under a
    merged cell, a row starts with its second column. The shadow covers the
@@ -2070,10 +2073,11 @@ a {
   box-shadow: -16px 0 0 color-mix(in srgb, var(--panel-text) 8%, #ffffff);
 }
 
-/* Set by statistics.js while a figure has more to its right: the edge
-   fades out, so it reads as more to scroll to rather than cut off. The
-   first mask layer keeps the top rule whole. */
-.figure-modal__media.has-more {
+/* Set by statistics.js while a figure (or a table panel) has more to its
+   right: the edge fades out, so it reads as more to scroll to rather than
+   cut off. The first mask layer keeps the media box's top rule whole. */
+.figure-modal__media.has-more,
+.figure-panel.has-more {
   -webkit-mask:
     linear-gradient(#000 0 0) top / 100% 2px no-repeat,
     linear-gradient(to left, transparent, #000 32px);
