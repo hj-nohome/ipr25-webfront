@@ -1263,7 +1263,8 @@ a {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   width: auto;
-  margin: 48px 0 0;
+  /* Cancels the section's right padding so the grid bleeds off the edge. */
+  margin: 48px -80px 0 0;
 }
 
 /* The whole card is one link to its chapter. */
@@ -1356,6 +1357,7 @@ a {
   .chapters--page .chapters__list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     margin-top: 40px;
+    margin-right: -20px;
   }
 
   .chapter-entry__band {
