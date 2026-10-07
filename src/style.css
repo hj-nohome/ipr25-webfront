@@ -335,16 +335,11 @@ a {
    backdrop-filter would trap a fixed child inside the bar; the sticky nav
    is at the top of the viewport whenever the toggle can be tapped. */
 @media (max-width: 768px) {
-  /* The closed drawer waits just off the right edge. Without this it
-     counts as page width: mobile browsers widen the page to fit it, so
-     the page pans sideways (or Chrome zooms the whole page out) and the
-     fixed background video resizes as the drawer moves. Only clip takes
-     it out of the page width; hidden on the viewport still lets Chrome
-     zoom out to fit it. The clip is on body, not .nav: WebKit clips both
-     axes of an overflow-x: clip box, which cut the drawer and backdrop
-     off at the bottom of the bar on iOS, and body is as tall as the page.
-     html needs an overflow of its own, or body's would pass to the
-     viewport (as hidden) instead of clipping body. */
+  /* Keeps the off-screen drawer out of the page width, which mobile
+     browsers would otherwise widen (or zoom out) to fit. clip, not hidden:
+     Chrome still zooms out for hidden. On body, not .nav: WebKit clips
+     both axes, which cut the drawer off at the bar. html's overflow stops
+     body's passing to the viewport. */
   html {
     overflow-x: hidden;
   }
@@ -1795,6 +1790,12 @@ a {
   transition-delay: 0s;
 }
 
+/* Set by statistics.js while a figure is open, which also pads html for the
+   scrollbar (Chrome ignores scrollbar-gutter here). */
+html.modal-open {
+  overflow: hidden;
+}
+
 .figure-modal__bg {
   position: absolute;
   inset: 0;
@@ -1821,6 +1822,7 @@ a {
   /* The chart shrinks to fit (see .figure-modal__media), so this only
      scrolls on screens too short for the text and controls alone. */
   overflow-y: auto;
+  overscroll-behavior: contain;   /* no scroll chaining or pull-to-refresh */
   padding: clamp(20px, 5vh, 40px) 40px clamp(16px, 4vh, 32px);
   transform: translateX(100%);
   transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
@@ -1887,9 +1889,8 @@ a {
 
 /* Table figures (see renderTable in statistics.js). The box drops its 16:9
    shape and scrolls when the table is taller than the room left, with the
-   header and total rows pinned, and sideways when it's wider. Both axes
-   are set: overflow-y: auto alone leaves x at the box's hidden, which
-   blocks swiping sideways. */
+   header and total rows pinned. Both axes: overflow-y alone leaves x
+   hidden, which blocks swiping. */
 .figure-modal__media--table {
   aspect-ratio: auto;
   overflow: auto;
@@ -1898,7 +1899,7 @@ a {
 
 /* Figures with several charts and tables (see renderPanels in
    statistics.js). Like tables, the box takes its content's height and
-   scrolls when that's taller or wider than the room left. */
+   scrolls when that's taller than the room left. */
 .figure-modal__media--panels {
   aspect-ratio: auto;
   overflow: auto;
@@ -1920,8 +1921,7 @@ a {
   min-width: 0;
 }
 
-/* A table too wide for its panel scrolls sideways on its own, so the
-   charts beside it stay put. */
+/* Wide tables scroll within their panel, not the whole figure. */
 .figure-panel:has(> .figure-table) {
   overflow-x: auto;
 }
@@ -1940,6 +1940,19 @@ a {
 .figure-panel__chart {
   position: relative;
   aspect-ratio: var(--ratio);
+}
+
+/* Phones: at least 240px tall, else the ratio. A height, not min-height,
+   which Chrome turns into a minimum width through aspect-ratio. */
+@media (max-width: 600px) {
+  .figure-panel {
+    container-type: inline-size;
+  }
+
+  .figure-panel__chart {
+    aspect-ratio: auto;
+    height: max(240px, calc(100cqi / (var(--ratio))));
+  }
 }
 
 /* Tables inside panels scroll with the rest, so their header and total
@@ -2045,16 +2058,13 @@ a {
   border-bottom: none;
 }
 
-/* Wide tables scroll sideways under their row labels, which stay put.
-   Labels are the row headers, not the first cell of each row: under a
-   merged cell, a row starts with its second column. The shadow covers the
-   box's 16px left padding, which scrolled cells would otherwise show
-   through. Panel tables (whose header and total rows don't pin) scroll
-   with the rest. */
+/* Pinned row labels. Row headers, not :first-child, since rows under a
+   merged cell start at the second column. The shadow covers the box's
+   16px left padding. */
 .figure-modal__media--table .figure-table tbody th {
   position: sticky;
   left: 0;
-  z-index: 0;   /* above the scrolled cells, below the pinned header */
+  z-index: 0;   /* below the pinned header */
   background: #ffffff;
   box-shadow: -16px 0 0 #ffffff;
 }
@@ -2062,7 +2072,7 @@ a {
 .figure-modal__media--table .figure-table thead th:first-child,
 .figure-modal__media--table .figure-table tfoot th {
   left: 0;
-  z-index: 2;   /* corners sit above both the pinned rows and column */
+  z-index: 2;   /* corners */
 }
 
 .figure-modal__media--table .figure-table thead th:first-child {
@@ -2073,9 +2083,8 @@ a {
   box-shadow: -16px 0 0 color-mix(in srgb, var(--panel-text) 8%, #ffffff);
 }
 
-/* Set by statistics.js while a figure (or a table panel) has more to its
-   right: the edge fades out, so it reads as more to scroll to rather than
-   cut off. The first mask layer keeps the media box's top rule whole. */
+/* Set by statistics.js while there's more to scroll to on the right. The
+   first mask layer keeps the top rule unfaded. */
 .figure-modal__media.has-more,
 .figure-panel.has-more {
   -webkit-mask:
@@ -2086,8 +2095,7 @@ a {
     linear-gradient(to left, transparent, #000 32px);
 }
 
-/* Phones: tighter cells, so short tables fit and wide ones show more
-   columns at once. */
+/* Phones: tighter cells. */
 @media (max-width: 600px) {
   .figure-table {
     font-size: 13px;

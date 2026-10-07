@@ -11,6 +11,8 @@ Chart.defaults.borderColor = 'rgba(23, 19, 31, 0.12)'
 Chart.defaults.font.family = "system-ui, 'Segoe UI', Roboto, sans-serif"
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+// Same breakpoint as the phone layout in style.css.
+const isPhone = window.matchMedia('(max-width: 600px)')
 
 const easeOutQuart = (t) => 1 - (1 - t) ** 4
 
@@ -303,6 +305,7 @@ const createChart = (canvas, chart, figure, isStepping, showLegend = true) => {
   // chart.badges ({ label, color, dataset, text }) adds a pill after each of
   // one dataset's bars, with its own legend item that doesn't toggle anything.
   const badges = chart.badges
+  const inTable = Boolean(figure.panels?.some((panel) => panel.table))
   if (showValues) {
     setValueLabels(canvas, {
       units: finalDatasets.map(unitFor),
@@ -310,9 +313,14 @@ const createChart = (canvas, chart, figure, isStepping, showLegend = true) => {
       stackTotals: chart.stackTotals,
       badges,
       size: chart.labelSize,
+      inTable,
+      // Segment labels pile up on phones; the table has them.
+      totalsOnly: isStacked && inTable && isPhone.matches,
     })
   }
   const legendLabels = {
+    // Chart.js's 40px default wraps phone legends onto extra rows.
+    ...(isPhone.matches && { boxWidth: 12 }),
     ...(!isDoughnut && { sort: (a, b) => a.datasetIndex - b.datasetIndex }),
     ...(badges && {
       generateLabels: (legendChart) => [
@@ -487,10 +495,7 @@ const renderFigure = (figure, isStepping) => {
   watchScrollHints()
 }
 
-// Fades the right edge of a box that scrolls sideways (see .has-more in
-// style.css) until it's scrolled to the end, so the cut-off column reads
-// as more to see. The boxes are the figure's own and, in panel figures,
-// each table panel.
+// Toggles .has-more (see style.css) on the figure box and table panels.
 const updateScrollHint = (box) => {
   const hiddenRight = box.scrollWidth - box.clientWidth - box.scrollLeft
   box.classList.toggle('has-more', hiddenRight > 1)
@@ -500,15 +505,14 @@ const scrollHintObserver = new ResizeObserver((entries) =>
   entries.forEach((entry) => updateScrollHint(entry.target))
 )
 
-// Observing a box also checks it once straight away.
+// Observing also checks each box once.
 const watchScrollHints = () => {
   const boxes = [modalMedia, ...modalMedia.querySelectorAll('.figure-panel:has(> .figure-table)')]
   scrollHintObserver.disconnect()
   boxes.forEach((box) => scrollHintObserver.observe(box))
 }
 
-// Scroll events don't bubble, so this listens in the capture phase to
-// catch the panels' as well as the box's own.
+// Capture, since the panels' scroll events don't bubble.
 modalMedia.addEventListener('scroll', (event) => updateScrollHint(event.target), { passive: true, capture: true })
 
 // The pager steps through the figures currently shown in the grid,
@@ -517,6 +521,16 @@ const visibleFigures = () =>
   Array.from(figuresGrid.querySelectorAll('.figure-card:not([hidden])'), (card) =>
     figures.find((item) => item.id === card.dataset.figureId)
   )
+
+// Locks page scroll (html.modal-open), padding html by the scrollbar's width
+// so content doesn't shift. Skips if unchanged: the pager reopens the modal
+// while open, when the scrollbar is already gone.
+const lockPage = (locked) => {
+  const root = document.documentElement
+  if (locked === root.classList.contains('modal-open')) return
+  root.style.paddingRight = locked ? `${window.innerWidth - root.clientWidth}px` : ''
+  root.classList.toggle('modal-open', locked)
+}
 
 const openModal = (figure) => {
   activeFigure = figure
@@ -537,6 +551,7 @@ const openModal = (figure) => {
 
   modal.classList.add('is-open')
   modal.setAttribute('aria-hidden', 'false')
+  lockPage(true)
 }
 
 const stepModal = (offset) => {
@@ -551,6 +566,7 @@ modalNext.addEventListener('click', () => stepModal(1))
 const closeModal = () => {
   modal.classList.remove('is-open')
   modal.setAttribute('aria-hidden', 'true')
+  lockPage(false)
 }
 
 figuresGrid.addEventListener('click', (event) => {

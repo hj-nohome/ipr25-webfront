@@ -8,6 +8,9 @@
 //   badges      - { dataset, text, color }: a pill after each of that
 //                 dataset's bars (e.g. a year-on-year change)
 //   size        - font size in px (default 11), smaller for small charts
+//   inTable     - a table shows the same numbers: bars too thin for their
+//                 labels go unlabelled, all together
+//   totalsOnly  - stacked: label stack totals only
 
 const TEXT = 'rgba(23, 19, 31, 0.8)'
 const font = (size, weight = 400) => `${weight} ${size}px system-ui, 'Segoe UI', Roboto, sans-serif`
@@ -77,9 +80,12 @@ export const valueLabelsPlugin = {
     }
     const isFree = (text, x, y, align, baseline) => !placed.some((b) => overlaps(b, box(text, x, y, align, baseline)))
     // Rotated a quarter turn, reading upwards from (x, y); downwards for
-    // negative values.
+    // negative values. Skipped where it would overlap a placed label.
     const drawUpright = (text, x, y, downwards) => {
       const width = ctx.measureText(text).width
+      const y1 = downwards ? y : y - width
+      const spot = { x1: x - textHeight / 2, y1, x2: x + textHeight / 2, y2: y1 + width }
+      if (placed.some((b) => overlaps(b, spot))) return
       ctx.save()
       ctx.translate(x, y)
       ctx.rotate(-Math.PI / 2)
@@ -88,12 +94,21 @@ export const valueLabelsPlugin = {
       ctx.fillStyle = TEXT
       ctx.fillText(text, 0, 0)
       ctx.restore()
-      const y1 = downwards ? y : y - width
-      placed.push({ x1: x - textHeight / 2, y1, x2: x + textHeight / 2, y2: y1 + width })
+      placed.push(spot)
     }
 
     // Stacked segments too small to hold their labels (see below).
     const small = []
+
+    // See inTable above.
+    const skipBars =
+      config.inTable &&
+      !horizontal &&
+      !config.stacked &&
+      chart.data.datasets.some((_, d) => {
+        const meta = chart.getDatasetMeta(d)
+        return meta.type === 'bar' && chart.isDatasetVisible(d) && meta.data.some((el) => el.width < textHeight)
+      })
 
     ctx.save()
     ctx.font = FONT
@@ -155,6 +170,7 @@ export const valueLabelsPlugin = {
         // and no line label is there; the rest wait in `small` until the
         // stack totals are down. Other bars' labels sit past the bar's end.
         if (config.stacked) {
+          if (config.totalsOnly) return
           const width = ctx.measureText(text).width
           const length = Math.abs((horizontal ? el.x : el.y) - el.base)
           const thickness = horizontal ? el.height : el.width
@@ -167,6 +183,7 @@ export const valueLabelsPlugin = {
           else small.push({ text, el, fill })
           return
         }
+        if (skipBars) return
         const negative = value < 0
         const length = Math.abs((horizontal ? el.x : el.y) - el.base)
 
