@@ -27,13 +27,11 @@ const createBgVideo = () => {
   return video
 }
 
-// Still image shown when the video can't play: Data Saver, no WebM
-// support, a load error, or no frame yet after BG_FALLBACK_MS (a slow
-// connection, or an iPhone blocking autoplay). It sits under the video, so
-// a video that turns up late still fades in over it. style.css picks the
+// Still image shown straight away, before the video starts loading, and
+// kept if it never plays (Data Saver, no WebM support, a load error, a
+// slow connection, or an iPhone blocking autoplay). It sits under the
+// video, so the video fades in over it once playing. style.css picks the
 // image: the video's first frame on desktop, bg-cover on phones.
-const BG_FALLBACK_MS = 4000
-
 const showBgFallback = () => {
   if (document.querySelector('.bg-fallback')) return
   const fallback = document.createElement('div')
@@ -45,26 +43,36 @@ const showBgFallback = () => {
 
 const canPlayWebm = document.createElement('video').canPlayType('video/webm') !== ''
 
-if (!hasImageBg && (saveData || !canPlayWebm)) showBgFallback()
+if (!hasImageBg) showBgFallback()
 
 if (!saveData && !hasImageBg && canPlayWebm) {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   document.documentElement.style.setProperty('--bg-crossfade', `${BG_CROSSFADE_MS}ms`)
+  const revealBgVideo = () => document.body.classList.add('bg-loaded')
 
   let current = createBgVideo()
   current.classList.add('is-visible', 'is-front')
-  current.autoplay = !reducedMotion
-  current.addEventListener('loadeddata', () => document.body.classList.add('bg-loaded'), { once: true })
-  current.addEventListener('error', showBgFallback)
   document.body.prepend(current)
 
-  setTimeout(() => {
-    if (!document.body.classList.contains('bg-loaded')) showBgFallback()
-  }, BG_FALLBACK_MS)
-
-  if (!reducedMotion) {
+  if (reducedMotion) {
+    // No playback: the first frame stands in as a still.
+    current.addEventListener('loadeddata', revealBgVideo, { once: true })
+  } else {
+    // Only fetched once the first copy plays, so a slow phone connection
+    // isn't split between two downloads of the same file.
     let next = createBgVideo()
+    next.preload = 'none'
     document.body.prepend(next)
+
+    // Revealed only once it's actually playing. If autoplay is refused
+    // (iPhone Low Power Mode) or the file fails, play() rejects and the
+    // fallback stays.
+    current.play().then(() => {
+      revealBgVideo()
+      next.preload = 'auto'
+      next.load()
+    }, () => {})
+
     let crossfading = false
 
     const crossfade = () => {

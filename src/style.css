@@ -89,11 +89,12 @@ body.bg-loaded::before {
   opacity: 1;
 }
 
-/* Still fallback for the video, added by main.js when the video can't
-   play. Desktop shows the video's first frame, so a late video takes over
-   seamlessly; phones show bg-cover. Each size only downloads its own
-   image. It sits below both video copies, so a video that loads late
-   fades in over it, and gets the same dark overlay. */
+/* Still fallback for the video, added by main.js before the video starts
+   loading and kept if it never plays. Desktop shows the video's first
+   frame, so the video takes over seamlessly; phones show bg-cover. Each
+   size only downloads its own image. It sits below both video copies, so
+   the video fades in over it once playing, and gets the same dark
+   overlay. */
 .bg-fallback {
   position: fixed;
   inset: 0;
