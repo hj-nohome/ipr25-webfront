@@ -335,15 +335,19 @@ a {
    backdrop-filter would trap a fixed child inside the bar; the sticky nav
    is at the top of the viewport whenever the toggle can be tapped. */
 @media (max-width: 768px) {
+  /* The closed drawer waits just off the right edge. Without this it
+     counts as page width: mobile browsers widen the page to fit it, so
+     the page pans sideways and the fixed background video resizes as
+     the drawer moves. Set on html (it applies to the viewport), not on
+     .nav: WebKit clips both axes of an overflow-x: clip box, which cut
+     the drawer and backdrop off at the bottom of the bar on iOS. */
+  html {
+    overflow-x: hidden;
+  }
+
   .nav {
     --menu-duration: 0.6s;
     --menu-ease: cubic-bezier(0.76, 0, 0.24, 1);
-    /* The closed drawer waits just off the right edge. Without this it
-       counts as page width: mobile browsers widen the page to fit it, so
-       the page pans sideways and the fixed background video resizes as
-       the drawer moves. clip (unlike hidden) leaves the drawer free to
-       run below the bar and doesn't affect the sticky nav. */
-    overflow-x: clip;
   }
 
   /* Backdrop: dims the page (and the logo) beside the drawer. Tapping it
@@ -2023,6 +2027,65 @@ a {
   font-weight: 600;
   background: color-mix(in srgb, var(--panel-text) 8%, #ffffff);
   border-bottom: none;
+}
+
+/* Numbers stay on one line; text columns can still wrap. */
+.figure-table td:not(.figure-table__cell--left) {
+  white-space: nowrap;
+}
+
+/* Wide tables scroll sideways under their row labels, which stay put.
+   Labels are the row headers, not the first cell of each row: under a
+   merged cell, a row starts with its second column. The shadow covers the
+   box's 16px left padding, which scrolled cells would otherwise show
+   through. Panel tables (whose header and total rows don't pin) scroll
+   with the rest. */
+.figure-modal__media--table .figure-table tbody th {
+  position: sticky;
+  left: 0;
+  z-index: 0;   /* above the scrolled cells, below the pinned header */
+  background: #ffffff;
+  box-shadow: -16px 0 0 #ffffff;
+}
+
+.figure-modal__media--table .figure-table thead th:first-child,
+.figure-modal__media--table .figure-table tfoot th {
+  left: 0;
+  z-index: 2;   /* corners sit above both the pinned rows and column */
+}
+
+.figure-modal__media--table .figure-table thead th:first-child {
+  box-shadow: inset 0 -2px 0 #1e9a8b, -16px 0 0 #ffffff;
+}
+
+.figure-modal__media--table .figure-table tfoot th {
+  box-shadow: -16px 0 0 color-mix(in srgb, var(--panel-text) 8%, #ffffff);
+}
+
+/* Set by statistics.js while a figure has more to its right: the edge
+   fades out, so it reads as more to scroll to rather than cut off. The
+   first mask layer keeps the top rule whole. */
+.figure-modal__media.has-more {
+  -webkit-mask:
+    linear-gradient(#000 0 0) top / 100% 2px no-repeat,
+    linear-gradient(to left, transparent, #000 32px);
+  mask:
+    linear-gradient(#000 0 0) top / 100% 2px no-repeat,
+    linear-gradient(to left, transparent, #000 32px);
+}
+
+/* Phones: tighter cells, so short tables fit and wide ones show more
+   columns at once. */
+@media (max-width: 600px) {
+  .figure-table {
+    font-size: 13px;
+  }
+
+  .figure-table th,
+  .figure-table td {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
 }
 
 .figure-table--enter tbody tr,

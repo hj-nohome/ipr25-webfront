@@ -484,7 +484,19 @@ const renderFigure = (figure, isStepping) => {
     modalMedia.innerHTML = '<canvas></canvas>'
     createChart(modalMedia.querySelector('canvas'), figure.chart, figure, isStepping)
   }
+  updateScrollHint()
 }
+
+// Fades the right edge of a figure wider than its box (see .has-more in
+// style.css) until it's scrolled to the end, so the cut-off column reads
+// as more to see.
+const updateScrollHint = () => {
+  const hiddenRight = modalMedia.scrollWidth - modalMedia.clientWidth - modalMedia.scrollLeft
+  modalMedia.classList.toggle('has-more', hiddenRight > 1)
+}
+
+modalMedia.addEventListener('scroll', updateScrollHint, { passive: true })
+new ResizeObserver(updateScrollHint).observe(modalMedia)
 
 // The pager steps through the figures currently shown in the grid,
 // so it follows the active chapter filter and search.
