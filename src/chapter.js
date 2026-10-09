@@ -8,8 +8,8 @@ const title = document.querySelector('#chapter-title')
 const name = document.querySelector('#chapter-name')
 const intro = document.querySelector('#chapter-intro')
 const image = document.querySelector('#chapter-image')
-const explore = document.querySelector('#chapter-explore')
 const background = document.querySelector('#chapter-bg')
+const cta = document.querySelector('#chapter-cta')
 
 // Fades the background and its dark overlay in once the image is ready,
 // like the video on the other pages (see body.bg-loaded in style.css).
@@ -36,10 +36,9 @@ const render = () => {
       return paragraph
     })
   )
+  cta.textContent = `Explore ${chapter.shortName}`
   image.src = chapter.image
   background.src = chapter.background
-  explore.href = `statistics.html#chapter-${chapter.number}`
-  explore.textContent = chapter.explore
 }
 
 window.addEventListener('hashchange', () => {

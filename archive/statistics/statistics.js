@@ -1,5 +1,6 @@
-// Statistics page: figure grid + search + click-to-expand modal.
-import './main.js'
+// Statistics page (archived): figure grid + search + click-to-expand modal.
+import '../../src/main.js'
+import './statistics.css'
 import { Chart, registerables } from 'chart.js'
 import { chapterPalettes, figures } from './data/figures.generated.js'
 import { setValueLabels, valueLabelsPlugin } from './value-labels.js'
@@ -59,6 +60,45 @@ const revealPlugin = {
   },
   afterDatasetsDraw(chart) {
     if (chart.$reveal !== undefined) chart.ctx.restore()
+  },
+}
+
+// chart.yCap: bars past the value axis's end are cut there, with a white
+// double slash this far in from the end to mark the break.
+const BREAK_INSET = 14
+
+const barBreakPlugin = {
+  id: 'barBreak',
+  afterDatasetsDraw(chart, _args, { cap }) {
+    if (cap === undefined) return
+    const { ctx, chartArea: area } = chart
+    const horizontal = chart.options.indexAxis === 'y'
+    const breakAt = horizontal ? area.right - BREAK_INSET : area.top + BREAK_INSET
+    ctx.save()
+    ctx.strokeStyle = '#ffffff'
+    ctx.lineWidth = 2
+    chart.data.datasets.forEach((dataset, d) => {
+      const meta = chart.getDatasetMeta(d)
+      if (meta.type !== 'bar' || !chart.isDatasetVisible(d)) return
+      meta.data.forEach((el, i) => {
+        // Only once the bar has grown past the break (it animates in).
+        if (!(dataset.data[i] > cap) || (horizontal ? el.x <= breakAt : el.y >= breakAt)) return
+        for (const offset of [-3, 3]) {
+          ctx.beginPath()
+          if (horizontal) {
+            const half = el.height / 2 + 1
+            ctx.moveTo(breakAt + offset - 3, el.y + half)
+            ctx.lineTo(breakAt + offset + 3, el.y - half)
+          } else {
+            const half = el.width / 2 + 1
+            ctx.moveTo(el.x - half, breakAt + offset + 3)
+            ctx.lineTo(el.x + half, breakAt + offset - 3)
+          }
+          ctx.stroke()
+        }
+      })
+    })
+    ctx.restore()
   },
 }
 
@@ -224,6 +264,8 @@ const createChart = (canvas, chart, figure, isStepping, showLegend = true) => {
       borderColor: seriesColor({ color }, i, palette),
       // Chart.js draws lower orders last, so a line laid over bars stays on top.
       ...(isBar && dataset.type === 'line' && { order: -1 }),
+      // Chart.js doesn't clip bars to the chart area by default.
+      ...(chart.yCap !== undefined && { clip: 0 }),
       ...dataset,
     }))
   } else {
@@ -260,7 +302,10 @@ const createChart = (canvas, chart, figure, isStepping, showLegend = true) => {
 
   // Optional per chart: chart.unit (e.g. '%') follows the values on the
   // value axis and in tooltips; chart.yMin / chart.yMax set its range.
-  // chart.y1Unit, chart.y1Min and chart.y1Max do the same for the right axis.
+  // chart.yCap sets the maximum too, for one or two outliers: bars past it are
+  // cut at the axis's end with a break mark, their labels still giving the
+  // real value. chart.y1Unit, chart.y1Min and chart.y1Max do the same as
+  // unit, yMin and yMax for the right axis.
   // chart.horizontal turns bars sideways, putting the values on the x axis;
   // chart.reverse flips the category order (largest bar at the bottom).
   // chart.tooltip: false turns off hover values and value labels, e.g. for
@@ -290,12 +335,13 @@ const createChart = (canvas, chart, figure, isStepping, showLegend = true) => {
   // whose labels may turn to run upwards (see value-labels.js).
   const showValues = chart.tooltip !== false
   const grace = !showValues ? 0 : isBar && !isHorizontal ? '15%' : '10%'
+  const yMax = chart.yCap ?? chart.yMax
   const valueScale = {
     beginAtZero: chart.yMin === undefined,
     min: chart.yMin,
-    max: chart.yMax,
+    max: yMax,
     // A set maximum is kept exactly (headroom would also coarsen the steps).
-    grace: chart.yMax === undefined ? grace : 0,
+    grace: yMax === undefined ? grace : 0,
     stacked: isStacked,
     title: axisTitle('y'),
     ...axisTicks(unit, chart.yStep),
@@ -312,6 +358,8 @@ const createChart = (canvas, chart, figure, isStepping, showLegend = true) => {
       stacked: isStacked,
       stackTotals: chart.stackTotals,
       badges,
+      cap: chart.yCap,
+      capInset: BREAK_INSET,
       size: chart.labelSize,
       inTable,
       // Segment labels pile up on phones; the table has them.
@@ -352,7 +400,8 @@ const createChart = (canvas, chart, figure, isStepping, showLegend = true) => {
       ...(chart.tooltip === false && { events: ['click'] }),
       // Room for labels outside small doughnut slices, above bars and
       // points that reach the top of the axis (so they clear the legend),
-      // past small stacked segments, and for badges.
+      // past small stacked segments, for badges, and past bars ending near
+      // a capped axis's end (which has no headroom).
       layout: {
         padding: !showValues
           ? 0
@@ -362,7 +411,9 @@ const createChart = (canvas, chart, figure, isStepping, showLegend = true) => {
               ? { top: 14 }
               : isStacked
                 ? { right: 12 }
-                : badges ? { right: 64 } : 0,
+                : badges
+                  ? { right: 64 }
+                  : chart.yCap !== undefined ? { right: 28 } : 0,
       },
       plugins: {
         // A filled line laid over bars (e.g. 2.1's share line) shades the
@@ -371,6 +422,7 @@ const createChart = (canvas, chart, figure, isStepping, showLegend = true) => {
         // A single series is named by the figure caption, and its bars may
         // each have their own colour, so it gets no legend. Doughnuts keep
         // theirs, since it names the slices.
+        barBreak: { cap: chart.yCap },
         // Legend and tooltip keep the data's order, whatever the draw order.
         legend: {
           display: showLegend && (isDoughnut || finalDatasets.length > 1),
@@ -413,8 +465,9 @@ const createChart = (canvas, chart, figure, isStepping, showLegend = true) => {
             }),
           },
     },
-    // valueLabelsPlugin first, so its labels draw inside revealPlugin's clip.
-    plugins: [valueLabelsPlugin, revealPlugin],
+    // valueLabelsPlugin before revealPlugin, so its labels draw inside the
+    // reveal's clip; after barBreakPlugin, so labels sit over break marks.
+    plugins: [barBreakPlugin, valueLabelsPlugin, revealPlugin],
   })
 
   activeCharts.push(instance)

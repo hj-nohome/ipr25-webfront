@@ -2487,114 +2487,145 @@
       "page": 52,
       "caption": "Overall JENDELA Achievements by Industry Players, 2025",
       "source": "MCMC",
-      "note": "Completion as % of each player's planned target. Operators are identified by logo in the report.",
-      "table": {
-        "columns": [
-          {
-            "label": "Category"
-          },
-          {
-            "label": "Industry player"
-          },
-          {
-            "label": "Completed (% of planned)",
-            "decimals": 1
+      "note": "Completion as % of each player's planned target (Planned = 100%). All players: Premises Passed: Completed 774,790, Target 357,450 (216.7%); Sites Upgraded: Completed 2,816, Target 2,843 (99.1%); New 4G Sites: Completed 954, Target 853 (105.9%). Operators are identified by logo in the report.",
+      "sharedLegend": true,
+      "panelColumns": 3,
+      "panelMinWidth": 260,
+      "panelRatio": "1",
+      "panels": [
+        {
+          "title": "Premises Passed",
+          "chart": {
+            "type": "bar",
+            "horizontal": true,
+            "unit": "%",
+            "yCap": 200,
+            "yStep": 50,
+            "labels": [
+              "TM",
+              "TIME",
+              "Maxis",
+              "Celcom Timur",
+              "allo",
+              "YTL Communications"
+            ],
+            "datasets": [
+              {
+                "label": "Planned",
+                "data": [
+                  100.0,
+                  100.0,
+                  100.0,
+                  100.0,
+                  100.0,
+                  100.0
+                ],
+                "color": "#bbbaba",
+                "valueLabels": false,
+                "maxBarThickness": 14
+              },
+              {
+                "label": "Completed",
+                "data": [
+                  109.2,
+                  450.9,
+                  161.1,
+                  129.7,
+                  114.7,
+                  1502.7
+                ],
+                "color": "#f3ad74",
+                "maxBarThickness": 14
+              }
+            ]
           }
-        ],
-        "rows": [
-          [
-            "Premises Passed",
-            "TM",
-            109.2
-          ],
-          [
-            "Premises Passed",
-            "TIME",
-            450.9
-          ],
-          [
-            "Premises Passed",
-            "Maxis",
-            161.1
-          ],
-          [
-            "Premises Passed",
-            "Celcom Timur",
-            129.7
-          ],
-          [
-            "Premises Passed",
-            "allo",
-            114.7
-          ],
-          [
-            "Premises Passed",
-            "YTL Communications",
-            1502.7
-          ],
-          [
-            "Premises Passed",
-            "All players (774,790 completed / 357,450 target)",
-            216.7
-          ],
-          [
-            "Sites Upgraded",
-            "CelcomDigi",
-            97.9
-          ],
-          [
-            "Sites Upgraded",
-            "Maxis",
-            107.2
-          ],
-          [
-            "Sites Upgraded",
-            "U Mobile",
-            86.2
-          ],
-          [
-            "Sites Upgraded",
-            "Yes",
-            100.0
-          ],
-          [
-            "Sites Upgraded",
-            "All players (2,816 completed / 2,843 target)",
-            99.1
-          ],
-          [
-            "New 4G Sites",
-            "CelcomDigi",
-            132.7
-          ],
-          [
-            "New 4G Sites",
-            "Maxis",
-            90.4
-          ],
-          [
-            "New 4G Sites",
-            "U Mobile",
-            163.5
-          ],
-          [
-            "New 4G Sites",
-            "Yes",
-            165.3
-          ],
-          [
-            "New 4G Sites",
-            "REDtone",
-            37.1
-          ],
-          [
-            "New 4G Sites",
-            "All players (954 completed / 853 target)",
-            105.9
-          ]
-        ]
-      },
-      "skipped": "Infographic, not a statistic; left off the statistics page (data kept here)."
+        },
+        {
+          "title": "Sites Upgraded",
+          "chart": {
+            "type": "bar",
+            "horizontal": true,
+            "unit": "%",
+            "yCap": 200,
+            "yStep": 50,
+            "labels": [
+              "CelcomDigi",
+              "Maxis",
+              "U Mobile",
+              "Yes"
+            ],
+            "datasets": [
+              {
+                "label": "Planned",
+                "data": [
+                  100.0,
+                  100.0,
+                  100.0,
+                  100.0
+                ],
+                "color": "#bbbaba",
+                "valueLabels": false,
+                "maxBarThickness": 14
+              },
+              {
+                "label": "Completed",
+                "data": [
+                  97.9,
+                  107.2,
+                  86.2,
+                  100.0
+                ],
+                "color": "#f3ad74",
+                "maxBarThickness": 14
+              }
+            ]
+          }
+        },
+        {
+          "title": "New 4G Sites",
+          "chart": {
+            "type": "bar",
+            "horizontal": true,
+            "unit": "%",
+            "yCap": 200,
+            "yStep": 50,
+            "labels": [
+              "CelcomDigi",
+              "Maxis",
+              "U Mobile",
+              "Yes",
+              "REDtone"
+            ],
+            "datasets": [
+              {
+                "label": "Planned",
+                "data": [
+                  100.0,
+                  100.0,
+                  100.0,
+                  100.0,
+                  100.0
+                ],
+                "color": "#bbbaba",
+                "valueLabels": false,
+                "maxBarThickness": 14
+              },
+              {
+                "label": "Completed",
+                "data": [
+                  132.7,
+                  90.4,
+                  163.5,
+                  165.3,
+                  37.1
+                ],
+                "color": "#f3ad74",
+                "maxBarThickness": 14
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "3.10",
@@ -4888,8 +4919,7 @@
             "color": "#6294cc"
           }
         ]
-      },
-      "skipped": "Infographic, not a statistic; left off the statistics page (data kept here)."
+      }
     },
     {
       "id": "6.6",
@@ -5243,8 +5273,7 @@
             "color": "#417ec0"
           }
         ]
-      },
-      "skipped": "Infographic, not a statistic; left off the statistics page (data kept here)."
+      }
     },
     {
       "id": "6.13",
@@ -6074,8 +6103,7 @@
           511,
           56.1
         ]
-      },
-      "skipped": "Infographic, not a statistic; left off the statistics page (data kept here)."
+      }
     },
     {
       "id": "6.27",

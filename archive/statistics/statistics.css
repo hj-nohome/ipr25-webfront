@@ -1,0 +1,664 @@
+/* Statistics page styles, moved out of src/style.css when the page was
+   archived. Loaded after it (statistics.js imports main.js first), so the
+   site's tokens, nav, panels and .button still apply. */
+
+/* Were shared with .chapters__title / .chapters__intro in style.css. */
+.figures__title {
+  margin: 0;
+  font-size: 42px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+.figures__intro {
+  max-width: 640px;
+  opacity: 0.75;
+}
+
+@media (max-width: 768px) {
+  .figures__title {
+    font-size: 32px;
+  }
+}
+
+/* Square button holding just an icon (e.g. the figure modal's arrows). */
+.button--icon {
+  --bracket-size: 6px;
+  padding: 10px;
+}
+
+.button--icon svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* Figures (Statistics page) */
+.figures {
+  margin-left: var(--gutter);
+  padding: 80px 24px 120px 80px;
+}
+
+.figures__title {
+  margin-bottom: 16px;
+}
+
+.figures__intro {
+  margin: 0 0 40px;
+}
+
+.figures__chapter {
+  margin: 0 0 16px;
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.figures__search {
+  max-width: 100%;
+  padding: 12px 16px;
+  font: inherit;
+  color: var(--text);
+  background: color-mix(in srgb, var(--text) 5%, transparent);
+  border: 1px solid var(--border);
+}
+
+.figures__search::placeholder {
+  color: color-mix(in srgb, var(--text) 55%, transparent);
+}
+
+.figures__layout {
+  display: flex;
+  align-items: flex-start;
+}
+
+.figures__sidebar {
+  flex-shrink: 0;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.figures__filters {
+  display: grid;
+  grid-template-columns: 1fr;
+  border: 1px solid var(--border);
+}
+
+.figures__filter {
+  padding: 14px 16px; /* same side padding as .figures__search, so the text lines up */
+  font: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  text-transform: uppercase;
+  text-align: left;
+  color: inherit;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.figures__filter:last-child {
+  border-bottom: none;   /* avoid a doubled line against .figures__filters' own bottom border */
+}
+
+.figures__filter:hover:not(.is-active) {
+  background: color-mix(in srgb, var(--bg), var(--text) 20%);
+}
+
+.figures__filter.is-active {
+  background: color-mix(in srgb, var(--bg), var(--text) 10%);
+  color: var(--text);
+}
+
+.figures__grid {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  border-left: 1px solid var(--border);
+  margin-bottom: 1px;
+}
+
+.figures__empty {
+  margin-top: 40px;
+  opacity: 0.6;
+}
+
+@media (max-width: 768px) {
+  .figures {
+    padding: 40px 20px 72px 0;
+  }
+
+  .figures__layout {
+    flex-direction: column;
+  }
+
+  .figures__sidebar {
+    width: 100%;
+  }
+
+  .figures__filters {
+    grid-template-columns: repeat(3, 1fr);   /* All + 8 chapters = 3×3 */
+  }
+
+  .figures__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.figure-card {
+  display: flex;
+  flex-direction: column;
+  justify-content:center;
+  text-align: left;
+  width: 100%;
+  min-height: 100px;
+  margin-bottom: -1px;
+  padding: 12px 24px;
+  font: inherit;
+  color: inherit;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  view-transition-class: figure-card;
+}
+
+.figure-card:hover {
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+}
+.figure-card:hover .figure-card__name,
+.figure-card:focus-visible .figure-card__name {
+  opacity: 0.6;
+  transform: none;
+}
+
+.figure-card[hidden] {
+  display: none;
+}
+
+/* A small muted label under the caption. It always keeps its space and only
+   fades in, so the caption doesn't shift on hover. */
+.figure-card__name {
+  margin: 8px 0 0;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.figure-card__caption {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+/* No hover on touch screens, so the label is always shown. */
+@media (hover: none) {
+  .figure-card__name {
+    opacity: 0.6;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .figure-card__name {
+    transform: none;
+  }
+}
+
+/* Figure grid filter animation (see applyFilters in statistics.js) */
+:root {
+  view-transition-name: none;
+}
+
+.nav {
+  view-transition-name: site-nav;
+}
+
+::view-transition-group(site-nav) {
+  z-index: 1;
+}
+
+/* Staying cards slide to their new position */
+::view-transition-group(.figure-card) {
+  animation-duration: 0.3s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Entering cards fade and scale up, starting just after the slide */
+::view-transition-new(.figure-card):only-child {
+  animation: figure-card-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+}
+
+/* Leaving cards fade out quickly */
+::view-transition-old(.figure-card):only-child {
+  animation: figure-card-out 0.15s ease both;
+}
+
+@keyframes figure-card-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+@keyframes figure-card-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Figure modal: a light sheet that slides in from the right like a page,
+   leaving the statistics page visible on the left. */
+.figure-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  visibility: hidden;
+  /* Stay visible until the slide-out has finished. */
+  transition: visibility 0s linear 0.5s;
+}
+
+.figure-modal.is-open {
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+/* Set by statistics.js while a figure is open, which also pads html for the
+   scrollbar (Chrome ignores scrollbar-gutter here). */
+html.modal-open {
+  overflow: hidden;
+}
+
+.figure-modal__bg {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.figure-modal.is-open .figure-modal__bg {
+  opacity: 1;
+}
+
+.figure-modal__panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  width: min(100%, max(560px, 58vw));
+  display: flex;
+  flex-direction: column;
+  /* Spacing tightens on short screens so the chart keeps its room. */
+  gap: clamp(16px, 4vh, 40px);
+  /* The chart shrinks to fit (see .figure-modal__media), so this only
+     scrolls on screens too short for the text and controls alone. */
+  overflow-y: auto;
+  overscroll-behavior: contain;   /* no scroll chaining or pull-to-refresh */
+  padding: clamp(20px, 5vh, 40px) 40px clamp(16px, 4vh, 32px);
+  transform: translateX(100%);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.figure-modal.is-open .figure-modal__panel {
+  transform: translateX(0);
+}
+
+.figure-modal__close {
+  align-self: flex-start;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0 0 -8px;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+}
+
+.figure-modal__close svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Takes the height left between the close button and the pager. */
+.figure-modal__body {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 16:9 when there's room; otherwise shrinks in height to keep the whole
+   panel within the viewport. Chart.js redraws to the new size. */
+.figure-modal__media {
+  flex: 0 1 auto;
+  min-height: 0;
+  aspect-ratio: 16 / 9;
+  margin-bottom: 8px;
+  padding: 16px;
+  background: #ffffff;
+  border-top: 2px solid var(--panel-text);
+  overflow: hidden;
+}
+
+.figure-modal__media canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Phones: a taller box, so charts with many bars and their value labels
+   have room. */
+@media (max-width: 600px) {
+  .figure-modal__media {
+    aspect-ratio: 4 / 5;
+  }
+}
+
+/* Table figures (see renderTable in statistics.js). The box drops its 16:9
+   shape and scrolls when the table is taller than the room left, with the
+   header and total rows pinned. Both axes: overflow-y alone leaves x
+   hidden, which blocks swiping. */
+.figure-modal__media--table {
+  aspect-ratio: auto;
+  overflow: auto;
+  padding: 0 16px;
+}
+
+/* Figures with several charts and tables (see renderPanels in
+   statistics.js). Like tables, the box takes its content's height and
+   scrolls when that's taller than the room left. */
+.figure-modal__media--panels {
+  aspect-ratio: auto;
+  overflow: auto;
+}
+
+/* At most --cols columns, each at least --min wide, so narrow screens get
+   fewer. */
+.figure-panels {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(max(var(--min), calc((100% - (var(--cols) - 1) * 24px) / var(--cols))), 1fr)
+  );
+  gap: 20px 24px;
+  color: var(--panel-text);
+}
+
+.figure-panel {
+  min-width: 0;
+}
+
+/* Wide tables scroll within their panel, not the whole figure. */
+.figure-panel:has(> .figure-table) {
+  overflow-x: auto;
+}
+
+.figure-panel--wide,
+.figure-panels__legend {
+  grid-column: 1 / -1;
+}
+
+.figure-panel__title {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.figure-panel__chart {
+  position: relative;
+  aspect-ratio: var(--ratio);
+}
+
+/* Phones: at least 240px tall, else the ratio. A height, not min-height,
+   which Chrome turns into a minimum width through aspect-ratio. */
+@media (max-width: 600px) {
+  .figure-panel {
+    container-type: inline-size;
+  }
+
+  .figure-panel__chart {
+    aspect-ratio: auto;
+    height: max(240px, calc(100cqi / (var(--ratio))));
+  }
+}
+
+/* Tables inside panels scroll with the rest, so their header and total
+   rows don't pin. */
+.figure-panel .figure-table thead th,
+.figure-panel .figure-table tfoot th,
+.figure-panel .figure-table tfoot td {
+  position: static;
+}
+
+.figure-panel .figure-table thead th {
+  padding-top: 4px;
+}
+
+.figure-panels__legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  color: rgba(23, 19, 31, 0.75);
+}
+
+.figure-panels__legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.figure-panels__legend span {
+  width: 28px;
+  height: 10px;
+}
+
+.figure-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  color: var(--panel-text);
+}
+
+.figure-table th,
+.figure-table td {
+  padding: 6px 12px;
+  text-align: right;
+  font-weight: 400;
+  border-bottom: 1px solid rgba(23, 19, 31, 0.12);
+}
+
+.figure-table th:first-child {
+  padding-left: 0;
+  text-align: left;
+}
+
+.figure-table th:last-child,
+.figure-table td:last-child {
+  padding-right: 0;
+}
+
+/* Text columns (column align: 'left' in the figure data). */
+.figure-table .figure-table__cell--left {
+  text-align: left;
+}
+
+/* A merged cell (column merge: true) spans the rows of its group. */
+.figure-table td[rowspan],
+.figure-table th[rowspan] {
+  vertical-align: top;
+}
+
+/* Borders don't stick with the cells in a collapsed table, so the
+   header's rule is an inset shadow. */
+.figure-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding-top: 14px;
+  padding-bottom: 10px;
+  vertical-align: bottom;
+  font-weight: 600;
+  color: #0e6b62;
+  background: #ffffff;
+  border-bottom: none;
+  box-shadow: inset 0 -2px 0 #1e9a8b;
+}
+
+.figure-table tbody tr:hover {
+  background: rgba(30, 154, 139, 0.08);
+}
+
+.figure-table tfoot th,
+.figure-table tfoot td {
+  position: sticky;
+  bottom: 0;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--panel-text) 8%, #ffffff);
+  border-bottom: none;
+}
+
+/* Pinned row labels. Row headers, not :first-child, since rows under a
+   merged cell start at the second column. The shadow covers the box's
+   16px left padding. */
+.figure-modal__media--table .figure-table tbody th {
+  position: sticky;
+  left: 0;
+  z-index: 0;   /* below the pinned header */
+  background: #ffffff;
+  box-shadow: -16px 0 0 #ffffff;
+}
+
+.figure-modal__media--table .figure-table thead th:first-child,
+.figure-modal__media--table .figure-table tfoot th {
+  left: 0;
+  z-index: 2;   /* corners */
+}
+
+.figure-modal__media--table .figure-table thead th:first-child {
+  box-shadow: inset 0 -2px 0 #1e9a8b, -16px 0 0 #ffffff;
+}
+
+.figure-modal__media--table .figure-table tfoot th {
+  box-shadow: -16px 0 0 color-mix(in srgb, var(--panel-text) 8%, #ffffff);
+}
+
+/* Set by statistics.js while there's more to scroll to on the right. The
+   first mask layer keeps the top rule unfaded. */
+.figure-modal__media.has-more,
+.figure-panel.has-more {
+  -webkit-mask:
+    linear-gradient(#000 0 0) top / 100% 2px no-repeat,
+    linear-gradient(to left, transparent, #000 32px);
+  mask:
+    linear-gradient(#000 0 0) top / 100% 2px no-repeat,
+    linear-gradient(to left, transparent, #000 32px);
+}
+
+/* Phones: tighter cells. */
+@media (max-width: 600px) {
+  .figure-table {
+    font-size: 13px;
+  }
+
+  .figure-table th,
+  .figure-table td {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+
+.figure-table--enter tbody tr,
+.figure-table--enter tfoot tr {
+  animation: figure-row-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--wait, 0ms) + var(--row, 0) * 20ms);
+}
+
+@keyframes figure-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .figure-table--enter tbody tr,
+  .figure-table--enter tfoot tr {
+    animation: none;
+  }
+}
+
+.figure-modal__source {
+  margin: 8px 0 0;
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.figure-modal__tag {
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+.figure-modal__title {
+  margin: 12px 0 4px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.figure-modal__caption {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.75;
+}
+
+/* Previous / next: two .button--icon buttons. The gap leaves room for
+   each one's brackets to grow on hover without touching the other's. */
+.figure-modal__pager {
+  align-self: flex-start;
+  flex-shrink: 0;
+  display: flex;
+  gap: 16px;
+}
+
+/* Clears the browser's <button> defaults; .button supplies the rest. */
+.figure-modal__step {
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .figure-modal__panel {
+    padding: 24px 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .figure-modal,
+  .figure-modal__bg,
+  .figure-modal__panel {
+    transition: none;
+  }
+}

@@ -11,6 +11,10 @@
 //   inTable     - a table shows the same numbers: bars too thin for their
 //                 labels go unlabelled, all together
 //   totalsOnly  - stacked: label stack totals only
+//   cap         - bars past this value are cut at the axis's end (chart.yCap)
+//   capInset    - how far in from the axis's end their break mark sits
+// A dataset with valueLabels: false is left unlabelled, e.g. a reference
+// series like 3.9's Planned bars (all 100%).
 
 const TEXT = 'rgba(23, 19, 31, 0.8)'
 const font = (size, weight = 400) => `${weight} ${size}px system-ui, 'Segoe UI', Roboto, sans-serif`
@@ -79,9 +83,10 @@ export const valueLabelsPlugin = {
       placed.push(box(text, x, y, align, baseline))
     }
     const isFree = (text, x, y, align, baseline) => !placed.some((b) => overlaps(b, box(text, x, y, align, baseline)))
-    // Rotated a quarter turn, reading upwards from (x, y); downwards for
-    // negative values. Skipped where it would overlap a placed label.
-    const drawUpright = (text, x, y, downwards) => {
+    // Rotated a quarter turn, reading upwards from (x, y); hanging down from
+    // it for negative values and cut bars. Skipped where it would overlap a
+    // placed label.
+    const drawUpright = (text, x, y, downwards, color = TEXT) => {
       const width = ctx.measureText(text).width
       const y1 = downwards ? y : y - width
       const spot = { x1: x - textHeight / 2, y1, x2: x + textHeight / 2, y2: y1 + width }
@@ -91,7 +96,7 @@ export const valueLabelsPlugin = {
       ctx.rotate(-Math.PI / 2)
       ctx.textAlign = downwards ? 'right' : 'left'
       ctx.textBaseline = 'middle'
-      ctx.fillStyle = TEXT
+      ctx.fillStyle = color
       ctx.fillText(text, 0, 0)
       ctx.restore()
       placed.push(spot)
@@ -121,7 +126,7 @@ export const valueLabelsPlugin = {
 
     order.forEach((d) => {
       const dataset = chart.data.datasets[d]
-      if (!chart.isDatasetVisible(d)) return
+      if (!chart.isDatasetVisible(d) || dataset.valueLabels === false) return
       const meta = chart.getDatasetMeta(d)
       const unit = config.units[d] ?? ''
       const format = formatter(dataset.data)
@@ -186,6 +191,11 @@ export const valueLabelsPlugin = {
         if (skipBars) return
         const negative = value < 0
         const length = Math.abs((horizontal ? el.x : el.y) - el.base)
+        // A bar cut at a capped axis's end: once it has grown past the break
+        // mark, its label goes just inside it, before the mark.
+        const area = chart.chartArea
+        const breakAt = horizontal ? area.right - config.capInset : area.top + config.capInset
+        const isCut = value > config.cap && (horizontal ? el.x > breakAt : el.y < breakAt)
 
         if (horizontal) {
           // Thin bars get smaller text, so neighbouring labels don't overlap.
@@ -193,6 +203,12 @@ export const valueLabelsPlugin = {
           ctx.font = font(size)
           textHeight = size * 0.8
           const width = ctx.measureText(text).width
+          if (isCut) {
+            draw(text, breakAt - 8, el.y, 'right', 'middle', textOn(fill))
+            ctx.font = FONT
+            textHeight = baseSize * 0.8
+            return
+          }
           const outside = [el.x + (negative ? -4 : 4), negative ? 'right' : 'left']
           const inside = [el.x + (negative ? 4 : -4), negative ? 'left' : 'right']
           // Past the bar's end, or just inside it when that spot is taken
@@ -213,7 +229,10 @@ export const valueLabelsPlugin = {
         const width = ctx.measureText(text).width
         const outsideY = el.y + (negative ? 4 : -4)
         const outsideBaseline = negative ? 'top' : 'bottom'
-        if (width > el.width + 2) {
+        if (isCut) {
+          if (width <= el.width - 4) draw(text, el.x, breakAt + 8, 'center', 'top', textOn(fill))
+          else drawUpright(text, el.x, breakAt + 8, true, textOn(fill))
+        } else if (width > el.width + 2) {
           drawUpright(text, el.x, outsideY, negative)
         } else if (isFree(text, el.x, outsideY, 'center', outsideBaseline)) {
           draw(text, el.x, outsideY, 'center', outsideBaseline)

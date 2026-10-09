@@ -11,7 +11,6 @@ export default defineConfig({
       // needs to be listed here explicitly or it's silently left out of dist/.
       input: {
         main: resolve(import.meta.dirname, 'index.html'),
-        statistics: resolve(import.meta.dirname, 'statistics.html'),
         chapters: resolve(import.meta.dirname, 'chapters.html'),
         chapter: resolve(import.meta.dirname, 'chapter.html'),
       },

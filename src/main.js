@@ -192,8 +192,7 @@ const revealObserver = new IntersectionObserver(
   },
   // Reveal once an element's top is 15% of the way up the viewport. A
   // threshold on the element's own height (as before) never fires for
-  // elements taller than the screen allows, e.g. the statistics grid on
-  // phones, which is several screens tall.
+  // elements taller than the screen allows, e.g. a long grid on phones.
   { threshold: 0, rootMargin: '0px 0px -15% 0px' }
 )
 
