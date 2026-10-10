@@ -62,6 +62,11 @@
 
         <div class="chapter-detail__media reveal">
           <img id="chapter-image" alt="" />
+          <!-- The chapter's background photo (or its image, for chapters with
+               `reverse`): chapter.js reveals it over the picture above with
+               the chapter's transition (see `transition` in
+               src/data/chapters.js), once per load. -->
+          <img class="chapter-detail__photo" id="chapter-photo" alt="" />
         </div>
 
         <div class="chapter-detail__cta reveal reveal--delay-1">

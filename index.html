@@ -6,9 +6,35 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ipr25-testing</title>
+  <!-- The intro plays once per visit (main.js records it). Checked here,
+       before the page paints, so a skipped intro never flashes. -->
+  <script>
+    try {
+      if (sessionStorage.getItem('ipr25-intro-seen')) document.documentElement.classList.add('intro-seen')
+    } catch {}
+  </script>
 </head>
 
 <body>
+  <!-- Opening animation (homepage only): the MCMC logo and the report title
+       slide out either side of a line, then the screen splits open onto the
+       page. Timing is in style.css (.intro); main.js locks scrolling while
+       it plays. -->
+  <div class="intro" aria-hidden="true">
+    <div class="intro__panel intro__panel--left"></div>
+    <div class="intro__panel intro__panel--right"></div>
+    <div class="intro__side intro__side--left">
+      <img src="images/mcmc-logo.png" alt="" class="intro__logo" />
+    </div>
+    <div class="intro__line"></div>
+    <div class="intro__side intro__side--right">
+      <div class="intro__text">
+        <p class="intro__title">Industry Performance Report 2025</p>
+        <p class="intro__subtitle">Malaysian Communications and Multimedia Commission</p>
+      </div>
+    </div>
+  </div>
+
   <div id="scroll-sentinel" aria-hidden="true"></div>
   <header class="nav">
     <div class="nav__inner">
@@ -68,7 +94,7 @@
         </p>
         <a href="#" class="button">Read Chairman's Statement</a>
       </div>
-      <div class="split-section__media reveal reveal--delay-1">
+      <div class="split-section__media split-section__media--swirl reveal reveal--delay-1">
         <img src="images/chairman.png" alt="MCMC Chairman" />
       </div>
     </section>
