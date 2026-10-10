@@ -708,23 +708,25 @@ a {
 }
 
 /* Both panels span the line's column (drawn over them), so they meet
-   without a gap. Each carries half of one purple glow centred on it. */
+   without a gap. Each carries half of one purple glow centred on it.
+   Each `animation` here names its keyframes: the production build's CSS
+   minifier turns a shorthand without a name into `animation: none`,
+   dropping the timing, which only shows up on the deployed site. */
 .intro__panel {
   grid-row: 1;
   align-self: stretch;
-  animation: 0.9s cubic-bezier(0.76, 0, 0.24, 1) 2.85s both;
 }
 
 .intro__panel--left {
   grid-column: 1 / 3;
   background: radial-gradient(circle 70vmax at 100% 50%, var(--intro-glow), var(--bg) 70%);
-  animation-name: intro-panel-left;
+  animation: intro-panel-left 0.9s cubic-bezier(0.76, 0, 0.24, 1) 2.85s both;
 }
 
 .intro__panel--right {
   grid-column: 2 / 4;
   background: radial-gradient(circle 70vmax at 0% 50%, var(--intro-glow), var(--bg) 70%);
-  animation-name: intro-panel-right;
+  animation: intro-panel-right 0.9s cubic-bezier(0.76, 0, 0.24, 1) 2.85s both;
 }
 
 .intro__line {
@@ -760,16 +762,12 @@ a {
   padding-right: 10px;
 }
 
-.intro__side > * {
-  animation: 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.7s both;
-}
-
 .intro__side--left > * {
-  animation-name: intro-from-right;
+  animation: intro-from-right 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.7s both;
 }
 
 .intro__side--right > * {
-  animation-name: intro-from-left;
+  animation: intro-from-left 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.7s both;
 }
 
 .intro__logo {
