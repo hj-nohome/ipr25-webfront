@@ -2,6 +2,8 @@
 // filled in from src/data/chapters.js by the #chapter-N hash.
 import './main.js'
 import { chapters } from './data/chapters.js'
+import { highlights } from './data/highlights.js'
+import { renderHighlights } from './highlights.js'
 import { revealWithCircleLines } from './circle-lines.js'
 import { revealWithSpiral } from './spiral.js'
 import { revealWithSwirlDashes } from './swirl-dashes.js'
@@ -17,6 +19,8 @@ const section = document.querySelector('.chapter-detail')
 const title = document.querySelector('#chapter-title')
 const name = document.querySelector('#chapter-name')
 const intro = document.querySelector('#chapter-intro')
+const highlightsLabel = document.querySelector('#chapter-highlights-label')
+const highlightsList = document.querySelector('#chapter-highlights')
 const media = document.querySelector('.chapter-detail__media')
 const image = document.querySelector('#chapter-image')
 const photo = document.querySelector('#chapter-photo')
@@ -88,6 +92,10 @@ const render = () => {
       return paragraph
     })
   )
+  const chapterHighlights = highlights[chapter.number]
+  highlightsLabel.hidden = !chapterHighlights
+  highlightsList.hidden = !chapterHighlights
+  renderHighlights(highlightsList, chapterHighlights)
   cta.textContent = `Explore ${chapter.shortName}`
   // The column starts on the first and the transition reveals the second.
   const [first, second] = chapter.reverse
