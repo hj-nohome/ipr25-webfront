@@ -1,6 +1,7 @@
 // Draws a chapter's Key Highlights 2025 from src/data/highlights.js, with
-// one builder per `layout`. Numbers built with counter() count up from 0
-// (src/count-up.js).
+// one builder per `layout`. Headline numbers (built with counter() or
+// `counts`) count up from 0 (src/count-up.js); supporting ones stay still
+// so that, beside the cover's transition, only a few things move at once.
 import { ArcElement, Chart, DoughnutController, Tooltip } from 'chart.js'
 import { countUp } from './count-up.js'
 
@@ -48,10 +49,14 @@ const counter = (className, value, decimals = 0) => {
 }
 
 // The unit's word gets its own span so headline figures can shrink it.
-const valueWithUnit = (value, unit = 'count', decimals = units[unit].decimals) => {
+// `counts` makes the number count up.
+const valueWithUnit = (value, unit = 'count', decimals = units[unit].decimals, { counts = false } = {}) => {
   const { prefix = '', symbol = '', word } = units[unit]
   const el = element('span', 'hl-value')
-  el.append(prefix, counter('hl-value__number', value, decimals), symbol)
+  const number = counts
+    ? counter('hl-value__number', value, decimals)
+    : element('span', 'hl-value__number', formatNumber(value, decimals))
+  el.append(prefix, number, symbol)
   if (word) el.append(' ', element('span', 'hl-value__word', word))
   return el
 }
@@ -110,7 +115,7 @@ const changeParts = (item, unit, decimals, { compareYear, changeStyle }) => {
     return { lines }
   }
 
-  const badge = element('span', 'hl-change')
+  const badge = element('span', percent < 0 ? 'hl-change hl-change--down' : 'hl-change')
   badge.append(...arrowChange(percent))
   return { badge, lines: previous ? [element('p', 'hl-previous', `(${previous})`)] : [] }
 }
@@ -136,9 +141,15 @@ const ratio = ({ label, value, previous, unit = 'percent' }, compareYear) => {
 }
 
 // An item's picture, such as logos; `imageAlt` says what it shows.
-const itemImage = (item) => {
+// `reveal` fades it in with the site's .reveal (main.js only finds those
+// present at load, so this adds .is-visible itself).
+const itemImage = (item, context) => {
   const img = image('hl-item__image', item.image)
   img.alt = item.imageAlt ?? ''
+  if (item.reveal) {
+    img.classList.add('reveal')
+    revealOnView([img], context, 'is-visible')
+  }
   return img
 }
 
@@ -153,7 +164,12 @@ const items = (block, spec, context) => {
       let value = null
       if (item.value !== undefined || item.text !== undefined) {
         value = element('p', 'hl-item__value')
-        value.append(item.value === undefined ? item.text : valueWithUnit(item.value, unit, decimals))
+        // Only `figures` items are headline numbers.
+        value.append(
+          item.value === undefined
+            ? item.text
+            : valueWithUnit(item.value, unit, decimals, { counts: style === 'figures' })
+        )
       }
       const label = item.label && element('p', 'hl-item__label', item.label)
 
@@ -169,7 +185,7 @@ const items = (block, spec, context) => {
             value,
             badge,
             ...lines,
-            item.image && itemImage(item),
+            item.image && itemImage(item, context),
             label,
             item.note && element('p', 'hl-item__note', item.note),
             item.ratio && ratio(item.ratio, context.compareYear),
@@ -186,7 +202,7 @@ const items = (block, spec, context) => {
 // legend in the items' own order. The chart is drawn (and sweeps in) the
 // first time it's on screen; the legend's values are what screen readers
 // get.
-const donut = (spec, { ready, cleanups }) => {
+const donut = (spec, { stage, cleanups }) => {
   const el = element('div', 'hl-donut')
   const frame = element('div', 'hl-donut__chart')
   const canvas = element('canvas')
@@ -252,21 +268,12 @@ const donut = (spec, { ready, cleanups }) => {
     })
   }
 
-  const observer = new IntersectionObserver(
-    ([entry]) => {
-      if (!entry.isIntersecting) return
-      observer.disconnect()
-      draw()
-    },
-    { threshold: 0.5 }
-  )
-  let stopped = false
-  ready.then(() => {
-    if (!stopped) observer.observe(frame)
+  let timer = 0
+  stage.add(frame, (delay) => {
+    timer = setTimeout(draw, delay)
   })
   cleanups.push(() => {
-    stopped = true
-    observer.disconnect()
+    clearTimeout(timer)
     chart?.destroy()
   })
 
@@ -287,7 +294,7 @@ const figure = (block, context) => {
 
   if (block.value !== undefined) {
     const lead = element('p', 'hl-block__lead')
-    lead.append(valueWithUnit(block.value, unit, decimals))
+    lead.append(valueWithUnit(block.value, unit, decimals, { counts: true }))
     parts.push(lead)
     if (block.caption) parts.push(element('p', 'hl-block__caption', block.caption))
     const { badge: pill, lines } = changeParts(block, unit, decimals, context)
@@ -334,7 +341,7 @@ const stackPart = (part, block, context) => {
     const [unit, decimals] = unitOf(part, block)
     const el = element('div', 'hl-figure')
     const value = element('p', 'hl-figure__value')
-    value.append(valueWithUnit(part.value, unit, decimals))
+    value.append(valueWithUnit(part.value, unit, decimals, { counts: true }))
     el.append(value)
     if (part.label) el.append(richText('hl-figure__label', part.label))
     return el
@@ -353,7 +360,8 @@ const stackPart = (part, block, context) => {
 const stack = (block, context) =>
   [heading(block), ...block.parts.map((part) => stackPart(part, block, context))].filter(Boolean)
 
-const shares = (block) => {
+// Each bar grows in once its row is on screen, like chapter 1's.
+const shares = (block, context) => {
   const list = element('ul', 'hl-shares')
   list.append(
     ...block.items.map((item) => {
@@ -372,6 +380,7 @@ const shares = (block) => {
       return row
     })
   )
+  revealOnView([...list.children], context)
   return [heading(block), list]
 }
 
@@ -380,7 +389,10 @@ const banner = (block) => {
   stats.append(
     ...block.stats.map((stat) => {
       const el = element('p', stat.inline ? 'hl-stat hl-stat--inline' : 'hl-stat')
-      el.append(valueWithUnit(stat.value, stat.unit), element('span', 'hl-stat__text', stat.text))
+      el.append(
+        valueWithUnit(stat.value, stat.unit, undefined, { counts: true }),
+        element('span', 'hl-stat__text', stat.text)
+      )
       return el
     })
   )
@@ -427,8 +439,22 @@ const grid = ({ compareYear, variant, changeStyle, blocks }, runtime) => {
   })
 }
 
-const breakdown = ({ compareYear, groups }) =>
-  groups.map((group) => {
+// Adds `className` to each element when the stage starts it, with its
+// place in the stagger as --reveal-delay.
+const revealOnView = (elements, { stage }, className = 'is-revealed') => {
+  elements.forEach((el) =>
+    stage.add(el, (delay) => {
+      el.style.setProperty('--reveal-delay', `${delay}ms`)
+      el.classList.add(className)
+    })
+  )
+}
+
+// Each item's row also gets a bar of its share of the group total, and
+// that share in words, which CSS swaps in for the previous value on hover.
+const breakdown = ({ compareYear, groups }, runtime) => {
+  const rows = []
+  const sections = groups.map((group) => {
     const section = element('section', 'highlights__group')
 
     const header = element('div', 'highlights__total')
@@ -448,11 +474,20 @@ const breakdown = ({ compareYear, groups }) =>
           element('p', 'highlights__item-label', item.label),
           element('p', 'highlights__item-description', item.description)
         )
-        row.append(
-          counter('highlights__item-value', item.value),
-          text,
-          element('span', 'highlights__previous', `${compareYear}: ${formatNumber(item.previous)}`)
+        const share = (item.value / group.value) * 100
+        const compare = element('span', 'highlights__compare')
+        compare.append(
+          element('span', 'highlights__previous', `${compareYear}: ${formatNumber(item.previous)}`),
+          // "of total" fits the space of the 2024 value it stands in for.
+          element('span', 'highlights__share-text', `${formatNumber(share)}% of total`)
         )
+        const bar = element('span', 'highlights__share')
+        bar.setAttribute('aria-hidden', 'true')
+        bar.style.setProperty('--share', `${share}%`)
+
+        // The share bar is this row's motion; its number stays still.
+        row.append(element('span', 'highlights__item-value', formatNumber(item.value)), text, compare, bar)
+        rows.push(row)
         return row
       })
     )
@@ -461,9 +496,54 @@ const breakdown = ({ compareYear, groups }) =>
     return section
   })
 
+  revealOnView(rows, runtime)
+  return sections
+}
+
 const layouts = { breakdown, grid }
 
-// Stop the previous chapter's counters and charts.
+// One observer for everything that animates in (counters, bars, the
+// donut, revealed images), so what comes into view together starts
+// together: in page order, STAGGER apart, each by the start function it
+// was added with. It starts watching once `ready` settles.
+const STAGGER = 80
+
+const createStage = ({ ready, cleanups }) => {
+  const starts = new Map()
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries
+        .filter((entry) => entry.isIntersecting)
+        .map((entry) => entry.target)
+        .sort((a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1))
+        .forEach((el, index) => {
+          observer.unobserve(el)
+          starts.get(el)(index * STAGGER)
+        })
+    },
+    // Like the site's .reveal: once its top clears the bottom 15% of the screen.
+    { rootMargin: '0px 0px -15% 0px' }
+  )
+  let watching = false
+  let stopped = false
+  ready.then(() => {
+    if (stopped) return
+    watching = true
+    starts.forEach((_, el) => observer.observe(el))
+  })
+  cleanups.push(() => {
+    stopped = true
+    observer.disconnect()
+  })
+  return {
+    add: (el, start) => {
+      starts.set(el, start)
+      if (watching) observer.observe(el)
+    },
+  }
+}
+
+// Stop the previous chapter's counters, charts and stage.
 let cleanups = []
 
 // Empties the container when the chapter has no highlights.
@@ -471,13 +551,24 @@ export const renderHighlights = (container, data) => {
   cleanups.forEach((cleanup) => cleanup())
   cleanups = []
 
-  // On first load, numbers and charts wait for the page intro to fade in;
-  // on a chapter switch it has long finished.
+  // On first load, everything waits for the page intro to fade in; on a
+  // chapter switch it has long finished.
   const intro = container.closest('.page-intro')?.getAnimations() ?? []
   const ready = Promise.allSettled(intro.map((animation) => animation.finished))
+  const stage = createStage({ ready, cleanups })
 
   container.dataset.layout = data?.layout ?? ''
   container.dataset.variant = data?.variant ?? ''
-  container.replaceChildren(...(data ? layouts[data.layout](data, { ready, cleanups }) : []))
-  cleanups.push(countUp(container.querySelectorAll('[data-count]'), { after: ready }))
+  container.replaceChildren(...(data ? layouts[data.layout](data, { stage, cleanups }) : []))
+  cleanups.push(countUp(container.querySelectorAll('[data-count]'), { schedule: stage.add }))
+
+  // Each change badge waits for the value beside it to finish counting,
+  // then lands (CSS); with reduced motion nothing counts, so none waits.
+  if (reducedMotion) return
+  container.querySelectorAll('.hl-change').forEach((badge) => {
+    const value = badge.parentElement.querySelector('[data-count]')
+    if (!value) return
+    badge.classList.add('is-pending')
+    value.addEventListener('countend', () => badge.classList.remove('is-pending'), { once: true })
+  })
 }

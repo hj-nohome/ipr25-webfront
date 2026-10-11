@@ -1717,15 +1717,15 @@ html.intro-seen .intro ~ main {
   transform: translateX(-4px);
 }
 
-/* The image sits in the top right corner; the button takes the space
-   under it, however tall the text column grows. */
+/* The image sits in the top right corner at its own height, however tall
+   the text column (and the button at its end) grows. */
 .chapter-detail__body {
   display: grid;
   grid-template-columns: minmax(0, 11fr) minmax(0, 9fr);
   grid-template-rows: auto 1fr;
   grid-template-areas:
     'text media'
-    'text cta';
+    'text .';
 }
 
 /* A container so the highlights can fit the column rather than the
@@ -1877,9 +1877,110 @@ html.intro-seen .intro ~ main {
   margin-top: 6px;
 }
 
-.highlights__item > .highlights__previous {
+/* The 2024 value, or on hover the item's share of its total; stacked in
+   one cell so the swap doesn't shift the row. */
+.highlights__compare {
+  display: inline-grid;
+  justify-items: end;
   padding-top: 4px;
+}
+
+.highlights__compare > * {
+  grid-area: 1 / 1;
+  transition: opacity 0.2s;
+}
+
+.highlights__compare .highlights__previous {
   opacity: 0.7;
+}
+
+.highlights__share-text {
+  color: var(--chapter-ink);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+}
+
+/* The item's share of its total. */
+.highlights__share {
+  grid-column: 2 / -1;
+  height: 3px;
+  margin-top: 10px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--chapter-accent) 15%, transparent);
+}
+
+.highlights__share::after {
+  content: '';
+  display: block;
+  width: var(--share);
+  height: 100%;
+  background: var(--chapter-accent);
+}
+
+/* Share bars (chapters 1 and 2) grow in once highlights.js marks their
+   row .is-revealed, with the counters' ease and length. */
+.highlights__share::after,
+.hl-share__bar::after {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition:
+    transform 1.4s cubic-bezier(0.25, 1, 0.5, 1) var(--reveal-delay, 0s),
+    background-color 0.2s;
+}
+
+.is-revealed .highlights__share::after,
+.is-revealed .hl-share__bar::after {
+  transform: scaleX(1);
+}
+
+/* Hover only where it exists, so a tap doesn't leave a row stuck on. */
+@media (hover: hover) {
+  .highlights__item:hover .highlights__share::after {
+    background: var(--chapter-accent-dark);
+  }
+
+  .highlights__item:hover .highlights__previous {
+    opacity: 0;
+  }
+
+  .highlights__item:hover .highlights__share-text {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .highlights__share::after,
+  .hl-share__bar::after {
+    transform: none;
+    transition: none;
+  }
+
+  .highlights__compare > * {
+    transition: none;
+  }
+}
+
+/* Counting numbers keep fixed-width digits, before, during and after the
+   count, so they don't wobble as they tick or shift when they finish. */
+.highlights [data-count] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Small whole numbers fade and scale in, with a slight overshoot, in
+   place of counting (src/count-up.js; keep 0.4s in step with POP_MS). */
+.count-pop {
+  display: inline-block;
+  transition:
+    opacity 0.4s ease-out,
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.count-pop.is-waiting {
+  opacity: 0;
+  transform: scale(0.6);
 }
 
 /* A counting number (src/count-up.js) over its final value, which holds
@@ -2057,7 +2158,13 @@ html.intro-seen .intro ~ main {
   opacity: 0.6;
 }
 
+/* Held back (.is-pending, from highlights.js) until the value beside it
+   has counted, then rises in, or drops in for a fall. */
 .hl-change {
+  display: inline-block;
+  transition:
+    opacity 0.3s ease-out,
+    transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
   padding: 2px 6px;
   border-radius: 3px;
   background: var(--chapter-accent);
@@ -2066,6 +2173,19 @@ html.intro-seen .intro ~ main {
   font-weight: 600;
   line-height: 1.4;
   white-space: nowrap;
+}
+
+.hl-change--down {
+  background: var(--chapter-accent-dark);
+}
+
+.hl-change.is-pending {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.hl-change--down.is-pending {
+  transform: translateY(-6px);
 }
 
 .hl-previous {
@@ -2619,15 +2739,23 @@ html.intro-seen .intro ~ main {
   opacity: 0.7;
 }
 
-/* --share is set per bar by highlights.js. */
+/* --share is set per bar by highlights.js; it grows in like chapter 1's
+   share bars (see .highlights__share). */
 .hl-share__bar {
   grid-column: 1 / -1;
   height: 6px;
   margin-top: 8px;
+  overflow: hidden;
   border-radius: 3px;
-  background:
-    linear-gradient(var(--chapter-accent-dark), var(--chapter-accent-dark)) 0 0 / var(--share) 100% no-repeat,
-    color-mix(in srgb, var(--chapter-accent) 20%, #ffffff);
+  background: color-mix(in srgb, var(--chapter-accent) 20%, #ffffff);
+}
+
+.hl-share__bar::after {
+  content: '';
+  display: block;
+  width: var(--share);
+  height: 100%;
+  background: var(--chapter-accent-dark);
 }
 
 .hl-banner__source {
@@ -2703,9 +2831,16 @@ html.intro-seen .intro ~ main {
   line-height: 1.5;
 }
 
+/* Notes: paler than the other tinted blocks, text in the label's colour;
+   both follow each chapter's accent. */
+.hl-block--notes {
+  background: color-mix(in srgb, var(--chapter-accent) 4%, #ffffff);
+}
+
 .hl-notes {
   margin: 0;
   padding-left: 1.25em;
+  color: var(--chapter-ink);
   font-size: 14px;
   line-height: 1.6;
 }
@@ -2739,8 +2874,9 @@ html.intro-seen .intro ~ main {
     grid-template-columns: auto minmax(0, 1fr);
   }
 
-  .highlights__item > .highlights__previous {
+  .highlights__compare {
     grid-column: 2;
+    justify-items: start;
     padding-top: 2px;
   }
 }
@@ -2771,9 +2907,9 @@ html.intro-seen .intro ~ main {
   visibility: visible;
 }
 
+/* Below the key highlights. */
 .chapter-detail__cta {
-  grid-area: cta;
-  padding: 40px 32px 80px;
+  margin-top: 48px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2788,7 +2924,7 @@ html.intro-seen .intro ~ main {
   }
 }
 
-/* Stacked on phones: image first, then the text, then the button. */
+/* Stacked on phones: image first, then the text (with the button). */
 @media (max-width: 768px) {
   .chapter-detail__bar {
     padding: 0 20px;
@@ -2799,8 +2935,7 @@ html.intro-seen .intro ~ main {
     grid-template-rows: none;
     grid-template-areas:
       'media'
-      'text'
-      'cta';
+      'text';
   }
 
   .chapter-detail__media {
@@ -2808,7 +2943,7 @@ html.intro-seen .intro ~ main {
   }
 
   .chapter-detail__text {
-    padding: 40px 20px 24px;
+    padding: 40px 20px 48px;
   }
 
   .chapter-detail__title {
@@ -2816,7 +2951,7 @@ html.intro-seen .intro ~ main {
   }
 
   .chapter-detail__cta {
-    padding: 0 20px 48px;
+    margin-top: 40px;
   }
 }
 

@@ -5,6 +5,10 @@
 // breakdown: cards of a total and the items it's made of, each with its
 // `compareYear` value as `previous`.
 //
+// Headline values count up from 0: a figure's `value`, 'figures' items,
+// stack `value` parts, banner stats and breakdown totals. Other numbers
+// stay still.
+//
 // grid: `blocks` in two columns (one when narrow), each by its `type`.
 // `variant: 'accent'` shows values in the chapter colour. `changeStyle`
 // shows changes as 'badge' ("↑1.5%" by the value; the default), 'inline'
@@ -18,8 +22,9 @@
 //   `lists` replaces itemsLabel/items/itemStyle/icon for several lists,
 //   each { label, style, icon, columns, items }.
 //   Items take the same value keys, or `text` for one that isn't a
-//   number, plus `heading` (above the value), `image` with `imageAlt`,
-//   and `wide` (all columns). `itemStyle` is 'list' (default), 'cards',
+//   number, plus `heading` (above the value), `image` with `imageAlt`
+//   (and `reveal` to fade it in on scroll), and `wide` (all columns).
+//   `itemStyle` is 'list' (default), 'cards',
 //   'stats', 'figures', 'bullets', 'pairs' or 'ranked'; `columns` sets
 //   at most how many columns 'figures' uses; 'icons' (an image over each
 //   label) and 'numbered' also work in stacks. `neutralValues` keeps the
@@ -323,6 +328,7 @@ export const highlights = {
                 heading: 'Top 3 Marketplaces:',
                 image: marketplaceLogos,
                 imageAlt: 'Shopee, TikTok Shop and Lazada',
+                reveal: true,
               },
               {
                 heading: 'Most purchased items online:',

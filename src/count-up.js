@@ -1,12 +1,31 @@
-// Counts numbers up from 0 the first time they scroll into view. Each
-// element is marked data-count="<value>" and its text must be just that
-// number, formatted like the counter does it (en-MY, value's decimals).
+// Counts numbers up from 0. Each element is marked data-count="<value>"
+// and its text must be just that number, formatted like the counter does
+// it (en-MY, value's decimals). When each starts is up to the caller's
+// `schedule(el, start)`, which calls start(delay) when it's time; each
+// fires a 'countend' event once it has counted all the way up. Whole
+// numbers under POP_BELOW fade and scale in instead (CSS .count-pop):
+// counting 0 to 7 is a few jerky steps, not a count.
 const DURATION = 1400
-const STAGGER = 80 // between numbers that come into view together
+const POP_BELOW = 20
+const POP_MS = 400 // matches .count-pop's transition
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 const easeOutQuart = (t) => 1 - (1 - t) ** 4
+
+const isSmall = (el) => !el.dataset.count.includes('.') && Number(el.dataset.count) < POP_BELOW
+
+// Hidden until it pops in; its text never changes.
+const preparePop = (el) => {
+  el.classList.add('count-pop', 'is-waiting')
+  return {
+    el,
+    pop: true,
+    finish: () => {
+      el.classList.remove('is-waiting')
+    },
+  }
+}
 
 // Shows 0 straight away; the final value stays in, unseen, holding the
 // number's finished width (and is what screen readers read).
@@ -31,6 +50,7 @@ const prepare = (el) => {
   el.replaceChildren(box)
 
   return {
+    el,
     start: 0,
     show: (progress) => {
       value.textContent = format.format(target * progress)
@@ -41,15 +61,13 @@ const prepare = (el) => {
   }
 }
 
-// Starts watching once `after` settles (e.g. an entrance animation).
 // Returns a stop function that puts every number back to its final value.
-export const countUp = (elements, { after = Promise.resolve() } = {}) => {
+export const countUp = (elements, { schedule }) => {
   if (reducedMotion || !elements.length) return () => {}
 
-  const counters = new Map([...elements].map((el) => [el, prepare(el)]))
   const running = new Set()
+  const timers = []
   let frame = 0
-  let stopped = false
 
   const tick = (now) => {
     for (const counter of running) {
@@ -58,35 +76,31 @@ export const countUp = (elements, { after = Promise.resolve() } = {}) => {
       if (progress === 1) {
         counter.finish()
         running.delete(counter)
+        counter.el.dispatchEvent(new Event('countend'))
       }
     }
     frame = running.size ? requestAnimationFrame(tick) : 0
   }
 
-  const observer = new IntersectionObserver(
-    (entries) => {
-      const now = performance.now()
-      entries
-        .filter((entry) => entry.isIntersecting)
-        .forEach((entry, index) => {
-          observer.unobserve(entry.target)
-          const counter = counters.get(entry.target)
-          counter.start = now + index * STAGGER
-          running.add(counter)
-        })
-      if (running.size && !frame) frame = requestAnimationFrame(tick)
-    },
-    { threshold: 0.5 }
-  )
-
-  after.then(() => {
-    if (!stopped) counters.forEach((_, el) => observer.observe(el))
+  const counters = [...elements].map((el) => {
+    const counter = isSmall(el) ? preparePop(el) : prepare(el)
+    schedule(el, (delay = 0) => {
+      if (counter.pop) {
+        el.style.transitionDelay = `${delay}ms`
+        counter.finish()
+        timers.push(setTimeout(() => el.dispatchEvent(new Event('countend')), delay + POP_MS))
+        return
+      }
+      counter.start = performance.now() + delay
+      running.add(counter)
+      if (!frame) frame = requestAnimationFrame(tick)
+    })
+    return counter
   })
 
   return () => {
-    stopped = true
-    observer.disconnect()
     cancelAnimationFrame(frame)
+    timers.forEach(clearTimeout)
     counters.forEach((counter) => counter.finish())
   }
 }
