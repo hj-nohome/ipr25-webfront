@@ -627,25 +627,27 @@ a {
   margin-bottom: -0.1em;
 }
 
+/* --intro-delay holds everything back until the homepage .intro has
+   opened (set below, under Intro); it's 0 on other pages. */
 .line-reveal__line > span {
   display: block;
   animation: line-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: 0.1s;
+  animation-delay: calc(var(--intro-delay, 0s) + 0.1s);
 }
 
 .line-reveal__line:nth-child(2) > span {
-  animation-delay: 0.22s;
+  animation-delay: calc(var(--intro-delay, 0s) + 0.22s);
 }
 
 .line-reveal__line:nth-child(3) > span {
-  animation-delay: 0.34s;
+  animation-delay: calc(var(--intro-delay, 0s) + 0.34s);
 }
 
 /* Starts once a single-line title is mostly in; the three-line
    homepage title waits longer via --page-intro-delay. */
 .page-intro {
   animation: fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: var(--page-intro-delay, 0.3s);
+  animation-delay: calc(var(--intro-delay, 0s) + var(--page-intro-delay, 0.3s));
 }
 
 @keyframes line-reveal {
@@ -675,6 +677,228 @@ a {
   }
 }
 
+/* Intro: homepage opening animation, over everything until it ends.
+   Pure CSS, so it starts on first paint without waiting for main.js.
+     0.15s  the line grows from the centre
+     0.7s   logo and title slide out from behind it
+     2.3s   they fade; the line stretches to full height
+     2.85s  the two panels part, revealing the page
+     3.75s  done: the overlay hides itself (intro-done), main.js unlocks scroll
+   The hero title starts at --intro-delay, while the panels are parting.
+
+   Laid out as one row, logo | line | text, with equal halves either side
+   so the line sits at the centre of the screen. Each panel covers the
+   screen from its edge to the line, so the screen splits open there. */
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-rows: 100%;
+  align-items: center;
+  column-gap: 32px;
+  --intro-glow: color-mix(in srgb, #3d2394 45%, var(--bg));
+  animation: intro-done 1ms 3.75s forwards;
+}
+
+.intro ~ main {
+  --intro-delay: 3s;
+}
+
+/* Both panels span the line's column (drawn over them), so they meet
+   without a gap. Each carries half of one purple glow centred on it.
+   Each `animation` here names its keyframes: the production build's CSS
+   minifier turns a shorthand without a name into `animation: none`,
+   dropping the timing, which only shows up on the deployed site. */
+.intro__panel {
+  grid-row: 1;
+  align-self: stretch;
+}
+
+.intro__panel--left {
+  grid-column: 1 / 3;
+  background: radial-gradient(circle 70vmax at 100% 50%, var(--intro-glow), var(--bg) 70%);
+  animation: intro-panel-left 0.9s cubic-bezier(0.76, 0, 0.24, 1) 2.85s both;
+}
+
+.intro__panel--right {
+  grid-column: 2 / 4;
+  background: radial-gradient(circle 70vmax at 0% 50%, var(--intro-glow), var(--bg) 70%);
+  animation: intro-panel-right 0.9s cubic-bezier(0.76, 0, 0.24, 1) 2.85s both;
+}
+
+.intro__line {
+  --intro-line-height: 120px;
+  grid-row: 1;
+  grid-column: 2;
+  width: 2px;
+  height: var(--intro-line-height);
+  background: linear-gradient(transparent, #ae91cc 20%, #ffffff 50%, #ae91cc 80%, transparent);
+  animation:
+    intro-line 2.75s 0.15s both,
+    intro-fade-out 0.4s ease 2.85s both;
+}
+
+/* Clips its content so the logo and text look like they come out from
+   behind the line. Each hugs the line; the outer padding keeps text off
+   the screen edge when the half is narrow. */
+.intro__side {
+  grid-row: 1;
+  overflow: hidden;
+  animation: intro-fade-out 0.4s ease 2.3s both;
+}
+
+.intro__side--left {
+  grid-column: 1;
+  justify-self: end;
+  padding-left: 10px;
+}
+
+.intro__side--right {
+  grid-column: 3;
+  justify-self: start;
+  padding-right: 10px;
+}
+
+.intro__side--left > * {
+  animation: intro-from-right 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.7s both;
+}
+
+.intro__side--right > * {
+  animation: intro-from-left 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.7s both;
+}
+
+.intro__logo {
+  display: block;
+  height: 72px;
+  width: auto;
+}
+
+.intro__title {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+/* One line where it fits; wraps into even lines on narrower screens. */
+.intro__subtitle {
+  margin: 4px 0 0;
+  font-size: 16px;
+  line-height: 1.3;
+  text-wrap: balance;
+  opacity: 0.75;
+}
+
+@keyframes intro-line {
+  0% {
+    transform: scaleY(0);
+    animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  22%,
+  78% {
+    transform: scaleY(1);
+    animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  /* Tall enough to run off the top and bottom of any screen. */
+  100% {
+    transform: scaleY(14);
+  }
+}
+
+@keyframes intro-from-right {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes intro-from-left {
+  from {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes intro-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes intro-panel-left {
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes intro-panel-right {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes intro-done {
+  to {
+    visibility: hidden;
+  }
+}
+
+/* Set by main.js while the intro plays. The gutter keeps the scrollbar's
+   space reserved, so the page doesn't shift sideways when it comes back. */
+html.intro-playing {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+
+@media (max-width: 768px) {
+  .intro {
+    column-gap: 16px;
+  }
+
+  .intro__line {
+    --intro-line-height: 88px;
+  }
+
+  .intro__logo {
+    height: 48px;
+  }
+
+  /* Sized to fit on one line in half the screen (about 11px on most
+     phones). On the narrowest it stops at 10px and wraps instead. */
+  .intro__title {
+    font-size: clamp(10px, calc((50vw - 30px) / 15.5), 14px);
+    white-space: normal;
+    text-wrap: balance;
+  }
+
+  .intro__subtitle {
+    font-size: 9.5px;
+  }
+}
+
+/* Plays once per visit: later loads in the same tab (the logo, Home,
+   back, refresh) skip it. intro-seen is set by the script in
+   index.html's <head>, before the page paints, so the intro never flashes. */
+html.intro-seen .intro {
+  display: none;
+}
+
+html.intro-seen .intro ~ main {
+  --intro-delay: 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro {
+    display: none;
+  }
+
+  .intro ~ main {
+    --intro-delay: 0s;
+  }
+}
+
 /* Scroll reveal: fade + slide up as an element enters the viewport. */
 .reveal {
   opacity: 0;
@@ -699,7 +923,6 @@ a {
     transition: none;
   }
 }
-
 @media (max-width: 768px) {
   .hero {
     grid-template-columns: 1fr;
@@ -797,6 +1020,29 @@ a {
   display: block;
 }
 
+/* Portrait cutout on a soft lavender panel, with the swirl artwork
+   (images/chairman-swirl.png) filling the frame behind it, as drawn: a
+   wide frame, with the figure centred and room either side. The figure is
+   sized as a share of the frame, so it holds together at any width. */
+.split-section__media--swirl {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  max-width: 520px;
+  background:
+    url('../images/chairman-swirl.png') center / cover no-repeat,
+    radial-gradient(closest-side, #f1ebf8, #f7f4fb 70%, #fbfafd);
+}
+
+/* Shoulders about half the frame wide, cut off by it at the waist. */
+.split-section__media--swirl img {
+  position: absolute;
+  top: 5%;
+  left: 50%;
+  width: 74%;
+  height: auto;
+  transform: translateX(-50%);
+}
+
 .button {
   --bracket-color: var(--panel-text, var(--text));
   --bracket-size: 10px; /* length of each bracket arm */
@@ -887,6 +1133,11 @@ a {
   .split-section__media {
     aspect-ratio: 16 / 10;
     order: -1;
+  }
+
+  /* Same proportions as on wider screens. */
+  .split-section__media--swirl {
+    aspect-ratio: 4 / 3;
   }
 
   /* Stacked under the text on phones: bleed left, right and bottom so the
@@ -1503,6 +1754,7 @@ a {
 }
 
 .chapter-detail__media {
+  position: relative;
   grid-area: media;
   aspect-ratio: 4 / 5;
   overflow: hidden;
@@ -1513,6 +1765,18 @@ a {
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+/* Stacked on the chapter image and shown once the chapter's transition
+   (chapter.js) has drawn it in. */
+.chapter-detail__photo {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+}
+
+.chapter-detail__media.is-photo-shown .chapter-detail__photo {
+  visibility: visible;
 }
 
 .chapter-detail__cta {

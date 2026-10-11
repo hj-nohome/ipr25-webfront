@@ -118,6 +118,34 @@ if (!saveData && !hasImageBg && canPlayWebm) {
   }
 }
 
+// Homepage intro: plays once per visit, recorded here and checked in
+// index.html's <head>. Scrolling stays locked while it plays. Its timing
+// is in style.css, ending with the overlay's own intro-done animation.
+// The timeout unlocks anyway if animationend never fires (e.g. animations
+// turned off in the browser). Reduced motion hides the intro entirely.
+const intro = document.querySelector('.intro')
+
+// Refreshing the homepage starts at the top instead of where the reader
+// left off. Back/forward still return to where they were, and a link to a
+// section (index.html#...) still lands on it.
+if (intro) {
+  const isReload = performance.getEntriesByType('navigation')[0]?.type === 'reload'
+  history.scrollRestoration = isReload && !location.hash ? 'manual' : 'auto'
+  if (history.scrollRestoration === 'manual') window.scrollTo(0, 0)
+}
+
+if (intro && getComputedStyle(intro).display !== 'none') {
+  try {
+    sessionStorage.setItem('ipr25-intro-seen', '1')
+  } catch {}
+  const unlockScroll = () => document.documentElement.classList.remove('intro-playing')
+  document.documentElement.classList.add('intro-playing')
+  intro.addEventListener('animationend', (event) => {
+    if (event.animationName === 'intro-done') unlockScroll()
+  })
+  setTimeout(unlockScroll, 5000)
+}
+
 const toggle = document.querySelector('#nav-toggle')
 const links = document.querySelector('#nav-links')
 
