@@ -1,4 +1,5 @@
 import './style.css'
+import { countUp } from './count-up.js'
 import bgVideoUrl from '../images/ipr-background-video.webm'
 
 // Looping background video, shared by every page.
@@ -191,11 +192,27 @@ window.matchMedia('(min-width: 769px)').addEventListener('change', (event) => {
 // Link index, for staggering the links as the menu slides in.
 ;[...links.children].forEach((el, i) => el.style.setProperty('--i', i))
 
+// An item's stats count up the first time it opens: they're hidden while
+// it's closed, so counting on scroll would finish unseen.
+const ACCORDION_COUNT_DELAY = 150 // ms into the answer's slide open
+const ACCORDION_COUNT_STAGGER = 80
+const accordionCounts = new Map()
+
+countUp(document.querySelectorAll('.accordion [data-count]'), {
+  schedule: (el, start) => {
+    const item = el.closest('.accordion__item')
+    accordionCounts.set(item, [...(accordionCounts.get(item) ?? []), start])
+  },
+})
+
 document.querySelectorAll('.accordion__question').forEach((question) => {
   question.addEventListener('click', () => {
     const item = question.closest('.accordion__item')
     const isOpen = item.classList.toggle('is-open')
     question.setAttribute('aria-expanded', String(isOpen))
+    if (!isOpen) return
+    accordionCounts.get(item)?.forEach((start, i) => start(ACCORDION_COUNT_DELAY + i * ACCORDION_COUNT_STAGGER))
+    accordionCounts.delete(item)
   })
 })
 

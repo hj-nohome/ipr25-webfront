@@ -997,10 +997,14 @@ html.intro-seen .intro ~ main {
   align-items: start;
 }
 
-/* A column that runs to the section's top, right and bottom edges by
-   cancelling its padding (e.g. the edge-to-edge accordion). */
-.split-section__bleed {
-  margin: calc(-1 * var(--split-pad-top, 80px)) -80px -80px 0;
+.split-section--single {
+  grid-template-columns: 1fr;
+  gap: 28px;
+}
+
+/* Runs to the section's right edge by cancelling its padding. */
+.split-section__bleed-right {
+  margin-right: -80px;
 }
 
 .split-section__text {
@@ -1018,6 +1022,13 @@ html.intro-seen .intro ~ main {
   font-size: 42px;
   font-weight: 400;
   letter-spacing: -0.02em;
+}
+
+.split-section__subtitle {
+  margin: 0;
+  font-family: var(--heading-font-family);
+  font-size: 24px;
+  font-weight: 600;
 }
 
 /* Intro paragraph under a page title; each page sets its own spacing. */
@@ -1063,11 +1074,25 @@ html.intro-seen .intro ~ main {
   position: relative;
   align-self: end;
   margin-bottom: -80px;
-  aspect-ratio: 4 / 3;
-  max-width: 520px;
-  background:
-    url('../images/chairman-swirl.png') center / cover no-repeat,
-    radial-gradient(closest-side, #f1ebf8, #f7f4fb 70%, transparent);
+  aspect-ratio: 6 / 5;
+  max-width: 600px;
+  overflow: visible;
+  clip-path: inset(0 -100vmax); /* top and bottom only, so the swirl's sides show */
+  background: radial-gradient(closest-side, #f1ebf8, #f7f4fb 70%, transparent);
+}
+
+/* The swirl at the frame's height and its own proportions, which are
+   wider than the frame's: as a `cover` background it lost its sides. */
+.split-section__media--swirl::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 100%;
+  aspect-ratio: 1769 / 1386;
+  background: url('../images/chairman-swirl.png') center / contain no-repeat;
+  transform: translateX(-50%);
+  pointer-events: none;
 }
 
 /* The reveal slide-in starts the frame below that edge; keep it from
@@ -1076,12 +1101,13 @@ html.intro-seen .intro ~ main {
   overflow: clip;
 }
 
-/* Shoulders about half the frame wide, cut off by it at the waist. */
+/* Shoulders about 60% of the frame wide, cut off by it just above the
+   waist. */
 .split-section__media--swirl img {
   position: absolute;
-  top: 5%;
+  top: 3%;
   left: 50%;
-  width: 74%;
+  width: 84%;
   height: auto;
   transform: translateX(-50%);
 }
@@ -1182,24 +1208,16 @@ html.intro-seen .intro ~ main {
      it no longer sits on the bottom edge. */
   .split-section__media--swirl {
     margin-bottom: 0;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 6 / 5;
   }
 
-  /* Stacked under the text on phones: bleed left, right and bottom so the
-     rows span the section. Its own left line would then sit on top of the
-     section's, so it's dropped. */
-  .split-section__bleed {
-    margin: 0 -20px -48px;
-  }
-
-  .split-section__bleed.accordion::after {
-    display: none;
+  .split-section__bleed-right {
+    margin-right: -20px;
   }
 }
 
 /* Drawn lines: 1px lines that draw themselves in when their section
    scrolls into view (.draw-lines in main.js)*/
-.spacer.draw-lines::after,
 .chapters::after,
 .chapters__list::before,
 .chapters__item::after,
@@ -1213,7 +1231,6 @@ html.intro-seen .intro ~ main {
 }
 
 /* Vertical lines draw top to bottom. */
-.spacer.draw-lines::after,
 .chapters::after,
 .accordion::after {
   top: 0;
@@ -1239,7 +1256,6 @@ html.intro-seen .intro ~ main {
 
 /* Drawn state. Vertical lines wait for .line-drawing (added in sequence
    by main.js); the chapters rows draw as soon as the section is visible. */
-.spacer.draw-lines.line-drawing::after,
 .chapters.line-drawing::after,
 .chapters.is-visible .chapters__list::before,
 .chapters.is-visible .chapters__item::after,
@@ -1250,7 +1266,6 @@ html.intro-seen .intro ~ main {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .spacer.draw-lines::after,
   .chapters::after,
   .chapters__list::before,
   .chapters__item::after,
@@ -1291,8 +1306,11 @@ html.intro-seen .intro ~ main {
   transition: transform 0.9s cubic-bezier(0.65, 0, 0.35, 1);
 }
 
+/* Above the rows, which come later in the DOM and would cover it with
+   their hover background. */
 .accordion::before {
   top: 0;
+  z-index: 1;
 }
 
 .accordion__item::after {
@@ -1301,27 +1319,13 @@ html.intro-seen .intro ~ main {
   transition-delay: calc(0.15s + var(--i, 0) * 110ms);
 }
 
-/* When the accordion bleeds to the section's edges, its top and bottom
-   lines sit on the panel's own edges and would close it into a box, so
-   drop them. On phones it sits under the text rather than at the top,
-   so the top line stays there as the divider. */
-.split-section__bleed .accordion__item:last-child::after {
-  display: none;
-}
-
-@media (min-width: 769px) {
-  .split-section__bleed.accordion::before {
-    display: none;
-  }
-}
-
 .accordion__question {
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 20px;   /* inset from the accordion's left line */
+  padding: 20px 120px 20px 20px;   /* inset from the accordion's left line */
   background: none;
   border: none;
   font: inherit;
@@ -1375,42 +1379,74 @@ html.intro-seen .intro ~ main {
   overflow: hidden;
 }
 
-.accordion__answer p {
+.accordion__answer-inner > p {
   margin: 0;
   padding: 0 20px 20px;
   opacity: 0.75;
 }
 
 /* "Read more" links to the PDF report. */
-.accordion__answer a {
+.accordion__answer p a {
   font-weight: 600;
 }
 
-/* Spacer: empty vertical rhythm block between sections */
-.spacer {
-  margin-left: var(--gutter);
-  border-left: 1px solid var(--border);
+.accordion__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 48px;
+  margin: 0;
+  padding: 8px 20px 0;
+  list-style: none;
 }
 
-.spacer--xl {
-  height: 800px;
+.accordion__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-/* A spacer whose left line draws in (see .draw-lines in main.js) as the
-   first segment of a stroke that continues into the next section. */
-.spacer.draw-lines {
-  position: relative;
-  border-left: none;
+.accordion__stat-value {
+  font-family: var(--heading-font-family);
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
 }
 
-.spacer.draw-lines::after {
-  /* Eases in: ends at full speed, where the next segment picks up. */
-  transition: transform var(--line-duration, 1s) cubic-bezier(0.11, 0, 0.5, 0);
+.accordion__stat-label {
+  font-weight: 500;
+}
+
+.accordion__explore {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin: 32px 20px 24px;
+  color: inherit;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.accordion__explore svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.25s ease;
+}
+
+.accordion__explore:hover svg,
+.accordion__explore:focus-visible svg {
+  transform: translate(2px, -2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .accordion__explore svg {
+    transition: none;
+  }
 }
 
 @media (max-width: 768px) {
-  .spacer--xl {
-    height: 120px;
+  .accordion__stat-value {
+    font-size: 28px;
   }
 }
 
@@ -1437,9 +1473,8 @@ html.intro-seen .intro ~ main {
    .chapters__list's bled-out content instead of being covered by it. */
 .chapters::after {
   z-index: 1;
-  /* Eases out from full speed, continuing the spacer's line above.
-     Duration set by main.js from the section's height. */
-  transition: transform var(--line-duration, 1.8s) cubic-bezier(0.5, 1, 0.89, 1);
+  /* Duration set by main.js from the section's height. */
+  transition: transform var(--line-duration, 1.8s) cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 .chapters__title {
@@ -1504,9 +1539,28 @@ html.intro-seen .intro ~ main {
   display: block;
 }
 
+/* Nudged on hover like the accordion's questions (same distance and ease).
+   A transform rather than padding, so the thumbnail stays put. */
 .chapters__name {
   flex: 1;
   font-size: 18px;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (hover: hover) {
+  .chapters__link:hover .chapters__name {
+    transform: translateX(8px);
+  }
+}
+
+.chapters__link:focus-visible .chapters__name {
+  transform: translateX(8px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chapters__name {
+    transition: none;
+  }
 }
 
 .chapters__tag {
