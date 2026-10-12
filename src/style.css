@@ -689,19 +689,23 @@ a {
      3.75s  done: the overlay hides itself (intro-done), main.js unlocks scroll
    The hero title starts at --intro-delay, while the panels are parting.
 
-   Laid out as one row, logo | line | text, with equal halves either side
-   so the line sits at the centre of the screen. Each panel covers the
-   screen from its edge to the line, so the screen splits open there. */
+   Laid out as one row, logo | line | text, with the line --intro-offset
+   left of the screen's centre: the text is much wider than the logo, so
+   that looks centred. Each panel covers the screen from its edge to the
+   line, so the screen splits open there. */
 .intro {
+  --intro-offset: 60px;
+  --intro-gap: 32px;
   position: fixed;
   inset: 0;
   z-index: 100;
   overflow: hidden;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  /* The first column ends where the line's centre lands at --intro-offset. */
+  grid-template-columns: minmax(0, calc(50% - var(--intro-offset) - 1px - var(--intro-gap))) auto minmax(0, 1fr);
   grid-template-rows: 100%;
   align-items: center;
-  column-gap: 32px;
+  column-gap: var(--intro-gap);
   --intro-glow: color-mix(in srgb, #3d2394 45%, var(--bg));
   animation: intro-done 1ms 3.75s forwards;
 }
@@ -773,32 +777,26 @@ a {
   animation: intro-from-left 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.7s both;
 }
 
-/* The line has to stay at the screen's centre for the split, so the logo
-   and text are sized to weigh about the same either side of it: the text
-   kept to two lines each, the logo matching its height. */
 .intro__logo {
   display: block;
-  height: 100px;
+  height: 72px;
   width: auto;
 }
 
-.intro__text {
-  max-width: 16em;
-}
-
+/* One line each, except on phones. */
 .intro__title {
   margin: 0;
   font-size: 22px;
   line-height: 1.2;
   letter-spacing: -0.01em;
-  text-wrap: balance;
+  white-space: nowrap;
 }
 
 .intro__subtitle {
   margin: 4px 0 0;
   font-size: 16px;
   line-height: 1.3;
-  text-wrap: balance;
+  white-space: nowrap;
   opacity: 0.75;
 }
 
@@ -860,9 +858,11 @@ html.intro-playing {
   overflow: hidden;
 }
 
+/* Phones wrap the text to fit each half, so the halves stay even. */
 @media (max-width: 768px) {
   .intro {
-    column-gap: 16px;
+    --intro-offset: 0px;
+    --intro-gap: 16px;
   }
 
   .intro__line {
@@ -877,10 +877,14 @@ html.intro-playing {
      phones). On the narrowest it stops at 10px and wraps instead. */
   .intro__title {
     font-size: clamp(10px, calc((50vw - 30px) / 15.5), 14px);
+    white-space: normal;
+    text-wrap: balance;
   }
 
   .intro__subtitle {
     font-size: 9.5px;
+    white-space: normal;
+    text-wrap: balance;
   }
 }
 
