@@ -32,6 +32,9 @@
   font: 16px/1.5 var(--font-family);
   color: var(--text);
   background: var(--bg);
+  /* Always reserved: Chrome leaves a reserved gutter out of 100vw, so
+     toggling it (the intro's scroll lock) would shift --gutter. */
+  scrollbar-gutter: stable;
 }
 
 @media (max-width: 768px) {
@@ -770,10 +773,17 @@ a {
   animation: intro-from-left 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.7s both;
 }
 
+/* The line has to stay at the screen's centre for the split, so the logo
+   and text are sized to weigh about the same either side of it: the text
+   kept to two lines each, the logo matching its height. */
 .intro__logo {
   display: block;
-  height: 72px;
+  height: 100px;
   width: auto;
+}
+
+.intro__text {
+  max-width: 16em;
 }
 
 .intro__title {
@@ -781,10 +791,9 @@ a {
   font-size: 22px;
   line-height: 1.2;
   letter-spacing: -0.01em;
-  white-space: nowrap;
+  text-wrap: balance;
 }
 
-/* One line where it fits; wraps into even lines on narrower screens. */
 .intro__subtitle {
   margin: 4px 0 0;
   font-size: 16px;
@@ -845,11 +854,10 @@ a {
   }
 }
 
-/* Set by main.js while the intro plays. The gutter keeps the scrollbar's
-   space reserved, so the page doesn't shift sideways when it comes back. */
+/* Set by main.js while the intro plays. The page doesn't shift when the
+   scrollbar comes back: :root keeps its space reserved. */
 html.intro-playing {
   overflow: hidden;
-  scrollbar-gutter: stable;
 }
 
 @media (max-width: 768px) {
@@ -869,8 +877,6 @@ html.intro-playing {
      phones). On the narrowest it stops at 10px and wraps instead. */
   .intro__title {
     font-size: clamp(10px, calc((50vw - 30px) / 15.5), 14px);
-    white-space: normal;
-    text-wrap: balance;
   }
 
   .intro__subtitle {
@@ -1589,7 +1595,7 @@ html.intro-seen .intro ~ main {
 
 .chapter-entry__name {
   margin: 0;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 400;
   line-height: 1.4;
   letter-spacing: 0.06em;
@@ -1740,10 +1746,12 @@ html.intro-seen .intro ~ main {
   margin: 0;
   font-size: 48px;
   font-weight: 400;
+  line-height: 1.15;
   letter-spacing: -0.02em;
+  text-wrap: balance; /* the longer chapter names wrap */
 }
 
-.chapter-detail__name {
+.chapter-detail__number {
   margin: 8px 0 32px;
   font-size: 12px;
   letter-spacing: 0.06em;

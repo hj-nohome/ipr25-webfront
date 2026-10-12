@@ -200,9 +200,9 @@ const items = (block, spec, context) => {
 
 // A Chart.js doughnut of % shares, each item with a `color`, over a
 // legend in the items' own order. The chart is drawn (and sweeps in) the
-// first time it's on screen; the legend's values are what screen readers
-// get.
-const donut = (spec, { stage, cleanups }) => {
+// first time it's on screen, once the cover's transition isn't playing;
+// the legend's values are what screen readers get.
+const donut = (spec, { stage, cleanups, coverIdle }) => {
   const el = element('div', 'hl-donut')
   const frame = element('div', 'hl-donut__chart')
   const canvas = element('canvas')
@@ -269,10 +269,12 @@ const donut = (spec, { stage, cleanups }) => {
   }
 
   let timer = 0
+  let stopped = false
   stage.add(frame, (delay) => {
-    timer = setTimeout(draw, delay)
+    timer = setTimeout(() => coverIdle().then(() => stopped || draw()), delay)
   })
   cleanups.push(() => {
+    stopped = true
     clearTimeout(timer)
     chart?.destroy()
   })
@@ -546,8 +548,9 @@ const createStage = ({ ready, cleanups }) => {
 // Stop the previous chapter's counters, charts and stage.
 let cleanups = []
 
-// Empties the container when the chapter has no highlights.
-export const renderHighlights = (container, data) => {
+// Empties the container when the chapter has no highlights. `coverIdle`
+// returns a promise that settles once the cover's transition isn't playing.
+export const renderHighlights = (container, data, { coverIdle = () => Promise.resolve() } = {}) => {
   cleanups.forEach((cleanup) => cleanup())
   cleanups = []
 
@@ -559,7 +562,7 @@ export const renderHighlights = (container, data) => {
 
   container.dataset.layout = data?.layout ?? ''
   container.dataset.variant = data?.variant ?? ''
-  container.replaceChildren(...(data ? layouts[data.layout](data, { stage, cleanups }) : []))
+  container.replaceChildren(...(data ? layouts[data.layout](data, { stage, cleanups, coverIdle }) : []))
   cleanups.push(countUp(container.querySelectorAll('[data-count]'), { schedule: stage.add }))
 
   // Each change badge waits for the value beside it to finish counting,

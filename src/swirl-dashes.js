@@ -1,47 +1,37 @@
-// Swirling dashes: the image comes in as a lattice of short dashes,
-// twisted into a vortex around the centre. They sweep in from the top left
-// as dots, stretch into streaks and fatten into bricks while the vortex
-// unwinds, until they cover the frame. Meanwhile the picture underneath
-// smears sideways, like a long exposure.
-//
-// revealWithSwirlDashes(containerEl, img, { from }) draws the image in
-// through the dashes, over a smeared copy of `from` (the picture it
-// replaces), until the image covers the container.
+// Swirling-dashes reveal: a lattice of dashes, twisted into a vortex, sweeps
+// in from the top left, growing from dots to streaks to bricks as the vortex
+// unwinds, until it covers the frame. Meanwhile the picture underneath
+// (`from`) smears sideways, like a long exposure.
 
 const REVEAL_MS = 3200
 const CELL = 12 // lattice spacing, CSS px
-// A dash's full size, relative to CELL: big enough to cover its cell
-// whichever way it's turned.
+// A dash's full size, relative to CELL: covers its cell at any angle.
 const COVER = Math.SQRT2 * 1.05
-// Share of the reveal the sweep takes to cross the frame, plus a random
-// head start for each dash; each dash grows over the rest.
+// Shares of the reveal: the sweep across the frame, and each dash's random head start.
 const SWEEP = 0.45
 const JITTER = 0.08
-// The vortex turns the lattice by up to TWIST radians at the centre,
-// falling off with distance (VORTEX_RADIUS, as a share of the frame's
-// half-diagonal), and unwinds to nothing by the end.
+// Twist at the centre (radians), falling off over VORTEX_RADIUS (share of the half-diagonal).
 const TWIST = 2.4
 const VORTEX_RADIUS = 0.6
-// Dashes run this far (radians) off the circles round the centre, so
-// together they read as a spiral flow.
+// Tilt (radians) off the circles round the centre, so the dashes read as a spiral.
 const PITCH = -0.5
-const SMEAR = 0.85 // how far the picture underneath fades to its smeared copy
-const SMEAR_SQUEEZE = 40 // the smeared copy is made by squeezing the picture this many times narrower
+const SMEAR = 0.85 // final opacity of the smeared copy
+const SMEAR_SQUEEZE = 40 // how much narrower the picture is squeezed to smear it
+// Caps one frame's step, so a slow frame slows the reveal instead of skipping it.
+const MAX_STEP_MS = 1000 / 30
 
 const easeInOut = (p) => (1 - Math.cos(Math.PI * p)) / 2
 
-// A dash's length and width, as shares of its full size, `q` of the way
-// through its growth: a dot, then a streak, then a brick, then solid.
+// Shares of the full size, `q` of the way through a dash's growth.
 const dashLength = (q) => Math.min(q / 0.6, 1) ** 0.7
 const dashWidth = (q) => 0.18 * Math.min(q / 0.15, 1) + 0.82 * Math.max((q - 0.5) / 0.5, 0) ** 2.5
 
-// Same random number in [0, 1) for the same lattice cell every frame.
+// Stable random number in [0, 1) per lattice cell.
 const hash = (i, j) => {
   const x = Math.sin(i * 127.1 + j * 311.7) * 43758.5453
   return x - Math.floor(x)
 }
 
-// Adds every dash to the current path, `p` of the way through the reveal.
 const traceDashes = (ctx, width, height, cell, p) => {
   const cx = width / 2
   const cy = height / 2
@@ -50,7 +40,6 @@ const traceDashes = (ctx, width, height, cell, p) => {
   const reach = Math.ceil(halfDiagonal / cell) + 1
   const full = cell * COVER
 
-  // Lattice points out to the corners, wherever the vortex turns them.
   for (let i = -reach; i <= reach; i++) {
     for (let j = -reach; j <= reach; j++) {
       const dx = i * cell
@@ -58,9 +47,8 @@ const traceDashes = (ctx, width, height, cell, p) => {
       const r = Math.hypot(dx, dy)
       if (r > halfDiagonal + full) continue
 
-      // The sweep runs diagonally by where the point sits before the twist,
-      // timed by the share of the frame it has passed so far, so it
-      // uncovers the frame at an even rate.
+      // Timed by position before the twist, eased so the sweep uncovers the
+      // frame at an even rate.
       const diagonal = Math.min(Math.max(((cx + dx) / width + (cy + dy) / height) / 2, 0), 1)
       const sweep = diagonal < 0.5 ? 2 * diagonal ** 2 : 1 - 2 * (1 - diagonal) ** 2
       const q =(p - sweep * SWEEP - hash(i, j) * JITTER) / (1 - SWEEP - JITTER)
@@ -74,7 +62,7 @@ const traceDashes = (ctx, width, height, cell, p) => {
       const growth = Math.min(q, 1)
       const halfLength = (full * dashLength(growth)) / 2
       const halfWidth = (full * dashWidth(growth)) / 2
-      // (ux, uy) points along the dash, (vx, vy) across it.
+      // u runs along the dash, v across it.
       const angle = Math.atan2(y - cy, x - cx) + Math.PI / 2 + PITCH
       const ux = Math.cos(angle)
       const uy = Math.sin(angle)
@@ -90,15 +78,19 @@ const traceDashes = (ctx, width, height, cell, p) => {
   }
 }
 
-// Sizes the canvas to its CSS box at the screen's pixel density.
+// False if the size was already right: setting it would only clear the canvas.
 const fitCanvas = (canvas) => {
   const dpr = window.devicePixelRatio || 1
   const { width, height } = canvas.getBoundingClientRect()
-  canvas.width = Math.round(width * dpr)
-  canvas.height = Math.round(height * dpr)
+  const w = Math.round(width * dpr)
+  const h = Math.round(height * dpr)
+  if (canvas.width === w && canvas.height === h) return false
+  canvas.width = w
+  canvas.height = h
+  return true
 }
 
-// A canvas the given size with `image` drawn on it like object-fit: cover.
+// `image` drawn as object-fit: cover.
 const coverLayer = (image, width, height) => {
   const layer = document.createElement('canvas')
   layer.width = width
@@ -110,11 +102,9 @@ const coverLayer = (image, width, height) => {
   return layer
 }
 
-// Overlays a canvas on the container (which needs a position) and draws
-// `image` through the dashes, sized like object-fit: cover, until it
-// covers the container. Resolves once it does, with the canvas removed, so
-// the caller can show the image itself in its place. Aborting `signal`
-// stops it early and resolves straight away.
+// Draws `image` (as object-fit: cover) in through the dashes on a canvas over
+// `container`, which needs a position. Resolves with the canvas removed once
+// the image covers it, or straight away when `signal` aborts.
 export const revealWithSwirlDashes = (container, image, { signal, from } = {}) =>
   new Promise((resolve) => {
     const canvas = document.createElement('canvas')
@@ -125,14 +115,15 @@ export const revealWithSwirlDashes = (container, image, { signal, from } = {}) =
     const ctx = canvas.getContext('2d')
     let fill = null
     let smeared = null
-    let startTime = null
+    let elapsed = 0
+    let lastFrame = null
     let frameId = null
 
-    // The fill is the image as a pattern, so filling the dashes' path
-    // paints the image only inside them. The smeared copy of `from` is it
-    // squeezed narrow and stretched back, which streaks it sideways.
+    // A pattern, so filling the dashes' path paints the image inside them.
+    // Squeezing `from` narrow and stretching it back streaks it sideways.
     const resize = () => {
-      fitCanvas(canvas)
+      // Skips the observer's first callback, which follows this first call.
+      if (!fitCanvas(canvas) && fill) return
       fill = ctx.createPattern(coverLayer(image, canvas.width, canvas.height), 'no-repeat')
       if (!from) return
       const squeezed = document.createElement('canvas')
@@ -158,9 +149,11 @@ export const revealWithSwirlDashes = (container, image, { signal, from } = {}) =
 
     const cell = CELL * (window.devicePixelRatio || 1)
 
+    // The first frame carries the setup, so counting starts on the second.
     const frame = (now) => {
-      startTime ??= now
-      const p = Math.min((now - startTime) / REVEAL_MS, 1)
+      if (lastFrame !== null) elapsed += Math.min(now - lastFrame, MAX_STEP_MS)
+      lastFrame = now
+      const p = Math.min(elapsed / REVEAL_MS, 1)
       const { width, height } = canvas
 
       ctx.clearRect(0, 0, width, height)

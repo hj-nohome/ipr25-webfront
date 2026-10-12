@@ -16,8 +16,8 @@ const transitions = {
 }
 
 const section = document.querySelector('.chapter-detail')
-const title = document.querySelector('#chapter-title')
 const name = document.querySelector('#chapter-name')
+const number = document.querySelector('#chapter-number')
 const intro = document.querySelector('#chapter-intro')
 const highlightsLabel = document.querySelector('#chapter-highlights-label')
 const highlightsList = document.querySelector('#chapter-highlights')
@@ -29,6 +29,23 @@ const cta = document.querySelector('#chapter-cta')
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 let photoReveal = null
+// The transition now playing, or a settled one; the highlights' donut
+// waits on it so its setup doesn't land mid-transition.
+let coverTransition = Promise.resolve()
+
+// Resolves once main.js has shown the column (.reveal) and its fade-in
+// has finished, so the transition plays on a still, fully shown column.
+const revealed = (el) =>
+  new Promise((resolve) => {
+    const settle = () => Promise.allSettled(el.getAnimations().map((a) => a.finished)).then(() => resolve())
+    if (el.classList.contains('is-visible')) return settle()
+    const observer = new MutationObserver(() => {
+      if (!el.classList.contains('is-visible')) return
+      observer.disconnect()
+      settle()
+    })
+    observer.observe(el, { attributes: true, attributeFilter: ['class'] })
+  })
 
 const onScreen = (el) =>
   new Promise((resolve) => {
@@ -44,8 +61,8 @@ const onScreen = (el) =>
   })
 
 // Plays the image -> photo transition once, as soon as both images have
-// loaded and are on screen; a new chapter (hashchange) cancels any
-// transition still running and starts over.
+// loaded and the column is on screen and done fading in; a new chapter
+// (hashchange) cancels any transition still running and starts over.
 const revealPhoto = async (transition) => {
   photoReveal?.abort()
   const controller = new AbortController()
@@ -58,12 +75,13 @@ const revealPhoto = async (transition) => {
   }
 
   try {
-    await Promise.all([image.decode(), photo.decode(), onScreen(media)])
+    await Promise.all([image.decode(), photo.decode(), onScreen(media), revealed(media)])
   } catch {
     return // an image failed to load: stay on the chapter image
   }
   if (controller.signal.aborted) return
-  await transition(media, photo, { signal: controller.signal, from: image })
+  coverTransition = transition(media, photo, { signal: controller.signal, from: image })
+  await coverTransition
   if (!controller.signal.aborted) media.classList.add('is-photo-shown')
 }
 
@@ -83,8 +101,8 @@ const render = () => {
   document.title = `Chapter ${chapter.number}: ${chapter.name} | ipr25-testing`
   // Picks the chapter's accent colours (see .chapter-detail in style.css).
   section.dataset.chapter = chapter.number
-  title.textContent = `Chapter ${chapter.number}`
   name.textContent = chapter.name
+  number.textContent = `Chapter ${chapter.number}`
   intro.replaceChildren(
     ...chapter.intro.map((text) => {
       const paragraph = document.createElement('p')
@@ -95,7 +113,7 @@ const render = () => {
   const chapterHighlights = highlights[chapter.number]
   highlightsLabel.hidden = !chapterHighlights
   highlightsList.hidden = !chapterHighlights
-  renderHighlights(highlightsList, chapterHighlights)
+  renderHighlights(highlightsList, chapterHighlights, { coverIdle: () => coverTransition })
   cta.textContent = `Explore ${chapter.shortName}`
   // The column starts on the first and the transition reveals the second.
   const [first, second] = chapter.reverse

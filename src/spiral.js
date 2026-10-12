@@ -1,42 +1,32 @@
-// Hypnotic spiral: one spiral arm wound tight around the centre unwinds,
-// widening as it goes, until it covers the frame. After a looping
-// black-and-white spiral GIF, played once as a transition instead.
-//
-// revealWithSpiral(containerEl, img) draws the image in through the arm,
-// with whatever is under the container showing between its turns, until
-// the image covers the container.
+// Spiral reveal: one arm, wound tight round the centre, unwinds and widens
+// until it covers the frame, drawing the image in through it.
 
 const REVEAL_MS = 2800
-// How far the arm turns, in radians, as the radius shrinks by a factor of
-// e. It starts ~10 turns deep across the frame and unwinds to a soft curve.
+// Radians the arm turns per e-fold of radius: ~10 turns deep at the start,
+// a soft curve by the end.
 const TWIST_START = 14
 const TWIST_END = 0.6
-// Where the arm's leading edge crosses the frame's inscribed circle:
-// 12 o'clock, turning a little clockwise as it unwinds.
-const START_ANGLE = -Math.PI / 2
+const START_ANGLE = -Math.PI / 2 // 12 o'clock
 const SPIN = Math.PI / 2
-// Inside this radius (in canvas pixels) the arm's endless turns are
-// smaller than a pixel, so it stops there.
+// Below this radius (canvas px) the turns are sub-pixel.
 const MIN_RADIUS = 0.5
+// Caps one frame's step, so a slow frame slows the reveal instead of skipping it.
+const MAX_STEP_MS = 1000 / 30
 
 const easeInOut = (p) => (1 - Math.cos(Math.PI * p)) / 2
 
-// Adds the arm to the current path. Its leading edge sits at `angle` on a
-// circle of `frameRadius` and winds clockwise towards the centre by `twist`
-// (see TWIST_START); `width` is the share of each turn it covers, 0 to 1.
+// `width` is the share of each turn the arm covers, 0 to 1.
 const traceArm = (ctx, cx, cy, radius, frameRadius, twist, angle, width) => {
   const edgeAngle = (r) => angle + twist * Math.log(frameRadius / r)
   const span = Math.PI * 2 * width
 
-  // Steps short enough that the edge stays within ~1/4 px of the true curve.
+  // Steps short enough to stay within ~1/4 px of the true curve.
   const radii = []
   for (let r = MIN_RADIUS; r < radius; r *= Math.exp(Math.min(0.05, Math.sqrt(2 / r) / Math.hypot(1, twist)))) {
     radii.push(r)
   }
   radii.push(radius)
 
-  // Out along the leading edge, round the outside, back in along the
-  // trailing edge.
   radii.forEach((r) => {
     const a = edgeAngle(r)
     ctx.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a))
@@ -49,19 +39,21 @@ const traceArm = (ctx, cx, cy, radius, frameRadius, twist, angle, width) => {
   ctx.closePath()
 }
 
-// Sizes the canvas to its CSS box at the screen's pixel density.
+// False if the size was already right: setting it would only clear the canvas.
 const fitCanvas = (canvas) => {
   const dpr = window.devicePixelRatio || 1
   const { width, height } = canvas.getBoundingClientRect()
-  canvas.width = Math.round(width * dpr)
-  canvas.height = Math.round(height * dpr)
+  const w = Math.round(width * dpr)
+  const h = Math.round(height * dpr)
+  if (canvas.width === w && canvas.height === h) return false
+  canvas.width = w
+  canvas.height = h
+  return true
 }
 
-// Overlays a canvas on the container (which needs a position) and draws
-// `image` through the arm, sized like object-fit: cover, until it covers
-// the container. Resolves once it does, with the canvas removed, so the
-// caller can show the image itself in its place. Aborting `signal` stops
-// it early and resolves straight away.
+// Draws `image` (as object-fit: cover) in through the arm on a canvas over
+// `container`, which needs a position. Resolves with the canvas removed once
+// the image covers it, or straight away when `signal` aborts.
 export const revealWithSpiral = (container, image, { signal } = {}) =>
   new Promise((resolve) => {
     const canvas = document.createElement('canvas')
@@ -71,13 +63,14 @@ export const revealWithSpiral = (container, image, { signal } = {}) =>
 
     const ctx = canvas.getContext('2d')
     let fill = null
-    let startTime = null
+    let elapsed = 0
+    let lastFrame = null
     let frameId = null
 
-    // The fill is the image scaled to cover the canvas, as a pattern, so
-    // filling the arm's path paints the image only inside it.
+    // A pattern, so filling the arm's path paints the image inside it.
     const resize = () => {
-      fitCanvas(canvas)
+      // Skips the observer's first callback, which follows this first call.
+      if (!fitCanvas(canvas) && fill) return
       const layer = document.createElement('canvas')
       layer.width = canvas.width
       layer.height = canvas.height
@@ -99,9 +92,11 @@ export const revealWithSpiral = (container, image, { signal } = {}) =>
     }
     signal?.addEventListener('abort', finish, { once: true })
 
+    // The first frame carries the setup, so counting starts on the second.
     const frame = (now) => {
-      startTime ??= now
-      const p = Math.min((now - startTime) / REVEAL_MS, 1)
+      if (lastFrame !== null) elapsed += Math.min(now - lastFrame, MAX_STEP_MS)
+      lastFrame = now
+      const p = Math.min(elapsed / REVEAL_MS, 1)
       const { width, height } = canvas
       const eased = easeInOut(p)
 
@@ -111,8 +106,7 @@ export const revealWithSpiral = (container, image, { signal } = {}) =>
         ctx,
         width / 2,
         height / 2,
-        // Big enough for the arm to reach the corners.
-        (Math.hypot(width, height) / 2) * 1.05,
+        (Math.hypot(width, height) / 2) * 1.05, // reaches the corners
         Math.min(width, height) / 2,
         TWIST_END + (TWIST_START - TWIST_END) * (1 - eased),
         START_ANGLE + SPIN * eased,

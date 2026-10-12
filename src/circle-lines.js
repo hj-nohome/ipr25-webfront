@@ -1,46 +1,36 @@
-// Op-art "circle lines": rings of radial bars around a hollow core, swept
-// clockwise ring by ring. Neighbouring rings start half a turn apart, so
-// mid-sweep the rings read as one spiral.
-//
-// createCircleLines(containerEl) loops it: each bar thins to a hairline and
-// eases back. revealWithCircleLines(containerEl, img) plays it once as a
-// transition: the image grows in through the bars until it covers the
-// container.
+// Op-art "circle lines": rings of radial bars swept clockwise, neighbouring
+// rings half a turn apart so mid-sweep they read as one spiral.
+// createCircleLines loops it; revealWithCircleLines plays it once, drawing
+// an image in through the bars.
 
 const BARS_PER_RING = 36
-// Ring edges as a fraction of the outer radius, outermost first. Each ring
-// is ~0.59x the one outside it; inside the last edge is the empty core.
+// Ring edges as fractions of the outer radius; inside the last is the empty core.
 const RING_EDGES = [1, 0.59, 0.345, 0.2, 0.12]
 
-// Adds every bar to the current path, each centred on its spoke and running
-// across its ring. widthAt(sweep) gives a bar's width as a fraction of its
-// ring's outer radius; `sweep` runs from 0 for the first bar the sweep
-// reaches to 1 for the last.
+// widthAt(sweep) gives a bar's width as a fraction of its ring's outer
+// radius; `sweep` runs 0 to 1 in the order the sweep reaches the bars.
 const traceBars = (ctx, cx, cy, radius, widthAt) => {
   const step = (Math.PI * 2) / BARS_PER_RING
 
   for (let ring = 0; ring < RING_EDGES.length - 1; ring++) {
     const rOut = RING_EDGES[ring] * radius
     const rIn = RING_EDGES[ring + 1] * radius
-    // Every other ring starts its sweep at 6 o'clock instead of 12.
-    const startBar = ring % 2 === 0 ? 0 : BARS_PER_RING / 2
+    const startBar = ring % 2 === 0 ? 0 : BARS_PER_RING / 2 // odd rings start at 6 o'clock
 
     for (let bar = 0; bar < BARS_PER_RING; bar++) {
-      // The sweep starts with the bar just clockwise of startBar and ends on startBar.
+      // The sweep ends on startBar.
       const order = (bar - startBar - 1 + BARS_PER_RING * 2) % BARS_PER_RING
       const half = (widthAt(order / (BARS_PER_RING - 1)) * rOut) / 2
       if (half <= 0) continue
 
-      // Angle clockwise from 12 o'clock; (ux, uy) points out along the bar,
-      // (vx, vy) across it.
+      // Clockwise from 12 o'clock; u runs along the bar, v across it.
       const angle = bar * step
       const ux = Math.sin(angle)
       const uy = -Math.cos(angle)
       const vx = -uy
       const vy = ux
 
-      // One path for every bar, filled once, so the overlaps near each
-      // ring's inner edge don't double up if the fill is translucent.
+      // One path, filled once, so overlaps don't double up under a translucent fill.
       ctx.moveTo(cx + ux * rIn - vx * half, cy + uy * rIn - vy * half)
       ctx.lineTo(cx + ux * rOut - vx * half, cy + uy * rOut - vy * half)
       ctx.lineTo(cx + ux * rOut + vx * half, cy + uy * rOut + vy * half)
@@ -50,32 +40,32 @@ const traceBars = (ctx, cx, cy, radius, widthAt) => {
   }
 }
 
-// Sizes the canvas to its CSS box at the screen's pixel density.
+// False if the size was already right: setting it would only clear the canvas.
 const fitCanvas = (canvas) => {
   const dpr = window.devicePixelRatio || 1
   const { width, height } = canvas.getBoundingClientRect()
-  canvas.width = Math.round(width * dpr)
-  canvas.height = Math.round(height * dpr)
+  const w = Math.round(width * dpr)
+  const h = Math.round(height * dpr)
+  if (canvas.width === w && canvas.height === h) return false
+  canvas.width = w
+  canvas.height = h
+  return true
 }
 
 // Looping animation
 
-// Bar width at rest, relative to the ring's outer radius. Wide enough that
-// neighbouring bars meet near the ring's inner edge.
+// Rest width, relative to the ring's outer radius: neighbours meet at the inner edge.
 const BAR_WIDTH = 0.128
-const MIN_WIDTH = 0.06 // narrowest point of the sweep, as a fraction of rest width
+const MIN_WIDTH = 0.06 // thinnest, as a fraction of rest width
 
 const LOOP_MS = 3750
 const SWEEP_START_MS = 130 // when the first bar starts thinning
-const SWEEP_MS = 2550 // from the first bar starting to the last
+const SWEEP_MS = 2550 // first bar to last
 const THIN_MS = 200 // full width -> hairline
-const RECOVER_MS = 1000 // hairline -> full width, easing in
-// Shown instead of the animation for prefers-reduced-motion: mid-sweep,
-// where the spiral is clearest.
-const STILL_MS = 1500
+const RECOVER_MS = 1000 // hairline -> full width
+const STILL_MS = 1500 // reduced-motion still: mid-sweep, where the spiral is clearest
 
-// Width of one bar (as a fraction of its rest width) `elapsed` ms after
-// the sweep reaches it.
+// A bar's width (fraction of rest) `elapsed` ms after the sweep reaches it.
 const barWidth = (elapsed) => {
   if (elapsed <= 0 || elapsed >= THIN_MS + RECOVER_MS) return 1
   if (elapsed < THIN_MS) {
@@ -88,7 +78,7 @@ const barWidth = (elapsed) => {
 
 const drawLoop = (ctx, color, t) => {
   const { width, height } = ctx.canvas
-  const radius = (Math.min(width, height) / 2) * 0.98 // a little room for antialiasing
+  const radius = (Math.min(width, height) / 2) * 0.98 // room for antialiasing
 
   ctx.clearRect(0, 0, width, height)
   ctx.beginPath()
@@ -101,9 +91,8 @@ const drawLoop = (ctx, color, t) => {
   ctx.fill()
 }
 
-// Appends a canvas that fills the container and loops the animation in the
-// container's CSS `color` (or options.color). Give the container a size,
-// e.g. aspect-ratio: 1.
+// Loops in the container's CSS `color` (or options.color). The container
+// needs a size, e.g. aspect-ratio: 1.
 export const createCircleLines = (container, options = {}) => {
   const canvas = document.createElement('canvas')
   canvas.setAttribute('aria-hidden', 'true')
@@ -123,7 +112,7 @@ export const createCircleLines = (container, options = {}) => {
   const render = () => drawLoop(ctx, color, reducedMotion.matches ? STILL_MS : loopTime)
 
   const tick = (now) => {
-    // Cap the step so a dropped or throttled frame doesn't skip ahead.
+    // Capped so a throttled frame doesn't skip ahead.
     if (lastFrame !== null) loopTime = (loopTime + Math.min(now - lastFrame, 100)) % LOOP_MS
     lastFrame = now
     render()
@@ -148,7 +137,6 @@ export const createCircleLines = (container, options = {}) => {
   })
   resizeObserver.observe(canvas)
 
-  // Only animate while on screen.
   const visibilityObserver = new IntersectionObserver(([entry]) => {
     onScreen = entry.isIntersecting
     if (onScreen) start()
@@ -179,19 +167,19 @@ export const createCircleLines = (container, options = {}) => {
 
 // One-shot reveal
 
-// Just wide enough for each bar to overlap its neighbours all the way to
-// the ring's outer edge, so together they cover the ring.
+// Just wide enough for neighbouring bars to overlap out to the ring's outer edge.
 const COVER_WIDTH = 2 * Math.sin(Math.PI / BARS_PER_RING) * 1.05
-const HAIRLINE = 0.04 // first width a bar shows at, as a fraction of COVER_WIDTH
+const HAIRLINE = 0.04 // first visible width, as a fraction of COVER_WIDTH
 
-const REVEAL_SWEEP_MS = 2000 // from the first bar appearing to the last
+const REVEAL_SWEEP_MS = 2000 // first bar to last
 const REVEAL_APPEAR_MS = 150 // nothing -> hairline
-const REVEAL_GROW_MS = 1000 // hairline -> covering, easing in
+const REVEAL_GROW_MS = 1000 // hairline -> covering
 const REVEAL_MS = REVEAL_SWEEP_MS + REVEAL_APPEAR_MS + REVEAL_GROW_MS
-const REVEAL_CORE_MS = 600 // the empty core fills in over the last stretch
+const REVEAL_CORE_MS = 600 // the core fills in over the last stretch
+// Caps one frame's step, so a slow frame slows the reveal instead of skipping it.
+const MAX_STEP_MS = 1000 / 30
 
-// Width of one bar (as a fraction of COVER_WIDTH) `elapsed` ms after the
-// sweep reaches it.
+// A bar's width (fraction of COVER_WIDTH) `elapsed` ms after the sweep reaches it.
 const revealWidth = (elapsed) => {
   if (elapsed <= 0) return 0
   if (elapsed < REVEAL_APPEAR_MS) return HAIRLINE * (elapsed / REVEAL_APPEAR_MS)
@@ -199,11 +187,9 @@ const revealWidth = (elapsed) => {
   return HAIRLINE + (1 - HAIRLINE) * p ** 2
 }
 
-// Overlays a canvas on the container (which needs a position) and draws
-// `image` through the bars, sized like object-fit: cover, until it covers
-// the container. Resolves once it does, with the canvas removed, so the
-// caller can show the image itself in its place. Aborting `signal` stops
-// it early and resolves straight away.
+// Draws `image` (as object-fit: cover) in through the bars on a canvas over
+// `container`, which needs a position. Resolves with the canvas removed once
+// the image covers it, or straight away when `signal` aborts.
 export const revealWithCircleLines = (container, image, { signal } = {}) =>
   new Promise((resolve) => {
     const canvas = document.createElement('canvas')
@@ -213,13 +199,14 @@ export const revealWithCircleLines = (container, image, { signal } = {}) =>
 
     const ctx = canvas.getContext('2d')
     let fill = null
-    let startTime = null
+    let t = 0
+    let lastFrame = null
     let frameId = null
 
-    // The fill is the image scaled to cover the canvas, as a pattern, so
-    // filling the bars' path paints the image only inside them.
+    // A pattern, so filling the bars' path paints the image inside them.
     const resize = () => {
-      fitCanvas(canvas)
+      // Skips the observer's first callback, which follows this first call.
+      if (!fitCanvas(canvas) && fill) return
       const layer = document.createElement('canvas')
       layer.width = canvas.width
       layer.height = canvas.height
@@ -241,14 +228,14 @@ export const revealWithCircleLines = (container, image, { signal } = {}) =>
     }
     signal?.addEventListener('abort', finish, { once: true })
 
+    // The first frame carries the setup, so counting starts on the second.
     const frame = (now) => {
-      startTime ??= now
-      const t = now - startTime
+      if (lastFrame !== null) t += Math.min(now - lastFrame, MAX_STEP_MS)
+      lastFrame = now
       const { width, height } = canvas
       const cx = width / 2
       const cy = height / 2
-      // Big enough for the outer ring to reach the corners.
-      const radius = (Math.hypot(width, height) / 2) * 1.05
+      const radius = (Math.hypot(width, height) / 2) * 1.05 // reaches the corners
 
       ctx.clearRect(0, 0, width, height)
       ctx.beginPath()
@@ -256,7 +243,7 @@ export const revealWithCircleLines = (container, image, { signal } = {}) =>
 
       const core = (t - (REVEAL_MS - REVEAL_CORE_MS)) / REVEAL_CORE_MS
       if (core > 0) {
-        // Slightly past the innermost ring's edge so no seam shows.
+        // 5% past the innermost ring's edge, so no seam shows.
         const coreRadius = RING_EDGES.at(-1) * radius * 1.05 * (1 - (1 - Math.min(core, 1)) ** 3)
         ctx.moveTo(cx + coreRadius, cy)
         ctx.arc(cx, cy, coreRadius, 0, Math.PI * 2)
