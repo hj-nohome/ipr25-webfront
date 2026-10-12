@@ -64,13 +64,18 @@
           </div>
         </div>
 
-        <div class="chapter-detail__media reveal">
-          <img id="chapter-image" alt="" />
+        <div class="chapter-detail__media">
+          <img class="chapter-detail__image" id="chapter-image" alt="" />
           <!-- The chapter's background photo (or its image, for chapters with
                `reverse`): chapter.js reveals it over the picture above with
                the chapter's transition (see `transition` in
                src/data/chapters.js), once per load. -->
           <img class="chapter-detail__photo" id="chapter-photo" alt="" />
+          <!-- Cover the first picture until chapter.js lifts them away, one
+               after another, before the transition. -->
+          <div class="chapter-detail__shutters" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
         </div>
       </div>
     </section>

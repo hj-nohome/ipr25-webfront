@@ -27,25 +27,24 @@ const photo = document.querySelector('#chapter-photo')
 const background = document.querySelector('#chapter-bg')
 const cta = document.querySelector('#chapter-cta')
 
+const shutters = [...document.querySelector('.chapter-detail__shutters').children]
+
+// Order the strips lift in, by transition, so the stagger leads into it.
+const shutterOrders = {
+  spiral: (i, count) => Math.floor(Math.abs(i - (count - 1) / 2)), // out from the centre
+}
+const leftToRight = (i) => i
+// Between the strips opening and the transition, so the first picture registers.
+const HOLD_MS = 300
+
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 let photoReveal = null
 // The transition now playing, or a settled one; the highlights' donut
 // waits on it so its setup doesn't land mid-transition.
 let coverTransition = Promise.resolve()
 
-// Resolves once main.js has shown the column (.reveal) and its fade-in
-// has finished, so the transition plays on a still, fully shown column.
-const revealed = (el) =>
-  new Promise((resolve) => {
-    const settle = () => Promise.allSettled(el.getAnimations().map((a) => a.finished)).then(() => resolve())
-    if (el.classList.contains('is-visible')) return settle()
-    const observer = new MutationObserver(() => {
-      if (!el.classList.contains('is-visible')) return
-      observer.disconnect()
-      settle()
-    })
-    observer.observe(el, { attributes: true, attributeFilter: ['class'] })
-  })
+const settled = (el) => Promise.allSettled(el.getAnimations({ subtree: true }).map((a) => a.finished))
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 const onScreen = (el) =>
   new Promise((resolve) => {
@@ -60,27 +59,36 @@ const onScreen = (el) =>
     observer.observe(el)
   })
 
-// Plays the image -> photo transition once, as soon as both images have
-// loaded and the column is on screen and done fading in; a new chapter
-// (hashchange) cancels any transition still running and starts over.
-const revealPhoto = async (transition) => {
+// Opens the strips over the image once it has loaded and the column is on
+// screen, then plays the image -> photo transition; a new chapter
+// (hashchange) closes them again and starts over.
+const revealPhoto = async (name) => {
   photoReveal?.abort()
   const controller = new AbortController()
   photoReveal = controller
-  media.classList.remove('is-photo-shown')
+  media.classList.remove('is-open', 'is-photo-shown')
 
   if (reducedMotion) {
     media.classList.add('is-photo-shown')
     return
   }
 
+  const order = shutterOrders[name] ?? leftToRight
+  shutters.forEach((strip, i) => strip.style.setProperty('--i', order(i, shutters.length)))
+
+  const [loaded] = await Promise.all([image.decode().then(() => true, () => false), onScreen(media)])
+  if (controller.signal.aborted) return
+  // Opens even if the image failed, rather than leave a blank column.
+  media.classList.add('is-open')
+  if (!loaded) return
+
   try {
-    await Promise.all([image.decode(), photo.decode(), onScreen(media), revealed(media)])
+    await Promise.all([photo.decode(), settled(media).then(() => wait(HOLD_MS))])
   } catch {
-    return // an image failed to load: stay on the chapter image
+    return // the photo failed to load: stay on the image
   }
   if (controller.signal.aborted) return
-  coverTransition = transition(media, photo, { signal: controller.signal, from: image })
+  coverTransition = transitions[name](media, photo, { signal: controller.signal, from: image })
   await coverTransition
   if (!controller.signal.aborted) media.classList.add('is-photo-shown')
 }
@@ -122,7 +130,7 @@ const render = () => {
   image.src = first
   photo.src = second
   background.src = chapter.background
-  revealPhoto(transitions[chapter.transition ?? 'circle-lines'])
+  revealPhoto(chapter.transition ?? 'circle-lines')
 }
 
 window.addEventListener('hashchange', () => {
