@@ -2919,47 +2919,19 @@ html.intro-seen .intro ~ main {
   visibility: visible;
 }
 
-/* Strips in the panel's colour over the first picture. Once chapter.js
-   opens the column (.is-open) they lift away in the order it sets (--i)
-   while the picture settles from a slight zoom. Transforms only, so they
-   stay smooth while the rest of the page is still loading. */
-.chapter-detail__shutters {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  pointer-events: none;
+/* Hidden until chapter.js has it loaded and on screen (.is-loaded). An
+   animation, not a transition, so a new chapter hides it at once. */
+.chapter-detail__image {
+  opacity: 0;
 }
 
-.chapter-detail__shutters span {
-  flex: 1;
-  margin-right: -1px; /* no hairline between strips */
-  background: var(--panel-bg);
-  transform-origin: top;
+.chapter-detail__media.is-loaded .chapter-detail__image {
+  animation: picture-fade-in 0.6s ease both;
 }
 
-.chapter-detail__media.is-open .chapter-detail__shutters span {
-  animation: shutter-open 0.7s cubic-bezier(0.76, 0, 0.24, 1) calc(var(--i, 0) * 70ms) both;
-}
-
-.chapter-detail__media.is-open .chapter-detail__image {
-  animation: picture-settle 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-@keyframes shutter-open {
+@keyframes picture-fade-in {
   to {
-    transform: scaleY(0);
-  }
-}
-
-@keyframes picture-settle {
-  from {
-    transform: scale(1.06);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .chapter-detail__shutters {
-    display: none;
+    opacity: 1;
   }
 }
 

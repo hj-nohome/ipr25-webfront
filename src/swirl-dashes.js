@@ -21,10 +21,13 @@ const SMEAR_SQUEEZE = 40 // how much narrower the picture is squeezed to smear i
 const MAX_STEP_MS = 1000 / 30
 
 const easeInOut = (p) => (1 - Math.cos(Math.PI * p)) / 2
+// Slow to start, so dashes stay streaks a while, and slow to finish, so
+// they close the last gaps gently instead of snapping shut.
+const easeInOutCubic = (p) => (p < 0.5 ? 4 * p ** 3 : 1 - (2 - 2 * p) ** 3 / 2)
 
 // Shares of the full size, `q` of the way through a dash's growth.
 const dashLength = (q) => Math.min(q / 0.6, 1) ** 0.7
-const dashWidth = (q) => 0.18 * Math.min(q / 0.15, 1) + 0.82 * Math.max((q - 0.5) / 0.5, 0) ** 2.5
+const dashWidth = (q) => 0.18 * Math.min(q / 0.15, 1) + 0.82 * easeInOutCubic(Math.max((q - 0.5) / 0.5, 0))
 
 // Stable random number in [0, 1) per lattice cell.
 const hash = (i, j) => {

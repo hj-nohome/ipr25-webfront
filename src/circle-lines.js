@@ -179,12 +179,14 @@ const REVEAL_CORE_MS = 600 // the core fills in over the last stretch
 // Caps one frame's step, so a slow frame slows the reveal instead of skipping it.
 const MAX_STEP_MS = 1000 / 30
 
-// A bar's width (fraction of COVER_WIDTH) `elapsed` ms after the sweep reaches it.
+// A bar's width (fraction of COVER_WIDTH) `elapsed` ms after the sweep
+// reaches it. Smoothstep, so each bar settles into place rather than
+// stopping dead at full width.
 const revealWidth = (elapsed) => {
   if (elapsed <= 0) return 0
   if (elapsed < REVEAL_APPEAR_MS) return HAIRLINE * (elapsed / REVEAL_APPEAR_MS)
   const p = Math.min((elapsed - REVEAL_APPEAR_MS) / REVEAL_GROW_MS, 1)
-  return HAIRLINE + (1 - HAIRLINE) * p ** 2
+  return HAIRLINE + (1 - HAIRLINE) * p * p * (3 - 2 * p)
 }
 
 // Draws `image` (as object-fit: cover) in through the bars on a canvas over

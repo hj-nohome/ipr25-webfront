@@ -27,14 +27,7 @@ const photo = document.querySelector('#chapter-photo')
 const background = document.querySelector('#chapter-bg')
 const cta = document.querySelector('#chapter-cta')
 
-const shutters = [...document.querySelector('.chapter-detail__shutters').children]
-
-// Order the strips lift in, by transition, so the stagger leads into it.
-const shutterOrders = {
-  spiral: (i, count) => Math.floor(Math.abs(i - (count - 1) / 2)), // out from the centre
-}
-const leftToRight = (i) => i
-// Between the strips opening and the transition, so the first picture registers.
+// Between the image fading in and the transition, so it registers.
 const HOLD_MS = 300
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -56,27 +49,23 @@ const onScreen = (el) =>
     observer.observe(el)
   })
 
-// Opens the strips over the image once it has loaded and the column is on
-// screen, then plays the image -> photo transition; a new chapter
-// (hashchange) closes them again and starts over.
+// Fades the image in once it has loaded and the column is on screen, then
+// plays the image -> photo transition; a new chapter (hashchange) hides it
+// again and starts over.
 const revealPhoto = async (name) => {
   photoReveal?.abort()
   const controller = new AbortController()
   photoReveal = controller
-  media.classList.remove('is-open', 'is-photo-shown')
+  media.classList.remove('is-loaded', 'is-photo-shown')
 
   if (reducedMotion) {
-    media.classList.add('is-photo-shown')
+    media.classList.add('is-loaded', 'is-photo-shown')
     return
   }
 
-  const order = shutterOrders[name] ?? leftToRight
-  shutters.forEach((strip, i) => strip.style.setProperty('--i', order(i, shutters.length)))
-
   const [loaded] = await Promise.all([image.decode().then(() => true, () => false), onScreen(media)])
   if (controller.signal.aborted) return
-  // Opens even if the image failed, rather than leave a blank column.
-  media.classList.add('is-open')
+  media.classList.add('is-loaded')
   if (!loaded) return
 
   try {
