@@ -44,7 +44,7 @@
 // `unit` (a block's, inherited by its items) is 'count' (the default),
 // 'percent', 'million', 'billion', 'mbps' or 'rmBillion', with `decimals` to
 // override its own; see units in src/highlights.js. `tone` ('plain',
-// 'tint', 'card', 'dark') and `wide` override a type's defaults.
+// 'tint', 'card', 'outline', 'dark') and `wide` override a type's defaults.
 import broadbandIcon from '../../images/chapter3-highlights-broadband.png'
 import jendelaIcon from '../../images/chapter3-highlights-Jendela.png'
 import mobileIcon from '../../images/chapter3-highlights-mobile.png'
@@ -98,6 +98,7 @@ export const highlights = {
     blocks: [
       {
         type: 'figure',
+        tone: 'outline',
         label: 'Market Capitalisation',
         unit: 'rmBillion',
         value: 110.63,
@@ -116,6 +117,7 @@ export const highlights = {
       },
       {
         type: 'figure',
+        tone: 'outline',
         label: 'Revenue',
         unit: 'rmBillion',
         value: 49.45,

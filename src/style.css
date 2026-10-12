@@ -19,8 +19,28 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+/* Montserrat for the large titles, self-hosted the same way. */
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('./fonts/montserrat-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('./fonts/montserrat-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 :root {
   --font-family: 'Figtree', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --heading-font-family: 'Montserrat', var(--font-family);
   --text: #ffffff;
   --bg: #1D1F3F;
   --border: #ffffff;
@@ -595,6 +615,7 @@ a {
 }
 
 .hero__title {
+  font-family: var(--heading-font-family);
   font-size: 68px;
   font-weight: 400;
   line-height: 1.05;
@@ -993,6 +1014,7 @@ html.intro-seen .intro ~ main {
 .split-section__title,
 .chapters__title {
   margin: 0;
+  font-family: var(--heading-font-family);
   font-size: 42px;
   font-weight: 400;
   letter-spacing: -0.02em;
@@ -1033,14 +1055,25 @@ html.intro-seen .intro ~ main {
 /* Portrait cutout on a soft lavender panel, with the swirl artwork
    (images/chairman-swirl.png) filling the frame behind it, as drawn: a
    wide frame, with the figure centred and room either side. The figure is
-   sized as a share of the frame, so it holds together at any width. */
+   sized as a share of the frame, so it holds together at any width. The
+   frame sits on the section's bottom edge (cancelling its padding), so the
+   waist crop lands there rather than mid-panel, and the glow fades out so
+   the frame has no visible edge. */
 .split-section__media--swirl {
   position: relative;
+  align-self: end;
+  margin-bottom: -80px;
   aspect-ratio: 4 / 3;
   max-width: 520px;
   background:
     url('../images/chairman-swirl.png') center / cover no-repeat,
-    radial-gradient(closest-side, #f1ebf8, #f7f4fb 70%, #fbfafd);
+    radial-gradient(closest-side, #f1ebf8, #f7f4fb 70%, transparent);
+}
+
+/* The reveal slide-in starts the frame below that edge; keep it from
+   overlapping the next section meanwhile. */
+.split-section:has(> .split-section__media--swirl) {
+  overflow: clip;
 }
 
 /* Shoulders about half the frame wide, cut off by it at the waist. */
@@ -1145,8 +1178,10 @@ html.intro-seen .intro ~ main {
     order: -1;
   }
 
-  /* Same proportions as on wider screens. */
+  /* Same proportions as on wider screens; stacked above the text here, so
+     it no longer sits on the bottom edge. */
   .split-section__media--swirl {
+    margin-bottom: 0;
     aspect-ratio: 4 / 3;
   }
 
@@ -1748,6 +1783,7 @@ html.intro-seen .intro ~ main {
 
 .chapter-detail__title {
   margin: 0;
+  font-family: var(--heading-font-family);
   font-size: 48px;
   font-weight: 400;
   line-height: 1.15;
@@ -2037,10 +2073,15 @@ html.intro-seen .intro ~ main {
   background: var(--chapter-tint);
 }
 
-.hl-block--card {
+.hl-block--card,
+.hl-block--outline {
   padding: 24px;
   background: #ffffff;
   box-shadow: 0 4px 24px rgb(23 19 31 / 0.08);
+}
+
+.hl-block--outline {
+  border: 1px solid rgb(23 19 31 / 0.1);
 }
 
 .hl-block--dark {
