@@ -39,9 +39,6 @@ const HOLD_MS = 300
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 let photoReveal = null
-// The transition now playing, or a settled one; the highlights' donut
-// waits on it so its setup doesn't land mid-transition.
-let coverTransition = Promise.resolve()
 
 const settled = (el) => Promise.allSettled(el.getAnimations({ subtree: true }).map((a) => a.finished))
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -88,8 +85,7 @@ const revealPhoto = async (name) => {
     return // the photo failed to load: stay on the image
   }
   if (controller.signal.aborted) return
-  coverTransition = transitions[name](media, photo, { signal: controller.signal, from: image })
-  await coverTransition
+  await transitions[name](media, photo, { signal: controller.signal, from: image })
   if (!controller.signal.aborted) media.classList.add('is-photo-shown')
 }
 
@@ -121,7 +117,7 @@ const render = () => {
   const chapterHighlights = highlights[chapter.number]
   highlightsLabel.hidden = !chapterHighlights
   highlightsList.hidden = !chapterHighlights
-  renderHighlights(highlightsList, chapterHighlights, { coverIdle: () => coverTransition })
+  renderHighlights(highlightsList, chapterHighlights)
   cta.textContent = `Explore ${chapter.shortName}`
   // The column starts on the first and the transition reveals the second.
   const [first, second] = chapter.reverse

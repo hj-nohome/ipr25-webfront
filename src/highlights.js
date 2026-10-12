@@ -199,10 +199,11 @@ const items = (block, spec, context) => {
 }
 
 // A Chart.js doughnut of % shares, each item with a `color`, over a
-// legend in the items' own order. The chart is drawn (and sweeps in) the
-// first time it's on screen, once the cover's transition isn't playing;
-// the legend's values are what screen readers get.
-const donut = (spec, { stage, cleanups, coverIdle }) => {
+// legend in the items' own order. The chart is built empty straight away,
+// so Chart.js's setup is done before the cover's transition, and sweeps in
+// when the stage starts it, alongside the block's numbers counting up. The
+// legend's values are what screen readers get.
+const donut = (spec, { stage, cleanups }) => {
   const el = element('div', 'hl-donut')
   const frame = element('div', 'hl-donut__chart')
   const canvas = element('canvas')
@@ -211,11 +212,13 @@ const donut = (spec, { stage, cleanups, coverIdle }) => {
 
   // Chart.js runs clockwise from the top: largest slice first.
   const slices = [...spec.items].sort((a, b) => b.value - a.value)
+  const values = slices.map((item) => item.value)
   let chart = null
+  let started = false
 
   // Hovering a legend row highlights its slice.
   const highlight = (item) => {
-    if (!chart) return
+    if (!started) return
     const active = item ? [{ datasetIndex: 0, index: slices.indexOf(item) }] : []
     chart.setActiveElements(active)
     chart.tooltip.setActiveElements(active, { x: chart.width / 2, y: chart.height / 2 })
@@ -236,7 +239,8 @@ const donut = (spec, { stage, cleanups, coverIdle }) => {
     })
   )
 
-  const draw = () => {
+  // Needs `el` on the page, for its styles.
+  const build = () => {
     const { fontFamily } = getComputedStyle(el)
     chart = new Chart(canvas, {
       type: 'doughnut',
@@ -244,7 +248,7 @@ const donut = (spec, { stage, cleanups, coverIdle }) => {
         labels: slices.map((item) => item.label),
         datasets: [
           {
-            data: slices.map((item) => item.value),
+            data: values.map(() => 0),
             backgroundColor: slices.map((item) => item.color),
             // Gaps between slices in the card's own colour.
             borderColor: getComputedStyle(el.closest('.hl-block')).backgroundColor,
@@ -256,7 +260,8 @@ const donut = (spec, { stage, cleanups, coverIdle }) => {
       options: {
         cutout: '50%',
         layout: { padding: 6 }, // room for hoverOffset
-        animation: reducedMotion ? false : { duration: 1000, easing: 'easeOutQuart' },
+        // The counters' length and ease (count-up.js), so they finish together.
+        animation: reducedMotion ? false : { duration: 1400, easing: 'easeOutQuart' },
         plugins: {
           tooltip: {
             titleFont: { family: fontFamily },
@@ -268,13 +273,19 @@ const donut = (spec, { stage, cleanups, coverIdle }) => {
     })
   }
 
+  // Filling in the values animates the slices out from zero.
+  const sweep = () => {
+    chart.data.datasets[0].data = values
+    chart.update()
+    started = true
+  }
+
+  queueMicrotask(build)
   let timer = 0
-  let stopped = false
   stage.add(frame, (delay) => {
-    timer = setTimeout(() => coverIdle().then(() => stopped || draw()), delay)
+    timer = setTimeout(sweep, delay)
   })
   cleanups.push(() => {
-    stopped = true
     clearTimeout(timer)
     chart?.destroy()
   })
@@ -548,9 +559,8 @@ const createStage = ({ ready, cleanups }) => {
 // Stop the previous chapter's counters, charts and stage.
 let cleanups = []
 
-// Empties the container when the chapter has no highlights. `coverIdle`
-// returns a promise that settles once the cover's transition isn't playing.
-export const renderHighlights = (container, data, { coverIdle = () => Promise.resolve() } = {}) => {
+// Empties the container when the chapter has no highlights.
+export const renderHighlights = (container, data) => {
   cleanups.forEach((cleanup) => cleanup())
   cleanups = []
 
@@ -562,7 +572,7 @@ export const renderHighlights = (container, data, { coverIdle = () => Promise.re
 
   container.dataset.layout = data?.layout ?? ''
   container.dataset.variant = data?.variant ?? ''
-  container.replaceChildren(...(data ? layouts[data.layout](data, { stage, cleanups, coverIdle }) : []))
+  container.replaceChildren(...(data ? layouts[data.layout](data, { stage, cleanups }) : []))
   cleanups.push(countUp(container.querySelectorAll('[data-count]'), { schedule: stage.add }))
 
   // Each change badge waits for the value beside it to finish counting,
