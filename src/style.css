@@ -694,7 +694,7 @@ a {
    that looks centred. Each panel covers the screen from its edge to the
    line, so the screen splits open there. */
 .intro {
-  --intro-offset: 60px;
+  --intro-offset: 90px;
   --intro-gap: 32px;
   position: fixed;
   inset: 0;
@@ -1096,7 +1096,7 @@ html.intro-seen .intro ~ main {
 
 .button:hover,
 .button:focus-visible {
-  background: var(--panel-text, var(--text));
+  background: rgba(29, 31, 63, 1);
   color: var(--panel-bg, var(--bg));
 }
 
@@ -1243,12 +1243,12 @@ html.intro-seen .intro ~ main {
 /* Tinted from the panel's text colour so it works on light and dark panels. */
 @media (hover: hover) {
   .accordion__item:hover {
-    background: color-mix(in srgb, var(--panel-text, var(--text)) 5%, transparent);
+    background: rgba(245, 240, 255, 1);
   }
 }
 
 .accordion__item:has(.accordion__question:focus-visible) {
-  background: color-mix(in srgb, var(--panel-text, var(--text)) 5%, transparent);
+  background: rgba(245, 240, 255, 1);
 }
 
 /* Accordion lines */
