@@ -1824,7 +1824,7 @@ html.intro-seen .intro ~ main {
   grid-template-rows: auto 1fr;
   grid-template-areas:
     'text media'
-    'text .';
+    'text rationale';
 }
 
 /* A container so the highlights can fit the column rather than the
@@ -1839,7 +1839,7 @@ html.intro-seen .intro ~ main {
   margin: 0;
   font-family: var(--heading-font-family);
   font-size: 48px;
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1.15;
   letter-spacing: -0.02em;
   text-wrap: balance; /* the longer chapter names wrap */
@@ -3035,6 +3035,36 @@ html.intro-seen .intro ~ main {
   margin-top: 48px;
 }
 
+/* Left-aligned with the image; the right padding keeps it off the screen edge. */
+.chapter-detail__rationale {
+  grid-area: rationale;
+  padding: 40px 48px 64px 0;
+}
+
+.chapter-detail__rationale-label {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--chapter-ink);
+}
+
+.chapter-detail__rationale-title {
+  margin: 0 0 16px;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.chapter-detail__rationale-text p {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.6;
+  opacity: 0.8;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .chapter-detail__back svg {
     transition: none;
@@ -3063,6 +3093,10 @@ html.intro-seen .intro ~ main {
 
   .chapter-detail__media {
     aspect-ratio: 16 / 10;
+  }
+
+  .chapter-detail__rationale {
+    display: none;
   }
 
   .chapter-detail__text {

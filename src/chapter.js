@@ -26,6 +26,8 @@ const image = document.querySelector('#chapter-image')
 const photo = document.querySelector('#chapter-photo')
 const background = document.querySelector('#chapter-bg')
 const cta = document.querySelector('#chapter-cta')
+const rationaleTitle = document.querySelector('#chapter-rationale-title')
+const rationaleText = document.querySelector('#chapter-rationale-text')
 
 // Between the image fading in and the transition, so it registers.
 const HOLD_MS = 300
@@ -88,6 +90,12 @@ const chapterFromHash = () => {
   return chapters.find((chapter) => chapter.number === Number(match?.[1])) ?? chapters[0]
 }
 
+const toParagraph = (text) => {
+  const paragraph = document.createElement('p')
+  paragraph.textContent = text
+  return paragraph
+}
+
 const render = () => {
   const chapter = chapterFromHash()
 
@@ -96,13 +104,9 @@ const render = () => {
   section.dataset.chapter = chapter.number
   name.textContent = chapter.name
   number.textContent = `Chapter ${chapter.number}`
-  intro.replaceChildren(
-    ...chapter.intro.map((text) => {
-      const paragraph = document.createElement('p')
-      paragraph.textContent = text
-      return paragraph
-    })
-  )
+  intro.replaceChildren(...chapter.intro.map(toParagraph))
+  rationaleTitle.textContent = chapter.rationale.title
+  rationaleText.replaceChildren(...chapter.rationale.text.map(toParagraph))
   const chapterHighlights = highlights[chapter.number]
   highlightsLabel.hidden = !chapterHighlights
   highlightsList.hidden = !chapterHighlights

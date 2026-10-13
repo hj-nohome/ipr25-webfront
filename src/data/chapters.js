@@ -5,6 +5,7 @@
 // the right-hand column. `transition` picks how `background` is revealed
 // over `image` (see chapter.js); circle lines unless set. `reverse` swaps
 // the two: the column starts on `background` and reveals `image`.
+// `rationale` explains the choice of imagery, under the column.
 import chapter1Image from '../../images/chapter1-cover-1400.jpg'
 import chapter2Image from '../../images/chapter2-cover-1400.jpg'
 import chapter3Image from '../../images/chapter3-cover-1400.jpg'
@@ -35,6 +36,13 @@ export const chapters = [
       'This chapter presents Malaysia\'s communications and multimedia licensing landscape in 2025. It covers the growth of Individual and Class Licences, licensing activity and renewals, compliance with licence conditions, cloud service provision and the ownership structure of Individual Licensees.',
       'Malaysia\'s technology-neutral licensing framework continues to support participation and investment across network infrastructure, services, applications and content as the industry evolves alongside 5G, cloud computing, artificial intelligence and the Internet of Things.',
     ],
+    rationale: {
+      title: 'The Foundation of Digital Connectivity',
+      text: [
+        'The image illustrates a high-capacity fibre optic network infrastructure, representing the core systems that support telecommunications services and digital connectivity. The arrangement of cables and network ports reflects the complexity, scale and reliability required to support Malaysia’s communications ecosystem.',
+        'The visual was selected to symbolise the regulatory foundation that underpins the industry. Through licensing and oversight, MCMC enables the development of network infrastructure and service provision, ensuring that the communications and multimedia sector operates within a structured and trusted framework.',
+      ],
+    },
   },
   {
     number: 2,
@@ -48,6 +56,13 @@ export const chapters = [
       'This chapter examines the economic performance of Malaysia\'s communications and multimedia industry across telecommunications, broadcasting, and postal and courier services. It highlights market capitalisation, industry revenue, capital expenditure, average revenue per user and the performance of communications and multimedia companies listed on the ACE Market.',
       'In 2025, the industry demonstrated resilience amid evolving market conditions, supported by strong demand for broadband, mobile connectivity, enterprise solutions and digital infrastructure.',
     ],
+    rationale: {
+      title: 'Progress Through Connectivity',
+      text: [
+        "The image illustrates an elevated highway cutting through the lush rainforest of Rawang, symbolising Malaysia's economic progress achieved in harmony with its natural environment. The modern transport infrastructure reflects connectivity, mobility and sustainable development, highlighting the nation's commitment to balancing economic advancement with environmental stewardship.",
+        "The visual was selected to represent the communications and multimedia industry's role as a key driver of economic growth, connecting businesses, communities and markets across the country. It complements the chapter's focus on industry performance, investment, market development and the sector's contribution to Malaysia's sustainable economic transformation.",
+      ],
+    },
   },
   {
     number: 3,
@@ -61,6 +76,13 @@ export const chapters = [
       'This chapter presents the state of connectivity in Malaysia, covering fixed broadband, mobile broadband, mobile cellular services, satellite broadband and 5G development. It also highlights the continued progress of JENDELA in strengthening high-speed broadband infrastructure and widening access to reliable digital connectivity nationwide.',
       "Malaysia's connectivity landscape advanced further in 2025 through higher subscriptions, wider network coverage and continued public-private collaboration.",
     ],
+    rationale: {
+      title: 'Extending the Nation’s Reach',
+      text: [
+        'The image illustrates a telecommunications tower silhouetted against a warm sunset, representing the extensive communications infrastructure that enables seamless connectivity across Malaysia. As a familiar feature throughout the country, telecommunications towers form the foundation of mobile and wireless services, ensuring that individuals, businesses and communities remain connected regardless of location.',
+        "The visual was selected to symbolise the essential role of communications infrastructure in delivering reliable services and expanding nationwide connectivity. It complements the chapter's focus on service availability, network coverage and the continuous enhancement of communications services that support Malaysia's digital transformation and an increasingly connected society.",
+      ],
+    },
   },
   {
     number: 4,
@@ -74,6 +96,13 @@ export const chapters = [
       "This chapter explores the changing broadcasting and content landscape in Malaysia as audiences move between television, radio, streaming services, mobile applications and social platforms. It highlights developments in audience behaviour, local content, digital distribution, advertising and the National Broadcasting Policy.",
       "As media consumption becomes increasingly multi-platform, broadcasters are expanding their digital presence, strengthening audience engagement and developing new approaches to content monetisation.",
     ],
+    rationale: {
+      title: 'Powering the Content Ecosystem',
+      text: [
+        'The image presents an audio mixing console, representing the technical environment behind media production, broadcasting and content delivery. It reflects the systems and expertise required to create, manage and distribute content across different communication platforms.',
+        'The visual was selected to symbolise the evolving content services ecosystem. As audiences increasingly access content across television, radio, streaming and digital platforms, MCMC continues to oversee a dynamic media landscape that supports access, relevance and industry development.',
+      ],
+    },
   },
   {
     number: 5,
@@ -87,6 +116,13 @@ export const chapters = [
       "This chapter highlights Malaysia's online and community services ecosystem, focusing on digital inclusion, community empowerment, e-commerce, cashless adoption, online safety and trusted digital transactions.",
       'Through NADI, Public Key Infrastructure and wider digital participation, communities across Malaysia gained greater access to connectivity, digital learning, entrepreneurship support and secure online services.',
     ],
+    rationale: {
+      title: 'Empowering Participation in the Digital Space',
+      text: [
+        'The image captures a live digital interaction through a smartphone, representing the growing role of online platforms in communication, commerce and community participation. It reflects how digital services have become part of everyday life, enabling users to create, share, engage and transact online.',
+        'The visual was selected to represent the rise of online community services in Malaysia. Through initiatives that support digital inclusion, access and responsible participation, MCMC helps create an environment where individuals and communities can benefit from the opportunities of the online ecosystem.',
+      ],
+    },
   },
   {
     number: 6,
@@ -100,6 +136,13 @@ export const chapters = [
       'This chapter reviews the performance and transformation of Malaysia\'s postal and courier sector in 2025. It covers postal and courier traffic, infrastructure expansion, technology adoption, sustainability initiatives and the conclusion of the five-year Pelan Accelerator Kurier Negara.',
       "Driven by e-commerce and logistics demand, courier traffic continued to expand while service providers strengthened their networks, adopted smarter operational solutions and widened access to delivery services nationwide.",
     ],
+    rationale: {
+      title: 'Connecting Through Every Delivery',
+      text: [
+        'The image illustrates an unmanned aerial vehicle (drone) transporting a parcel, representing the future of postal and courier services driven by technological innovation. As logistics continues to evolve, autonomous delivery solutions have the potential to enhance delivery speed, improve operational efficiency and expand service accessibility, particularly in remote and hard-to-reach areas.',
+        "The visual was selected to symbolise the industry's transformation towards smarter, technology-enabled logistics and future-ready delivery networks. It complements the chapter's focus on innovation, operational excellence and the continued evolution of postal and courier services in supporting Malaysia's growing digital economy.",
+      ],
+    },
   },
   {
     number: 7,
@@ -113,6 +156,13 @@ export const chapters = [
       "This chapter examines service quality, consumer protection and regulatory governance across Malaysia's communications and multimedia ecosystem. It covers complaint management, consumer safeguards, network and service quality, market and content regulation, technical standards and the role of industry forums in strengthening accountability.",
       'In 2025, service quality evolved beyond network performance to encompass consumer redress, online safety, platform responsiveness and trusted digital services.',
     ],
+    rationale: {
+      title: 'Maintaining Reliable Service Standards',
+      text: [
+        "The image illustrates telecommunications technicians working on a communications tower, representing the continuous efforts required to build, maintain and enhance Malaysia's nationwide communications infrastructure. Set against a clear blue sky, the tower symbolises the extensive network coverage that has become a familiar feature across the country, supporting reliable connectivity for individuals, businesses and communities.",
+        "The visual was selected to highlight the commitment to delivering high-quality, resilient and dependable communications services. It complements the chapter's focus on service quality, network performance, infrastructure maintenance and the ongoing efforts to meet the evolving expectations of consumers and industry.",
+      ],
+    },
   },
   {
     number: 8,
@@ -126,5 +176,12 @@ export const chapters = [
       "This chapter looks ahead to the technologies, market shifts and new opportunities expected to shape Malaysia's communications and multimedia industry. It explores the future of telecommunications, cybersecurity, cloud and data centres, AI-enabled services, broadcasting, digital content, and postal and courier services.",
       'Malaysia\'s next phase of digital growth will be driven by high-capacity connectivity, wider cloud adoption, trusted AI, resilient digital infrastructure and an increasingly integrated multi-platform content ecosystem.',
     ],
+    rationale: {
+      title: 'Advancing Towards a Connected Future',
+      text: [
+        "The image illustrates a modern architectural space viewed from below, where clean geometric lines converge towards the sky, symbolising vision, progress and the limitless possibilities of the future. The contemporary design reflects innovation, resilience and the forward momentum that continues to shape Malaysia's communications and multimedia landscape.",
+        "The visual was selected to represent the industry's outlook as it embraces emerging technologies, digital transformation and evolving consumer needs. Its abstract composition conveys optimism and continuous advancement, complementing the chapter's focus on future trends, strategic opportunities and the long-term development of a connected and digitally empowered Malaysia.",
+      ],
+    },
   },
 ]
