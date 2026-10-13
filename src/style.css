@@ -706,24 +706,21 @@ a {
      0.15s  the line grows from the centre
      0.7s   logo and title slide out from behind it
      2.3s   they fade; the line stretches to full height
-     2.85s  the two panels part, revealing the page
+     2.85s  the two panels part from the centre, revealing the page
      3.75s  done: the overlay hides itself (intro-done), main.js unlocks scroll
    The hero title starts at --intro-delay, while the panels are parting.
 
-   Laid out as one row, logo | line | text, with the line --intro-offset
-   left of the screen's centre: the text is much wider than the logo, so
-   that looks centred. Each panel covers the screen from its edge to the
-   line, so the screen splits open there. */
+   Laid out as one row, logo | line | text, with equal halves either side
+   so the line sits at the screen's centre, where the screen splits open.
+   The text is broken onto two lines to keep it close to the logo's width. */
 .intro {
-  --intro-offset: 90px;
   --intro-gap: 32px;
   position: fixed;
   inset: 0;
   z-index: 100;
   overflow: hidden;
   display: grid;
-  /* The first column ends where the line's centre lands at --intro-offset. */
-  grid-template-columns: minmax(0, calc(50% - var(--intro-offset) - 1px - var(--intro-gap))) auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   grid-template-rows: 100%;
   align-items: center;
   column-gap: var(--intro-gap);
@@ -735,30 +732,35 @@ a {
   --intro-delay: 3s;
 }
 
-/* Both panels span the line's column (drawn over them), so they meet
-   without a gap. Each carries half of one purple glow centred on it.
+/* Each covers half the screen, so the screen splits open at the line,
+   and carries half of one purple glow centred there. They sit outside
+   the grid; the line and the sides are raised above them.
    Each `animation` here names its keyframes: the production build's CSS
    minifier turns a shorthand without a name into `animation: none`,
    dropping the timing, which only shows up on the deployed site. */
 .intro__panel {
-  grid-row: 1;
-  align-self: stretch;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
 }
 
 .intro__panel--left {
-  grid-column: 1 / 3;
+  left: 0;
   background: radial-gradient(circle 70vmax at 100% 50%, var(--intro-glow), var(--bg) 70%);
   animation: intro-panel-left 0.9s cubic-bezier(0.76, 0, 0.24, 1) 2.85s both;
 }
 
 .intro__panel--right {
-  grid-column: 2 / 4;
+  right: 0;
   background: radial-gradient(circle 70vmax at 0% 50%, var(--intro-glow), var(--bg) 70%);
   animation: intro-panel-right 0.9s cubic-bezier(0.76, 0, 0.24, 1) 2.85s both;
 }
 
 .intro__line {
   --intro-line-height: 120px;
+  position: relative;
+  z-index: 1;
   grid-row: 1;
   grid-column: 2;
   width: 2px;
@@ -770,9 +772,10 @@ a {
 }
 
 /* Clips its content so the logo and text look like they come out from
-   behind the line. Each hugs the line; the outer padding keeps text off
-   the screen edge when the half is narrow. */
+   behind the line. */
 .intro__side {
+  position: relative;
+  z-index: 1;
   grid-row: 1;
   overflow: hidden;
   animation: intro-fade-out 0.4s ease 2.3s both;
@@ -781,13 +784,11 @@ a {
 .intro__side--left {
   grid-column: 1;
   justify-self: end;
-  padding-left: 10px;
 }
 
 .intro__side--right {
   grid-column: 3;
   justify-self: start;
-  padding-right: 10px;
 }
 
 .intro__side--left > * {
@@ -804,7 +805,7 @@ a {
   width: auto;
 }
 
-/* One line each, except on phones. */
+/* Two lines each, broken in index.html. */
 .intro__title {
   margin: 0;
   font-size: 22px;
@@ -879,10 +880,10 @@ html.intro-playing {
   overflow: hidden;
 }
 
-/* Phones wrap the text to fit each half, so the halves stay even. */
+/* Phones: the text is sized for a 390px screen, and scales down below
+   that so it still fits its half. */
 @media (max-width: 768px) {
   .intro {
-    --intro-offset: 0px;
     --intro-gap: 16px;
   }
 
@@ -894,18 +895,12 @@ html.intro-playing {
     height: 48px;
   }
 
-  /* Sized to fit on one line in half the screen (about 11px on most
-     phones). On the narrowest it stops at 10px and wraps instead. */
   .intro__title {
-    font-size: clamp(10px, calc((50vw - 30px) / 15.5), 14px);
-    white-space: normal;
-    text-wrap: balance;
+    font-size: min(15px, 3.85vw);
   }
 
   .intro__subtitle {
-    font-size: 9.5px;
-    white-space: normal;
-    text-wrap: balance;
+    font-size: min(11px, 2.82vw);
   }
 }
 
