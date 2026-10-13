@@ -45,9 +45,15 @@
   --bg: #1D1F3F;
   --border: #ffffff;
   --nav-height: 72px;
-  /* Left edge of the page content: centres a 1200px column on wide
-     screens, with a 12px minimum (20px on phones, below). */
-  --gutter: calc(12px + max(0px, (100vw - 1200px) / 2));
+  /* Left edge of the page content: centres a 1440px column on wide
+     screens; 8vw at least, so laptops keep a margin (20px on phones,
+     below). */
+  --gutter: max(12px + (100vw - 1440px) / 2, 8vw);
+  /* Right edge of the content: lines up with the nav's DOWNLOAD link,
+     with at least 80px of room on mid-size screens. */
+  --content-right: max(80px, var(--gutter));
+  /* Where list rows end (the accordion's + icons, the chapters' tags). */
+  --row-end: var(--content-right);
   color-scheme: dark;
   font: 16px/1.5 var(--font-family);
   color: var(--text);
@@ -60,6 +66,7 @@
 @media (max-width: 768px) {
   :root {
     --gutter: 20px;
+    --row-end: 20px; /* the phone text edge */
   }
 }
 
@@ -607,7 +614,7 @@ a {
 /* Hero */
 .hero {
   margin-left: var(--gutter);
-  padding: 80px;
+  padding: 80px var(--content-right) 80px 80px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 48px;
@@ -984,7 +991,7 @@ html.intro-seen .intro ~ main {
 /* Split section: reusable text + media layout for report sections */
 .split-section {
   margin-left: var(--gutter);
-  padding: var(--split-pad-top, 80px) 80px 80px;
+  padding: var(--split-pad-top, 80px) var(--content-right) 80px 80px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 48px;
@@ -1004,7 +1011,7 @@ html.intro-seen .intro ~ main {
 
 /* Runs to the section's right edge by cancelling its padding. */
 .split-section__bleed-right {
-  margin-right: -80px;
+  margin-right: calc(-1 * var(--content-right));
 }
 
 .split-section__text {
@@ -1325,7 +1332,9 @@ html.intro-seen .intro ~ main {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 20px 120px 20px 20px;   /* inset from the accordion's left line */
+  /* Inset from the accordion's left line; the accordion bleeds past the
+     content's right edge, so this brings the icon back to it. */
+  padding: 20px var(--row-end) 20px 20px;
   background: none;
   border: none;
   font: inherit;
@@ -1356,8 +1365,8 @@ html.intro-seen .intro ~ main {
 
 .accordion__icon {
   flex-shrink: 0;
-  width: 18px;
-  height: 18px;
+  width: 32px;
+  height: 32px;
   transition: transform 0.25s ease;
 }
 
@@ -1380,6 +1389,7 @@ html.intro-seen .intro ~ main {
 }
 
 .accordion__answer-inner > p {
+  max-width: 70ch;
   margin: 0;
   padding: 0 20px 20px;
   opacity: 0.75;
@@ -1511,7 +1521,7 @@ html.intro-seen .intro ~ main {
   display: flex;
   align-items: center;
   gap: 30px;
-  padding: 8px 160px 8px 100px;
+  padding: 8px var(--row-end) 8px 100px;
   text-decoration: none;
   color: var(--text);
   transition: background 0.2s ease;
@@ -1582,7 +1592,7 @@ html.intro-seen .intro ~ main {
     width: calc(100% + 40px);
   }
 
-  /* Replaces the desktop padding (160px on the right), which squeezed the
+  /* Replaces the desktop padding (80px+ on the right), which squeezed the
      chapter names into a narrow column on phones. */
   .chapters__link {
     gap: 16px;
