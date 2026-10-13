@@ -896,19 +896,21 @@ html.intro-playing {
     height: 48px;
   }
 
-  /* Title only, over two lines: the max-width always breaks it as
-     "Industry Performance / Report 2025". Below ~360px wide it shrinks so
-     the first line still fits its half. */
+  /* Over two lines: the max-width always breaks it as "Industry
+     Performance / Report 2025". Below ~360px wide it shrinks so the first
+     line still fits its half. */
   .intro__title {
     max-width: 11em;
     font-size: min(14px, calc((50vw - 30px) / 9.8));
     white-space: normal;
   }
 
-  /* Too long to fit half a phone at a readable size, and the logo
-     already says MCMC. */
+  /* Two even lines: "Malaysian Communications / and Multimedia
+     Commission", shrinking below ~350px wide to stay at two. */
   .intro__subtitle {
-    display: none;
+    font-size: min(11px, calc((50vw - 30px) / 12.9));
+    white-space: normal;
+    text-wrap: balance;
   }
 }
 
