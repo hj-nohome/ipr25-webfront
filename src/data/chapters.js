@@ -30,7 +30,7 @@ export const chapters = [
     image: chapter1Image,
     background: chapter1Background,
     reverse: true,
-    transition: 'circle-lines',
+    transition: 'circle-lines-smooth',
     intro: [
       'This chapter presents Malaysia\'s communications and multimedia licensing landscape in 2025. It covers the growth of Individual and Class Licences, licensing activity and renewals, compliance with licence conditions, cloud service provision and the ownership structure of Individual Licensees.',
       'Malaysia\'s technology-neutral licensing framework continues to support participation and investment across network infrastructure, services, applications and content as the industry evolves alongside 5G, cloud computing, artificial intelligence and the Internet of Things.',
@@ -43,7 +43,7 @@ export const chapters = [
     image: chapter2Image,
     background: chapter2Background,
     reverse: true,
-    transition: 'swirl-dashes',
+    transition: 'circle-lines-smooth',
     intro: [
       'This chapter examines the economic performance of Malaysia\'s communications and multimedia industry across telecommunications, broadcasting, and postal and courier services. It highlights market capitalisation, industry revenue, capital expenditure, average revenue per user and the performance of communications and multimedia companies listed on the ACE Market.',
       'In 2025, the industry demonstrated resilience amid evolving market conditions, supported by strong demand for broadband, mobile connectivity, enterprise solutions and digital infrastructure.',
@@ -56,7 +56,7 @@ export const chapters = [
     image: chapter3Image,
     background: chapter3Background,
     reverse: true,
-    transition: 'circle-lines',
+    transition: 'circle-lines-smooth',
     intro: [
       'This chapter presents the state of connectivity in Malaysia, covering fixed broadband, mobile broadband, mobile cellular services, satellite broadband and 5G development. It also highlights the continued progress of JENDELA in strengthening high-speed broadband infrastructure and widening access to reliable digital connectivity nationwide.',
       "Malaysia's connectivity landscape advanced further in 2025 through higher subscriptions, wider network coverage and continued public-private collaboration.",
@@ -69,7 +69,7 @@ export const chapters = [
     image: chapter4Image,
     background: chapter4Background,
     reverse: true,
-    transition: 'spiral',
+    transition: 'circle-lines-smooth',
     intro: [
       "This chapter explores the changing broadcasting and content landscape in Malaysia as audiences move between television, radio, streaming services, mobile applications and social platforms. It highlights developments in audience behaviour, local content, digital distribution, advertising and the National Broadcasting Policy.",
       "As media consumption becomes increasingly multi-platform, broadcasters are expanding their digital presence, strengthening audience engagement and developing new approaches to content monetisation.",
@@ -82,7 +82,7 @@ export const chapters = [
     image: chapter5Image,
     background: chapter5Background,
     reverse: true,
-    transition: 'circle-lines',
+    transition: 'circle-lines-smooth',
     intro: [
       "This chapter highlights Malaysia's online and community services ecosystem, focusing on digital inclusion, community empowerment, e-commerce, cashless adoption, online safety and trusted digital transactions.",
       'Through NADI, Public Key Infrastructure and wider digital participation, communities across Malaysia gained greater access to connectivity, digital learning, entrepreneurship support and secure online services.',
@@ -95,7 +95,7 @@ export const chapters = [
     image: chapter6Image,
     background: chapter6Background,
     reverse: true,
-    transition: 'circle-lines',
+    transition: 'circle-lines-smooth',
     intro: [
       'This chapter reviews the performance and transformation of Malaysia\'s postal and courier sector in 2025. It covers postal and courier traffic, infrastructure expansion, technology adoption, sustainability initiatives and the conclusion of the five-year Pelan Accelerator Kurier Negara.',
       "Driven by e-commerce and logistics demand, courier traffic continued to expand while service providers strengthened their networks, adopted smarter operational solutions and widened access to delivery services nationwide.",
@@ -108,7 +108,7 @@ export const chapters = [
     image: chapter7Image,
     background: chapter7Background,
     reverse: true,
-    transition: 'swirl-dashes',
+    transition: 'circle-lines-smooth',
     intro: [
       "This chapter examines service quality, consumer protection and regulatory governance across Malaysia's communications and multimedia ecosystem. It covers complaint management, consumer safeguards, network and service quality, market and content regulation, technical standards and the role of industry forums in strengthening accountability.",
       'In 2025, service quality evolved beyond network performance to encompass consumer redress, online safety, platform responsiveness and trusted digital services.',
@@ -121,7 +121,7 @@ export const chapters = [
     image: chapter8Image,
     background: chapter8Background,
     reverse: true,
-    transition: 'spiral',
+    transition: 'circle-lines-smooth',
     intro: [
       "This chapter looks ahead to the technologies, market shifts and new opportunities expected to shape Malaysia's communications and multimedia industry. It explores the future of telecommunications, cybersecurity, cloud and data centres, AI-enabled services, broadcasting, digital content, and postal and courier services.",
       'Malaysia\'s next phase of digital growth will be driven by high-capacity connectivity, wider cloud adoption, trusted AI, resilient digital infrastructure and an increasingly integrated multi-platform content ecosystem.',

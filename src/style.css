@@ -711,8 +711,7 @@ a {
    The hero title starts at --intro-delay, while the panels are parting.
 
    Laid out as one row, logo | line | text, with equal halves either side
-   so the line sits at the screen's centre, where the screen splits open.
-   The text is broken onto two lines to keep it close to the logo's width. */
+   so the line sits at the screen's centre, where the screen splits open. */
 .intro {
   --intro-gap: 32px;
   position: fixed;
@@ -772,7 +771,8 @@ a {
 }
 
 /* Clips its content so the logo and text look like they come out from
-   behind the line. */
+   behind the line. Each hugs the line; the outer padding keeps text off
+   the screen edge when the half is narrow. */
 .intro__side {
   position: relative;
   z-index: 1;
@@ -784,11 +784,13 @@ a {
 .intro__side--left {
   grid-column: 1;
   justify-self: end;
+  padding-left: 10px;
 }
 
 .intro__side--right {
   grid-column: 3;
   justify-self: start;
+  padding-right: 10px;
 }
 
 .intro__side--left > * {
@@ -805,7 +807,7 @@ a {
   width: auto;
 }
 
-/* Two lines each, broken in index.html. */
+/* One line each, except on phones. */
 .intro__title {
   margin: 0;
   font-size: 22px;
@@ -880,8 +882,7 @@ html.intro-playing {
   overflow: hidden;
 }
 
-/* Phones: the text is sized for a 390px screen, and scales down below
-   that so it still fits its half. */
+/* Phones: the text fits in half the screen, beside the centred line. */
 @media (max-width: 768px) {
   .intro {
     --intro-gap: 16px;
@@ -895,12 +896,19 @@ html.intro-playing {
     height: 48px;
   }
 
+  /* Title only, over two lines: the max-width always breaks it as
+     "Industry Performance / Report 2025". Below ~360px wide it shrinks so
+     the first line still fits its half. */
   .intro__title {
-    font-size: min(15px, 3.85vw);
+    max-width: 11em;
+    font-size: min(14px, calc((50vw - 30px) / 9.8));
+    white-space: normal;
   }
 
+  /* Too long to fit half a phone at a readable size, and the logo
+     already says MCMC. */
   .intro__subtitle {
-    font-size: min(11px, 2.82vw);
+    display: none;
   }
 }
 

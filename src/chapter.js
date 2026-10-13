@@ -4,13 +4,14 @@ import './main.js'
 import { chapters } from './data/chapters.js'
 import { highlights } from './data/highlights.js'
 import { renderHighlights } from './highlights.js'
-import { revealWithCircleLines } from './circle-lines.js'
+import { revealWithCircleLines, revealWithSmoothCircleLines } from './circle-lines.js'
 import { revealWithSpiral } from './spiral.js'
 import { revealWithSwirlDashes } from './swirl-dashes.js'
 
 // By each chapter's `transition` in chapters.js.
 const transitions = {
   'circle-lines': revealWithCircleLines,
+  'circle-lines-smooth': revealWithSmoothCircleLines,
   spiral: revealWithSpiral,
   'swirl-dashes': revealWithSwirlDashes,
 }

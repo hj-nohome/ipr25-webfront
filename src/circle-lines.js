@@ -189,10 +189,74 @@ const revealWidth = (elapsed) => {
   return HAIRLINE + (1 - HAIRLINE) * p * p * (3 - 2 * p)
 }
 
+const clamp01 = (x) => Math.min(Math.max(x, 0), 1)
+
+// How a reveal plays: its length, each bar's width (fraction of
+// COVER_WIDTH) at time t, and how far the core has filled in (0 to 1).
+const classicReveal = {
+  durationMs: REVEAL_MS,
+  widthAt: (t, sweep) => revealWidth(t - sweep * REVEAL_SWEEP_MS),
+  coreAt: (t) => 1 - (1 - clamp01((t - (REVEAL_MS - REVEAL_CORE_MS)) / REVEAL_CORE_MS)) ** 3,
+}
+
+// CSS cubic-bezier(x1, y1, x2, y2) as a function: progress 0..1 -> eased 0..1.
+const cubicBezier = (x1, y1, x2, y2) => {
+  const curve = (a, b, t) => 3 * a * t * (1 - t) ** 2 + 3 * b * t ** 2 * (1 - t) + t ** 3
+  return (x) => {
+    if (x <= 0) return 0
+    if (x >= 1) return 1
+    // x(t) only ever increases, so bisect for the t that gives x.
+    let lo = 0
+    let hi = 1
+    for (let i = 0; i < 20; i++) {
+      const mid = (lo + hi) / 2
+      if (curve(x1, x2, mid) < x) lo = mid
+      else hi = mid
+    }
+    return curve(y1, y2, (lo + hi) / 2)
+  }
+}
+
+// The smooth reveal eases everything out (Emil Kowalski's design
+// engineering guidance: ease-out for anything entering, never ease-in): bars
+// grow from nothing with a strong ease-out, the sweep slows as it comes
+// round, and the core opens up while the bars are still sweeping in.
+const STRONG_EASE_OUT = cubicBezier(0.23, 1, 0.32, 1)
+const SWEEP_EASE_OUT = cubicBezier(0.25, 0.46, 0.45, 0.94) // gentler, so the spiral stays readable
+const SMOOTH_SWEEP_MS = 1500 // first bar to last
+const SMOOTH_GROW_MS = 900 // nothing -> covering
+const SMOOTH_MS = SMOOTH_SWEEP_MS + SMOOTH_GROW_MS
+// The core opens while the sweep is still going, so the centre never sits empty.
+const SMOOTH_CORE_START_MS = 450
+const SMOOTH_CORE_MS = 1200
+
+// When the eased sweep reaches each bar: the inverse of SWEEP_EASE_OUT, by
+// bisection, for the BARS_PER_RING sweep positions traceBars asks about.
+const smoothStarts = Array.from({ length: BARS_PER_RING }, (_, i) => {
+  const sweep = i / (BARS_PER_RING - 1)
+  let lo = 0
+  let hi = 1
+  for (let j = 0; j < 20; j++) {
+    const mid = (lo + hi) / 2
+    if (SWEEP_EASE_OUT(mid) < sweep) lo = mid
+    else hi = mid
+  }
+  return ((lo + hi) / 2) * SMOOTH_SWEEP_MS
+})
+
+const smoothReveal = {
+  durationMs: SMOOTH_MS,
+  widthAt: (t, sweep) => {
+    const startsAt = smoothStarts[Math.round(sweep * (BARS_PER_RING - 1))]
+    return STRONG_EASE_OUT((t - startsAt) / SMOOTH_GROW_MS)
+  },
+  coreAt: (t) => STRONG_EASE_OUT((t - SMOOTH_CORE_START_MS) / SMOOTH_CORE_MS),
+}
+
 // Draws `image` (as object-fit: cover) in through the bars on a canvas over
 // `container`, which needs a position. Resolves with the canvas removed once
 // the image covers it, or straight away when `signal` aborts.
-export const revealWithCircleLines = (container, image, { signal } = {}) =>
+const reveal = (timing) => (container, image, { signal } = {}) =>
   new Promise((resolve) => {
     const canvas = document.createElement('canvas')
     canvas.setAttribute('aria-hidden', 'true')
@@ -241,12 +305,12 @@ export const revealWithCircleLines = (container, image, { signal } = {}) =>
 
       ctx.clearRect(0, 0, width, height)
       ctx.beginPath()
-      traceBars(ctx, cx, cy, radius, (sweep) => COVER_WIDTH * revealWidth(t - sweep * REVEAL_SWEEP_MS))
+      traceBars(ctx, cx, cy, radius, (sweep) => COVER_WIDTH * timing.widthAt(t, sweep))
 
-      const core = (t - (REVEAL_MS - REVEAL_CORE_MS)) / REVEAL_CORE_MS
+      const core = timing.coreAt(t)
       if (core > 0) {
         // 5% past the innermost ring's edge, so no seam shows.
-        const coreRadius = RING_EDGES.at(-1) * radius * 1.05 * (1 - (1 - Math.min(core, 1)) ** 3)
+        const coreRadius = RING_EDGES.at(-1) * radius * 1.05 * core
         ctx.moveTo(cx + coreRadius, cy)
         ctx.arc(cx, cy, coreRadius, 0, Math.PI * 2)
       }
@@ -254,8 +318,11 @@ export const revealWithCircleLines = (container, image, { signal } = {}) =>
       ctx.fillStyle = fill
       ctx.fill()
 
-      if (t >= REVEAL_MS) finish()
+      if (t >= timing.durationMs) finish()
       else frameId = requestAnimationFrame(frame)
     }
     frameId = requestAnimationFrame(frame)
   })
+
+export const revealWithCircleLines = reveal(classicReveal)
+export const revealWithSmoothCircleLines = reveal(smoothReveal)
