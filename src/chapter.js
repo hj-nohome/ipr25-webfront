@@ -53,7 +53,7 @@ const onScreen = (el) =>
 // Fades the image in once it has loaded and the column is on screen, then
 // plays the image -> photo transition; a new chapter (hashchange) hides it
 // again and starts over.
-const revealPhoto = async (name) => {
+const revealPhoto = async (name, durationMs) => {
   photoReveal?.abort()
   const controller = new AbortController()
   photoReveal = controller
@@ -75,7 +75,7 @@ const revealPhoto = async (name) => {
     return // the photo failed to load: stay on the image
   }
   if (controller.signal.aborted) return
-  await transitions[name](media, photo, { signal: controller.signal, from: image })
+  await transitions[name](media, photo, { signal: controller.signal, from: image, durationMs })
   if (!controller.signal.aborted) media.classList.add('is-photo-shown')
 }
 
@@ -116,7 +116,7 @@ const render = () => {
   image.src = first
   photo.src = second
   background.src = chapter.background
-  revealPhoto(chapter.transition ?? 'circle-lines')
+  revealPhoto(chapter.transition ?? 'circle-lines', chapter.transitionMs)
 }
 
 window.addEventListener('hashchange', () => {

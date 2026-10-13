@@ -223,12 +223,13 @@ const cubicBezier = (x1, y1, x2, y2) => {
 // round, and the core opens up while the bars are still sweeping in.
 const STRONG_EASE_OUT = cubicBezier(0.23, 1, 0.32, 1)
 const SWEEP_EASE_OUT = cubicBezier(0.25, 0.46, 0.45, 0.94) // gentler, so the spiral stays readable
-const SMOOTH_SWEEP_MS = 1500 // first bar to last
-const SMOOTH_GROW_MS = 900 // nothing -> covering
+// Same overall length as the classic reveal (REVEAL_MS).
+const SMOOTH_SWEEP_MS = 2000 // first bar to last
+const SMOOTH_GROW_MS = 1150 // nothing -> covering
 const SMOOTH_MS = SMOOTH_SWEEP_MS + SMOOTH_GROW_MS
 // The core opens while the sweep is still going, so the centre never sits empty.
-const SMOOTH_CORE_START_MS = 450
-const SMOOTH_CORE_MS = 1200
+const SMOOTH_CORE_START_MS = 600
+const SMOOTH_CORE_MS = 1600
 
 // When the eased sweep reaches each bar: the inverse of SWEEP_EASE_OUT, by
 // bisection, for the BARS_PER_RING sweep positions traceBars asks about.
@@ -255,8 +256,9 @@ const smoothReveal = {
 
 // Draws `image` (as object-fit: cover) in through the bars on a canvas over
 // `container`, which needs a position. Resolves with the canvas removed once
-// the image covers it, or straight away when `signal` aborts.
-const reveal = (timing) => (container, image, { signal } = {}) =>
+// the image covers it, or straight away when `signal` aborts. `durationMs`
+// plays the same motion faster or slower; the timing's own length otherwise.
+const reveal = (timing) => (container, image, { signal, durationMs = timing.durationMs } = {}) =>
   new Promise((resolve) => {
     const canvas = document.createElement('canvas')
     canvas.setAttribute('aria-hidden', 'true')
@@ -298,6 +300,8 @@ const reveal = (timing) => (container, image, { signal } = {}) =>
     const frame = (now) => {
       if (lastFrame !== null) t += Math.min(now - lastFrame, MAX_STEP_MS)
       lastFrame = now
+      // Where the timing is at, stretched or squeezed to last durationMs.
+      const at = (t / durationMs) * timing.durationMs
       const { width, height } = canvas
       const cx = width / 2
       const cy = height / 2
@@ -305,9 +309,9 @@ const reveal = (timing) => (container, image, { signal } = {}) =>
 
       ctx.clearRect(0, 0, width, height)
       ctx.beginPath()
-      traceBars(ctx, cx, cy, radius, (sweep) => COVER_WIDTH * timing.widthAt(t, sweep))
+      traceBars(ctx, cx, cy, radius, (sweep) => COVER_WIDTH * timing.widthAt(at, sweep))
 
-      const core = timing.coreAt(t)
+      const core = timing.coreAt(at)
       if (core > 0) {
         // 5% past the innermost ring's edge, so no seam shows.
         const coreRadius = RING_EDGES.at(-1) * radius * 1.05 * core
@@ -318,7 +322,7 @@ const reveal = (timing) => (container, image, { signal } = {}) =>
       ctx.fillStyle = fill
       ctx.fill()
 
-      if (t >= timing.durationMs) finish()
+      if (t >= durationMs) finish()
       else frameId = requestAnimationFrame(frame)
     }
     frameId = requestAnimationFrame(frame)

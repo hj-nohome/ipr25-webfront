@@ -3,8 +3,10 @@
 // Key Highlights page. `shortName` labels the Explore button; `background`
 // replaces the site's video loop behind the page; `image` is the picture in
 // the right-hand column. `transition` picks how `background` is revealed
-// over `image` (see chapter.js); circle lines unless set. `reverse` swaps
-// the two: the column starts on `background` and reveals `image`.
+// over `image` (see chapter.js); circle lines unless set. `transitionMs`
+// sets how long a circle-lines transition takes; its default otherwise.
+// `reverse` swaps the two: the column starts on `background` and reveals
+// `image`.
 import chapter1Image from '../../images/chapter1-cover-1400.jpg'
 import chapter2Image from '../../images/chapter2-cover-1400.jpg'
 import chapter3Image from '../../images/chapter3-cover-1400.jpg'
@@ -44,6 +46,7 @@ export const chapters = [
     background: chapter2Background,
     reverse: true,
     transition: 'circle-lines-smooth',
+    transitionMs: 3200,
     intro: [
       'This chapter examines the economic performance of Malaysia\'s communications and multimedia industry across telecommunications, broadcasting, and postal and courier services. It highlights market capitalisation, industry revenue, capital expenditure, average revenue per user and the performance of communications and multimedia companies listed on the ACE Market.',
       'In 2025, the industry demonstrated resilience amid evolving market conditions, supported by strong demand for broadband, mobile connectivity, enterprise solutions and digital infrastructure.',
