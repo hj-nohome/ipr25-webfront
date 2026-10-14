@@ -217,10 +217,10 @@ const cubicBezier = (x1, y1, x2, y2) => {
   }
 }
 
-// The smooth reveal eases everything out (Emil Kowalski's design
-// engineering guidance: ease-out for anything entering, never ease-in): bars
-// grow from nothing with a strong ease-out, the sweep slows as it comes
-// round, and the core opens up while the bars are still sweeping in.
+// The smooth reveal eases everything out (ease-out for anything entering,
+// never ease-in): bars grow from nothing with a strong ease-out, the sweep
+// slows as it comes round, and the core opens up while the bars are still
+// sweeping in.
 const STRONG_EASE_OUT = cubicBezier(0.23, 1, 0.32, 1)
 const SWEEP_EASE_OUT = cubicBezier(0.25, 0.46, 0.45, 0.94) // gentler, so the spiral stays readable
 // Same overall length as the classic reveal (REVEAL_MS).

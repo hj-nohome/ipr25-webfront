@@ -53,7 +53,6 @@ export const chapters = [
     background: chapter2Background,
     reverse: true,
     transition: 'circle-lines-smooth',
-    transitionMs: 3200,
     intro: [
       'This chapter examines the economic performance of Malaysia\'s communications and multimedia industry across telecommunications, broadcasting, and postal and courier services. It highlights market capitalisation, industry revenue, capital expenditure, average revenue per user and the performance of communications and multimedia companies listed on the ACE Market.',
       'In 2025, the industry demonstrated resilience amid evolving market conditions, supported by strong demand for broadband, mobile connectivity, enterprise solutions and digital infrastructure.',
