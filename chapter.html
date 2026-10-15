@@ -21,15 +21,16 @@
   <header class="nav">
     <div class="nav__inner">
       <a href="index.html" class="nav__brand">
-        <img src="images/mcmc-logo.png" alt="MCMC" />
+        <img src="images/mcmc-logo.webp" alt="MCMC" />
       </a>
       <nav id="nav-links" class="nav__links">
-        <!-- Home, the file size and the note show in the phone menu only. -->
+        <!-- Home, the rest of the download label and the note show in the phone
+             menu only. -->
         <a href="index.html" class="nav__link nav__link--home" data-i18n="nav.home">HOME</a>
         <a href="chapters.html" class="nav__link" aria-current="page" data-i18n="nav.chapters">CHAPTERS</a>
         <!-- replace url if MCMC hosts the report -->
         <a href="ipr25-report.pdf" class="nav__link nav__link--download" download="MCMC-Industry-Performance-Report-2025.pdf" target="_blank">
-          <span data-i18n="nav.download">DOWNLOAD</span> <span class="nav__link-meta">PDF, 15.6 MB</span>
+          <span data-i18n="nav.download">Download</span><span class="nav__link-rest" data-i18n="nav.downloadRest"> the Full Report</span>
         </a>
         <p class="nav__note" data-i18n="nav.note">Industry Performance Report 2025</p>
       </nav>
@@ -86,7 +87,7 @@
 
         <!-- Why the chapter's imagery was chosen; hidden on phones. -->
         <aside class="chapter-detail__rationale">
-          <h2 class="chapter-detail__rationale-label" data-i18n="chapter.rationale">Design Rationale:</h2>
+          <h2 class="chapter-detail__rationale-label" data-i18n="chapter.rationale">Design Rationale</h2>
           <h3 class="chapter-detail__rationale-title" id="chapter-rationale-title"></h3>
           <div class="chapter-detail__rationale-text" id="chapter-rationale-text"></div>
         </aside>
@@ -109,7 +110,7 @@
       </div>
 
       <!-- Column 2: Address -->
-      <div class="footer-column" style="padding-top:48px;">
+      <div class="footer-column footer-column--address">
         <p>MCMC HQ Tower 1<br>
           Jalan Impact, Cyber 6 63000 Cyberjaya<br>
           Selangor Darul Ehsan, Malaysia</p>

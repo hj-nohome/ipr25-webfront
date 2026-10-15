@@ -23,7 +23,8 @@ export const bm = {
 
   'nav.home': 'UTAMA', // draft: MCMC's BM site keeps "HOME" in English
   'nav.chapters': 'BAB', // draft
-  'nav.download': 'MUAT TURUN', // draft: standard BM, not found on MCMC's site
+  'nav.download': 'Muat Turun', // draft: standard BM, not found on MCMC's site
+  'nav.downloadRest': ' Laporan Penuh', // draft; phone menu only
   'nav.note': 'Laporan Prestasi Industri 2025', // draft: as intro.title
 
   'hero.line1': 'Laporan', // draft: as intro.title
@@ -68,7 +69,7 @@ export const bm = {
   chapter: 'Bab', // draft
 
   'chapter.back': 'Semua bab', // draft
-  'chapter.rationale': 'Rasional Reka Bentuk:', // draft
+  'chapter.rationale': 'Rasional Reka Bentuk', // draft
 
   'footer.contact': 'Hubungi kami:', // confirmed: MCMC site ("HUBUNGI KAMI")
   'footer.email': 'E-mel:', // draft: MCMC's BM site keeps "Email:" in English
