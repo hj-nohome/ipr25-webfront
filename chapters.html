@@ -5,7 +5,13 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chapters | ipr25-testing</title>
+  <!-- BM: hidden until main.js has swapped the page text in. -->
+  <script>
+    try {
+      if (localStorage.getItem('ipr25-lang') === 'ms') document.documentElement.classList.add('i18n-pending')
+    } catch {}
+  </script>
+  <title data-i18n="title.chapters">Chapters | ipr25-testing</title>
 </head>
 
 <body>
@@ -18,14 +24,19 @@
       <nav id="nav-links" class="nav__links">
         <!-- Home, the rest of the download label and the note show in the phone
              menu only. -->
-        <a href="index.html" class="nav__link nav__link--home">HOME</a>
-        <a href="chapters.html" class="nav__link" aria-current="page">CHAPTERS</a>
+        <a href="index.html" class="nav__link nav__link--home" data-i18n="nav.home">HOME</a>
+        <a href="chapters.html" class="nav__link" aria-current="page" data-i18n="nav.chapters">CHAPTERS</a>
         <!-- replace url if MCMC hosts the report -->
         <a href="ipr25-report.pdf" class="nav__link nav__link--download" download="MCMC-Industry-Performance-Report-2025.pdf" target="_blank">
-          Download<span class="nav__link-rest"> the Full Report</span>
+          <span data-i18n="nav.download">Download</span><span class="nav__link-rest" data-i18n="nav.downloadRest"> the Full Report</span>
         </a>
-        <p class="nav__note">Industry Performance Report 2025</p>
+        <p class="nav__note" data-i18n="nav.note">Industry Performance Report 2025</p>
       </nav>
+      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+        <button type="button" class="lang-toggle__option" data-lang="ms" lang="ms" aria-pressed="false">BM</button>
+        <span class="lang-toggle__divider" aria-hidden="true">/</span>
+        <button type="button" class="lang-toggle__option" data-lang="en" lang="en" aria-pressed="true">EN</button>
+      </div>
       <button id="nav-toggle" class="nav__toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-links">
         <span></span><span></span><span></span>
       </button>
@@ -35,16 +46,16 @@
   <main>
     <section class="chapters chapters--page">
       <h1 class="chapters__title">
-        <span class="line-reveal__line"><span>Chapters</span></span>
+        <span class="line-reveal__line"><span data-i18n="chapters.heading">Chapters</span></span>
       </h1>
       <div class="page-intro">
-        <p class="chapters__intro">
+        <p class="chapters__intro" data-i18n="chapters.intro1">
           Explore the performance, developments and key 
           trends shaping Malaysia's communications and 
           multimedia industry in 2025.
         </p>
 
-        <p class="chapters__intro">
+        <p class="chapters__intro" data-i18n="chapters.intro2">
           Across eight chapters, the Industry 
           Performance Report examines the licensing 
           landscape, economic performance, services, and 
@@ -61,8 +72,8 @@
             <div class="chapter-entry__cover">
               <img src="images/chapter1-cover-480.webp" alt="" loading="lazy" />
               <div class="chapter-entry__band">
-                <p class="chapter-entry__tag">Chapter 1</p>
-                <h2 class="chapter-entry__name">Licensing</h2>
+                <p class="chapter-entry__tag"><span data-i18n="chapter">Chapter</span> 1</p>
+                <h2 class="chapter-entry__name" data-chapter-name="1">Licensing</h2>
               </div>
             </div>
           </a>
@@ -73,8 +84,8 @@
             <div class="chapter-entry__cover">
               <img src="images/chapter2-cover-480.webp" alt="" loading="lazy" />
               <div class="chapter-entry__band">
-                <p class="chapter-entry__tag">Chapter 2</p>
-                <h2 class="chapter-entry__name">Economic Performance of the C&amp;M Industry</h2>
+                <p class="chapter-entry__tag"><span data-i18n="chapter">Chapter</span> 2</p>
+                <h2 class="chapter-entry__name" data-chapter-name="2">Economic Performance of the C&amp;M Industry</h2>
               </div>
             </div>
           </a>
@@ -85,8 +96,8 @@
             <div class="chapter-entry__cover">
               <img src="images/chapter3-cover-480.webp" alt="" loading="lazy" />
               <div class="chapter-entry__band">
-                <p class="chapter-entry__tag">Chapter 3</p>
-                <h2 class="chapter-entry__name">Services and Connectivity</h2>
+                <p class="chapter-entry__tag"><span data-i18n="chapter">Chapter</span> 3</p>
+                <h2 class="chapter-entry__name" data-chapter-name="3">Services and Connectivity</h2>
               </div>
             </div>
           </a>
@@ -97,8 +108,8 @@
             <div class="chapter-entry__cover">
               <img src="images/chapter4-cover-480.webp" alt="" loading="lazy" />
               <div class="chapter-entry__band">
-                <p class="chapter-entry__tag">Chapter 4</p>
-                <h2 class="chapter-entry__name">Content Services</h2>
+                <p class="chapter-entry__tag"><span data-i18n="chapter">Chapter</span> 4</p>
+                <h2 class="chapter-entry__name" data-chapter-name="4">Content Services</h2>
               </div>
             </div>
           </a>
@@ -109,8 +120,8 @@
             <div class="chapter-entry__cover">
               <img src="images/chapter5-cover-480.webp" alt="" loading="lazy" />
               <div class="chapter-entry__band">
-                <p class="chapter-entry__tag">Chapter 5</p>
-                <h2 class="chapter-entry__name">Online and Community Services</h2>
+                <p class="chapter-entry__tag"><span data-i18n="chapter">Chapter</span> 5</p>
+                <h2 class="chapter-entry__name" data-chapter-name="5">Online and Community Services</h2>
               </div>
             </div>
           </a>
@@ -121,8 +132,8 @@
             <div class="chapter-entry__cover">
               <img src="images/chapter6-cover-480.webp" alt="" loading="lazy" />
               <div class="chapter-entry__band">
-                <p class="chapter-entry__tag">Chapter 6</p>
-                <h2 class="chapter-entry__name">Postal and Courier</h2>
+                <p class="chapter-entry__tag"><span data-i18n="chapter">Chapter</span> 6</p>
+                <h2 class="chapter-entry__name" data-chapter-name="6">Postal and Courier</h2>
               </div>
             </div>
           </a>
@@ -133,8 +144,8 @@
             <div class="chapter-entry__cover">
               <img src="images/chapter7-cover-480.webp" alt="" loading="lazy" />
               <div class="chapter-entry__band">
-                <p class="chapter-entry__tag">Chapter 7</p>
-                <h2 class="chapter-entry__name">Quality of Services</h2>
+                <p class="chapter-entry__tag"><span data-i18n="chapter">Chapter</span> 7</p>
+                <h2 class="chapter-entry__name" data-chapter-name="7">Quality of Services</h2>
               </div>
             </div>
           </a>
@@ -145,8 +156,8 @@
             <div class="chapter-entry__cover">
               <img src="images/chapter8-cover-480.webp" alt="" loading="lazy" />
               <div class="chapter-entry__band">
-                <p class="chapter-entry__tag">Chapter 8</p>
-                <h2 class="chapter-entry__name">Outlook</h2>
+                <p class="chapter-entry__tag"><span data-i18n="chapter">Chapter</span> 8</p>
+                <h2 class="chapter-entry__name" data-chapter-name="8">Outlook</h2>
               </div>
             </div>
           </a>
@@ -160,12 +171,12 @@
 
       <!-- Column 1: Contact Info -->
       <div class="footer-column">
-        <h3>Contact us:</h3>
+        <h3 data-i18n="footer.contact">Contact us:</h3>
         <p>T: +603 8688 8000</p>
         <p>F: +603 8688 1000</p>
-        <p>Email: <a href="#">www.mcmc.gov.my</a></p>
+        <p><span data-i18n="footer.email">Email:</span> <a href="#">www.mcmc.gov.my</a></p>
 
-        <p class="footer-copyright">&copy; 2026 Malaysian Communications and Multimedia Commission. All rights reserved.
+        <p class="footer-copyright" data-i18n="footer.copyright">&copy; 2026 Malaysian Communications and Multimedia Commission. All rights reserved.
         </p>
       </div>
 

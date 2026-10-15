@@ -5,6 +5,12 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- BM: hidden until main.js has swapped the page text in. -->
+  <script>
+    try {
+      if (localStorage.getItem('ipr25-lang') === 'ms') document.documentElement.classList.add('i18n-pending')
+    } catch {}
+  </script>
   <title>Chapter | ipr25-testing</title>
 </head>
 
@@ -20,14 +26,19 @@
       <nav id="nav-links" class="nav__links">
         <!-- Home, the rest of the download label and the note show in the phone
              menu only. -->
-        <a href="index.html" class="nav__link nav__link--home">HOME</a>
-        <a href="chapters.html" class="nav__link" aria-current="page">CHAPTERS</a>
+        <a href="index.html" class="nav__link nav__link--home" data-i18n="nav.home">HOME</a>
+        <a href="chapters.html" class="nav__link" aria-current="page" data-i18n="nav.chapters">CHAPTERS</a>
         <!-- replace url if MCMC hosts the report -->
         <a href="ipr25-report.pdf" class="nav__link nav__link--download" download="MCMC-Industry-Performance-Report-2025.pdf" target="_blank">
-          Download<span class="nav__link-rest"> the Full Report</span>
+          <span data-i18n="nav.download">Download</span><span class="nav__link-rest" data-i18n="nav.downloadRest"> the Full Report</span>
         </a>
-        <p class="nav__note">Industry Performance Report 2025</p>
+        <p class="nav__note" data-i18n="nav.note">Industry Performance Report 2025</p>
       </nav>
+      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+        <button type="button" class="lang-toggle__option" data-lang="ms" lang="ms" aria-pressed="false">BM</button>
+        <span class="lang-toggle__divider" aria-hidden="true">/</span>
+        <button type="button" class="lang-toggle__option" data-lang="en" lang="en" aria-pressed="true">EN</button>
+      </div>
       <button id="nav-toggle" class="nav__toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-links">
         <span></span><span></span><span></span>
       </button>
@@ -42,7 +53,7 @@
           <svg viewBox="0 0 12 12" fill="none" aria-hidden="true">
             <path d="M11 6H1m4-4L1 6l4 4" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
-          All chapters
+          <span data-i18n="chapter.back">All chapters</span>
         </a>
       </div>
 
@@ -80,11 +91,11 @@
 
           <!-- Phones, rationalePhone 'button': opens the rationale as a panel
                over the text, so the chapter starts right under the image. -->
-          <button type="button" class="chapter-detail__rationale-toggle" aria-expanded="false" aria-controls="chapter-rationale">Design Rationale</button>
+          <button type="button" class="chapter-detail__rationale-toggle" aria-expanded="false" aria-controls="chapter-rationale" data-i18n="chapter.rationale">Design Rationale</button>
 
           <!-- Why the chapter's imagery was chosen. -->
           <aside class="chapter-detail__rationale" id="chapter-rationale">
-            <h2 class="chapter-detail__rationale-label">Design Rationale</h2>
+            <h2 class="chapter-detail__rationale-label" data-i18n="chapter.rationale">Design Rationale</h2>
             <h3 class="chapter-detail__rationale-title" id="chapter-rationale-title"></h3>
             <div class="chapter-detail__rationale-text" id="chapter-rationale-text"></div>
           </aside>
@@ -98,12 +109,12 @@
 
       <!-- Column 1: Contact Info -->
       <div class="footer-column">
-        <h3>Contact us:</h3>
+        <h3 data-i18n="footer.contact">Contact us:</h3>
         <p>T: +603 8688 8000</p>
         <p>F: +603 8688 1000</p>
-        <p>Email: <a href="#">www.mcmc.gov.my</a></p>
+        <p><span data-i18n="footer.email">Email:</span> <a href="#">www.mcmc.gov.my</a></p>
 
-        <p class="footer-copyright">&copy; 2026 Malaysian Communications and Multimedia Commission. All rights reserved.
+        <p class="footer-copyright" data-i18n="footer.copyright">&copy; 2026 Malaysian Communications and Multimedia Commission. All rights reserved.
         </p>
       </div>
 

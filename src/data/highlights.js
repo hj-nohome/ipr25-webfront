@@ -1,6 +1,7 @@
 // Key Highlights 2025 on chapter.html, keyed by chapter number and drawn by
 // src/highlights.js. `layout` picks the design; the other keys are that
-// layout's data. Chapters missing here hide the Key Highlights heading.
+// layout's data. Chapters missing here hide the Key Highlights heading;
+// `label` replaces its text.
 //
 // breakdown: cards of a total and the items it's made of, each with its
 // `compareYear` value as `previous`.
@@ -45,6 +46,8 @@
 // 'percent', 'million', 'billion', 'mbps' or 'rmBillion', with `decimals` to
 // override its own; see units in src/highlights.js. `tone` ('plain',
 // 'tint', 'card', 'outline', 'dark') and `wide` override a type's defaults.
+// Any text can be a { en, ms } pair for the BM toggle (src/i18n.js);
+// plain text shows in both languages.
 import broadbandIcon from '../../images/chapter3-highlights-broadband.webp'
 import jendelaIcon from '../../images/chapter3-highlights-Jendela.webp'
 import mobileIcon from '../../images/chapter3-highlights-mobile.webp'
@@ -180,53 +183,75 @@ export const highlights = {
       {
         type: 'figure',
         tone: 'tint',
-        label: 'Total Broadband Subscriptions',
+        // BM checked against the sources in src/data/ui-text.js.
+        label: { en: 'Total Broadband Subscriptions', ms: 'Jumlah Langganan Jalur Lebar' }, // confirmed: Pocket Book
         unit: 'million',
         value: 49.91,
         change: 0.6,
         icon: broadbandIcon,
         itemStyle: 'stats',
         items: [
-          { label: 'Mobile Broadband Subscriptions', value: 44.87 },
-          { label: 'Fixed Broadband Subscriptions', value: 5.04 },
+          // confirmed: Pocket Book
+          { label: { en: 'Mobile Broadband Subscriptions', ms: 'Langganan Jalur Lebar Mudah Alih' }, value: 44.87 },
+          // confirmed: Pocket Book ("Jalur Lebar Tetap")
+          { label: { en: 'Fixed Broadband Subscriptions', ms: 'Langganan Jalur Lebar Tetap' }, value: 5.04 },
         ],
       },
       {
         type: 'figure',
         tone: 'card',
-        intro: 'JENDELA surpassed its fibre target while continuing to strengthen nationwide mobile broadband coverage and speeds.',
+        intro: {
+          en: 'JENDELA surpassed its fibre target while continuing to strengthen nationwide mobile broadband coverage and speeds.',
+          ms: 'JENDELA melepasi sasaran gentian optiknya sambil terus memperkukuh liputan dan kelajuan jalur lebar mudah alih di seluruh negara.', // draft
+        },
         icon: jendelaIcon,
         itemStyle: 'stats',
         items: [
-          { label: 'Premises Passed with Fibre', value: 9.81, unit: 'million' },
-          { label: '4G LTE Coverage in Populated Areas', value: 99.71, unit: 'percent', decimals: 2 },
-          { label: 'Median Mobile Broadband Speed', value: 143.7, unit: 'mbps' },
+          // draft: JENDELA reports say "premis tersedia dengan capaian gentian optik"
+          { label: { en: 'Premises Passed with Fibre', ms: 'Premis Dilalui Gentian Optik' }, value: 9.81, unit: 'million' },
+          {
+            // confirmed: JENDELA progress ("Liputan 4G di kawasan berpenduduk")
+            label: { en: '4G LTE Coverage in Populated Areas', ms: 'Liputan 4G LTE di Kawasan Berpenduduk' },
+            value: 99.71,
+            unit: 'percent',
+            decimals: 2,
+          },
+          {
+            // draft: JENDELA progress reports the average ("purata"), not the median
+            label: { en: 'Median Mobile Broadband Speed', ms: 'Kelajuan Median Jalur Lebar Mudah Alih' },
+            value: 143.7,
+            unit: 'mbps',
+          },
         ],
       },
       {
         type: 'figure',
         tone: 'card',
-        label: 'Mobile Cellular Subscriptions',
+        label: { en: 'Mobile Cellular Subscriptions', ms: 'Langganan Selular Mudah Alih' }, // confirmed: Pocket Book
         unit: 'million',
         value: 49.79,
         change: 0.3,
         icon: mobileIcon,
         itemStyle: 'stats',
         items: [
-          { label: 'Prepaid Subscriptions', value: 32.94 },
-          { label: 'Postpaid Subscriptions', value: 16.85 },
+          { label: { en: 'Prepaid Subscriptions', ms: 'Langganan Prabayar' }, value: 32.94 }, // confirmed: Pocket Book
+          { label: { en: 'Postpaid Subscriptions', ms: 'Langganan Pascabayar' }, value: 16.85 }, // confirmed: Pocket Book
         ],
       },
       {
         type: 'figure',
         tone: 'card',
-        label: '5G Subscriptions',
+        label: { en: '5G Subscriptions', ms: 'Langganan 5G' }, // confirmed: Pocket Book
         unit: 'million',
         decimals: 1,
         value: 29.0,
         previous: 18.2,
-        description: 'Penetration rate of 84.6 per 100 inhabitants',
-        itemsLabel: 'Coverage of Populated Areas (CoPA)',
+        description: {
+          en: 'Penetration rate of 84.6 per 100 inhabitants',
+          ms: 'Kadar penembusan 84.6 bagi 100 penduduk', // confirmed: Pocket Book ("kadar penembusan bagi 100 penduduk")
+        },
+        // confirmed: JENDELA progress ("kawasan berpenduduk")
+        itemsLabel: { en: 'Coverage of Populated Areas (CoPA)', ms: 'Liputan Kawasan Berpenduduk (CoPA)' },
         icon: fiveGIcon,
         itemStyle: 'bullets',
         items: [
@@ -566,6 +591,75 @@ export const highlights = {
         parts: [
           {
             text: 'CFM, CMCF, Postal Forum and MTSFB continued to support consumer protection, responsible content practices, industry self-regulation and technical standardisation through industry codes, stakeholder engagement and collaborative governance initiatives.',
+          },
+        ],
+      },
+    ],
+  },
+  // The report has no Key Highlights for the Outlook: its subtitle (p.192)
+  // and the chapter's six outlook areas instead.
+  8: {
+    label: "What's Shaping the Outlook",
+    layout: 'grid',
+    blocks: [
+      {
+        type: 'figure',
+        tone: 'tint',
+        wide: true,
+        label: 'Outlook',
+        intro: 'Connectivity, cloud, AI, content and logistics are moving towards higher-value, technology-enabled and sustainable growth.',
+      },
+      {
+        type: 'stack',
+        title: 'Telecommunications',
+        parts: [
+          {
+            text: 'A maturing market shifts growth towards higher data use, fibre uptake, 5G migration and enterprise services.',
+          },
+        ],
+      },
+      {
+        type: 'stack',
+        title: '5G and Network Evolution',
+        parts: [
+          {
+            text: 'Users move away from 4G and 2G, with 5G-Advanced, private 5G networks and RedCap opening new use cases.',
+          },
+        ],
+      },
+      {
+        type: 'stack',
+        title: 'Cybersecurity and Digital Trust',
+        parts: [
+          {
+            text: 'AI-enabled threats and post-quantum readiness raise the bar for governance, monitoring and cyber resilience.',
+          },
+        ],
+      },
+      {
+        type: 'stack',
+        title: 'Cloud, Data Centres and AI',
+        parts: [
+          {
+            text: 'Sovereign cloud, edge computing and GPU-as-a-Service drive the next wave of infrastructure demand.',
+          },
+        ],
+      },
+      {
+        type: 'stack',
+        title: 'Broadcasting and Content',
+        parts: [
+          {
+            text: 'A multi-platform mix of streaming, micro-dramas, AI-assisted production and digital advertising.',
+          },
+        ],
+      },
+      {
+        type: 'stack',
+        title: 'Postal and Courier',
+        parts: [
+          {
+            text: 'Competition moves from parcel volume to efficiency, automation and greener last-mile delivery.',
           },
         ],
       },

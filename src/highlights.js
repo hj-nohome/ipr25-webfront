@@ -4,6 +4,7 @@
 // so that, beside the cover's transition, only a few things move at once.
 import { ArcElement, Chart, DoughnutController, Tooltip } from 'chart.js'
 import { countUp } from './count-up.js'
+import { t } from './i18n.js'
 
 Chart.register(DoughnutController, ArcElement, Tooltip)
 
@@ -11,20 +12,22 @@ const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matc
 
 // By a value's `unit` in highlights.js; its `decimals` overrides. Words
 // are lower case; the accent variant capitalises them on values (CSS).
+// The BM in this file is checked against the sources in src/data/ui-text.js.
 const units = {
   count: { decimals: 0 },
   percent: { decimals: 1, symbol: '%' },
-  million: { decimals: 2, word: 'million' },
-  billion: { decimals: 2, word: 'billion' },
+  million: { decimals: 2, word: { en: 'million', ms: 'juta' } }, // confirmed: Pocket Book
+  billion: { decimals: 2, word: { en: 'billion', ms: 'bilion' } }, // confirmed: Pocket Book
   mbps: { decimals: 1, word: 'Mbps' },
-  rmBillion: { decimals: 2, prefix: 'RM', word: 'billion' },
+  rmBillion: { decimals: 2, prefix: 'RM', word: { en: 'billion', ms: 'bilion' } }, // confirmed: Pocket Book
 }
 
 const formatNumber = (value, decimals = 0) =>
   value.toLocaleString('en-MY', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
 
 const formatValue = (value, unit = 'count', decimals = units[unit].decimals) => {
-  const { prefix = '', symbol = '', word } = units[unit]
+  const { prefix = '', symbol = '' } = units[unit]
+  const word = t(units[unit].word)
   return `${prefix}${formatNumber(value, decimals)}${symbol}${word ? ` ${word}` : ''}`
 }
 
@@ -51,7 +54,8 @@ const counter = (className, value, decimals = 0) => {
 // The unit's word gets its own span so headline figures can shrink it.
 // `counts` makes the number count up.
 const valueWithUnit = (value, unit = 'count', decimals = units[unit].decimals, { counts = false } = {}) => {
-  const { prefix = '', symbol = '', word } = units[unit]
+  const { prefix = '', symbol = '' } = units[unit]
+  const word = t(units[unit].word)
   const el = element('span', 'hl-value')
   const number = counts
     ? counter('hl-value__number', value, decimals)
@@ -80,7 +84,8 @@ const arrowChange = (percent) => {
   const arrow = element('span', '', percent < 0 ? '↓' : '↑')
   arrow.setAttribute('aria-hidden', 'true')
   return [
-    element('span', 'visually-hidden', percent < 0 ? 'down ' : 'up '),
+    // draft
+    element('span', 'visually-hidden', t(percent < 0 ? { en: 'down ', ms: 'turun ' } : { en: 'up ', ms: 'naik ' })),
     arrow,
     `${formatNumber(Math.abs(percent), 1)}%`,
   ]
@@ -102,7 +107,8 @@ const changeParts = (item, unit, decimals, { compareYear, changeStyle }) => {
     line.append(
       element('span', 'hl-trend__change', `${percent < 0 ? '−' : '+'}${formatNumber(Math.abs(percent), 1)}%`),
       ' ',
-      element('span', 'hl-trend__from', previous ?? `from ${compareYear}`)
+      // draft
+      element('span', 'hl-trend__from', previous ?? t({ en: `from ${compareYear}`, ms: `berbanding ${compareYear}` }))
     )
     return { lines: [line] }
   }
@@ -119,6 +125,8 @@ const changeParts = (item, unit, decimals, { compareYear, changeStyle }) => {
   badge.append(...arrowChange(percent))
   return { badge, lines: previous ? [element('p', 'hl-previous', `(${previous})`)] : [] }
 }
+
+const source = (block) => `${t({ en: 'Source', ms: 'Sumber' })}: ${block.source}` // confirmed: Pocket Book
 
 const heading = (block, fallback) => {
   if (block.title) return element('h3', 'hl-block__title', block.title)
@@ -330,7 +338,7 @@ const figure = (block, context) => {
     }
   }
 
-  if (block.source) parts.push(element('p', 'hl-block__source', `Source: ${block.source}`))
+  if (block.source) parts.push(element('p', 'hl-block__source', source(block)))
   return parts
 }
 
@@ -410,7 +418,7 @@ const banner = (block) => {
     })
   )
   const parts = [heading(block)]
-  if (block.source) parts.push(element('p', 'hl-banner__source', `Source: ${block.source}`))
+  if (block.source) parts.push(element('p', 'hl-banner__source', source(block)))
   return [...parts, stats]
 }
 
@@ -422,7 +430,7 @@ const statement = (block) => [
 const notes = (block) => {
   const list = element('ol', 'hl-notes')
   list.append(...block.items.map((note) => element('li', '', note)))
-  return [heading(block, 'Note'), list]
+  return [heading(block, t({ en: 'Note', ms: 'Nota' })), list] // confirmed: Pocket Book
 }
 
 // Each type's default tone and width; a block can override either.
@@ -492,7 +500,12 @@ const breakdown = ({ compareYear, groups }, runtime) => {
         compare.append(
           element('span', 'highlights__previous', `${compareYear}: ${formatNumber(item.previous)}`),
           // "of total" fits the space of the 2024 value it stands in for.
-          element('span', 'highlights__share-text', `${formatNumber(share)}% of total`)
+          element(
+            'span',
+            'highlights__share-text',
+            // draft: modelled on the Pocket Book's "% daripada Bursa Malaysia"
+            t({ en: `${formatNumber(share)}% of total`, ms: `${formatNumber(share)}% daripada jumlah` })
+          )
         )
         const bar = element('span', 'highlights__share')
         bar.setAttribute('aria-hidden', 'true')
