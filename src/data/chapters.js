@@ -7,22 +7,22 @@
 // sets how long a circle-lines transition takes; its default otherwise.
 // `reverse` swaps the two: the column starts on `background` and reveals
 // `image`. `rationale` explains the choice of imagery, under the column.
-import chapter1Image from '../../images/chapter1-cover-1400.jpg'
-import chapter2Image from '../../images/chapter2-cover-1400.jpg'
-import chapter3Image from '../../images/chapter3-cover-1400.jpg'
-import chapter4Image from '../../images/chapter4-cover-1400.jpg'
-import chapter5Image from '../../images/chapter5-cover-1400.jpg'
-import chapter6Image from '../../images/chapter6-cover-1400.jpg'
-import chapter7Image from '../../images/chapter7-cover-1400.jpg'
-import chapter8Image from '../../images/chapter8-cover-1400.jpg'
-import chapter1Background from '../../images/chapter1-highlight-bg.jpg'
-import chapter2Background from '../../images/chapter2-highlight-bg.jpg'
-import chapter3Background from '../../images/chapter3-highlight-bg.jpg'
-import chapter4Background from '../../images/chapter4-highlight-bg.jpg'
-import chapter5Background from '../../images/chapter5-highlight-bg.jpg'
-import chapter6Background from '../../images/chapter6-highlight-bg.jpg'
-import chapter7Background from '../../images/chapter7-highlight-bg.jpg'
-import chapter8Background from '../../images/chapter8-highlight-bg.jpg'
+import chapter1Image from '../../images/chapter1-cover-1400.webp'
+import chapter2Image from '../../images/chapter2-cover-1400.webp'
+import chapter3Image from '../../images/chapter3-cover-1400.webp'
+import chapter4Image from '../../images/chapter4-cover-1400.webp'
+import chapter5Image from '../../images/chapter5-cover-1400.webp'
+import chapter6Image from '../../images/chapter6-cover-1400.webp'
+import chapter7Image from '../../images/chapter7-cover-1400.webp'
+import chapter8Image from '../../images/chapter8-cover-1400.webp'
+import chapter1Background from '../../images/chapter1-highlight-bg.webp'
+import chapter2Background from '../../images/chapter2-highlight-bg.webp'
+import chapter3Background from '../../images/chapter3-highlight-bg.webp'
+import chapter4Background from '../../images/chapter4-highlight-bg.webp'
+import chapter5Background from '../../images/chapter5-highlight-bg.webp'
+import chapter6Background from '../../images/chapter6-highlight-bg.webp'
+import chapter7Background from '../../images/chapter7-highlight-bg.webp'
+import chapter8Background from '../../images/chapter8-highlight-bg.webp'
 
 export const chapters = [
   {
