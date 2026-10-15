@@ -65,21 +65,30 @@
           </div>
         </div>
 
-        <div class="chapter-detail__media">
-          <img class="chapter-detail__image" id="chapter-image" alt="" />
-          <!-- The chapter's background photo (or its image, for chapters with
-               `reverse`): chapter.js reveals it over the picture above with
-               the chapter's transition (see `transition` in
-               src/data/chapters.js), once per load. -->
-          <img class="chapter-detail__photo" id="chapter-photo" alt="" />
-        </div>
+        <!-- The image and rationale: separate grid cells on wider screens, and
+             one block on phones for chapters that show the rationale there
+             (see `rationalePhone` in src/data/chapters.js). -->
+        <div class="chapter-detail__visual">
+          <div class="chapter-detail__media">
+            <img class="chapter-detail__image" id="chapter-image" alt="" />
+            <!-- The chapter's background photo (or its image, for chapters with
+                 `reverse`): chapter.js reveals it over the picture above with
+                 the chapter's transition (see `transition` in
+                 src/data/chapters.js), once per load. -->
+            <img class="chapter-detail__photo" id="chapter-photo" alt="" />
+          </div>
 
-        <!-- Why the chapter's imagery was chosen; hidden on phones. -->
-        <aside class="chapter-detail__rationale">
-          <h2 class="chapter-detail__rationale-label">Design Rationale</h2>
-          <h3 class="chapter-detail__rationale-title" id="chapter-rationale-title"></h3>
-          <div class="chapter-detail__rationale-text" id="chapter-rationale-text"></div>
-        </aside>
+          <!-- Phones, rationalePhone 'button': opens the rationale as a panel
+               over the text, so the chapter starts right under the image. -->
+          <button type="button" class="chapter-detail__rationale-toggle" aria-expanded="false" aria-controls="chapter-rationale">Design Rationale</button>
+
+          <!-- Why the chapter's imagery was chosen. -->
+          <aside class="chapter-detail__rationale" id="chapter-rationale">
+            <h2 class="chapter-detail__rationale-label">Design Rationale</h2>
+            <h3 class="chapter-detail__rationale-title" id="chapter-rationale-title"></h3>
+            <div class="chapter-detail__rationale-text" id="chapter-rationale-text"></div>
+          </aside>
+        </div>
       </div>
     </section>
   </main>
