@@ -109,6 +109,7 @@ const render = () => {
   rationaleTitle.textContent = chapter.rationale.title
   rationaleText.replaceChildren(...chapter.rationale.text.map(toParagraph))
   const chapterHighlights = highlights[chapter.number]
+  highlightsLabel.textContent = chapterHighlights?.label ?? 'Key Highlights 2025'
   highlightsLabel.hidden = !chapterHighlights
   highlightsList.hidden = !chapterHighlights
   renderHighlights(highlightsList, chapterHighlights)

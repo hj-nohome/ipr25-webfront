@@ -1,6 +1,7 @@
 // Key Highlights 2025 on chapter.html, keyed by chapter number and drawn by
 // src/highlights.js. `layout` picks the design; the other keys are that
-// layout's data. Chapters missing here hide the Key Highlights heading.
+// layout's data. Chapters missing here hide the Key Highlights heading;
+// `label` replaces its text.
 //
 // breakdown: cards of a total and the items it's made of, each with its
 // `compareYear` value as `previous`.
@@ -566,6 +567,75 @@ export const highlights = {
         parts: [
           {
             text: 'CFM, CMCF, Postal Forum and MTSFB continued to support consumer protection, responsible content practices, industry self-regulation and technical standardisation through industry codes, stakeholder engagement and collaborative governance initiatives.',
+          },
+        ],
+      },
+    ],
+  },
+  // The report has no Key Highlights for the Outlook: its subtitle (p.192)
+  // and the chapter's six outlook areas instead.
+  8: {
+    label: "What's Shaping the Outlook",
+    layout: 'grid',
+    blocks: [
+      {
+        type: 'figure',
+        tone: 'tint',
+        wide: true,
+        label: 'Outlook',
+        intro: 'Connectivity, cloud, AI, content and logistics are moving towards higher-value, technology-enabled and sustainable growth.',
+      },
+      {
+        type: 'stack',
+        title: 'Telecommunications',
+        parts: [
+          {
+            text: 'A maturing market shifts growth towards higher data use, fibre uptake, 5G migration and enterprise services.',
+          },
+        ],
+      },
+      {
+        type: 'stack',
+        title: '5G and Network Evolution',
+        parts: [
+          {
+            text: 'Users move away from 4G and 2G, with 5G-Advanced, private 5G networks and RedCap opening new use cases.',
+          },
+        ],
+      },
+      {
+        type: 'stack',
+        title: 'Cybersecurity and Digital Trust',
+        parts: [
+          {
+            text: 'AI-enabled threats and post-quantum readiness raise the bar for governance, monitoring and cyber resilience.',
+          },
+        ],
+      },
+      {
+        type: 'stack',
+        title: 'Cloud, Data Centres and AI',
+        parts: [
+          {
+            text: 'Sovereign cloud, edge computing and GPU-as-a-Service drive the next wave of infrastructure demand.',
+          },
+        ],
+      },
+      {
+        type: 'stack',
+        title: 'Broadcasting and Content',
+        parts: [
+          {
+            text: 'A multi-platform mix of streaming, micro-dramas, AI-assisted production and digital advertising.',
+          },
+        ],
+      },
+      {
+        type: 'stack',
+        title: 'Postal and Courier',
+        parts: [
+          {
+            text: 'Competition moves from parcel volume to efficiency, automation and greener last-mile delivery.',
           },
         ],
       },
