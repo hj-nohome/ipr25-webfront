@@ -3236,19 +3236,10 @@ html.intro-seen .intro ~ main {
     box-shadow: 0 -12px 24px rgb(23 19 31 / 0.08);
   }
 
-  /* Bottom: the image, the text, then the rationale, held at the bottom of
-     the screen behind the text and revealed as the text scrolls away. */
+  /* Bottom: the image, the text, then the rationale as the chapter's last
+     section, after the button; nothing of it shows any earlier. */
   .chapter-detail[data-rationale-phone='bottom'] .chapter-detail__media {
     order: -1;
-  }
-
-  .chapter-detail[data-rationale-phone='bottom'] .chapter-detail__rationale {
-    position: sticky;
-    bottom: 0;
-  }
-
-  .chapter-detail[data-rationale-phone='bottom'] .chapter-detail__text {
-    box-shadow: 0 12px 24px rgb(23 19 31 / 0.08);
   }
 
   /* Button: the chapter starts straight under the image. A button on the

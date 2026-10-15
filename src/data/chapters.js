@@ -8,8 +8,8 @@
 // `reverse` swaps the two: the column starts on `background` and reveals
 // `image`. `rationale` explains the choice of imagery, under the column.
 // `rationalePhone` places it on phones: 'top' pins the image and rationale
-// while the text scrolls up over them; 'bottom' puts it after the text,
-// revealed as the text scrolls away; 'button' puts a button on the image
+// while the text scrolls up over them; 'bottom' puts it after the text, as
+// the chapter's last section; 'button' puts a button on the image
 // that opens it as a panel over the text. Hidden on phones unless set.
 import chapter1Image from '../../images/chapter1-cover-1400.webp'
 import chapter2Image from '../../images/chapter2-cover-1400.webp'
