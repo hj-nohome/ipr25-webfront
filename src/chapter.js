@@ -4,6 +4,7 @@ import './main.js'
 import { chapters } from './data/chapters.js'
 import { highlights } from './data/highlights.js'
 import { renderHighlights } from './highlights.js'
+import { localize, onLangChange, t } from './i18n.js'
 import { revealWithCircleLines, revealWithSmoothCircleLines } from './circle-lines.js'
 import { revealWithSpiral } from './spiral.js'
 import { revealWithSwirlDashes } from './swirl-dashes.js'
@@ -97,23 +98,33 @@ const toParagraph = (text) => {
   return paragraph
 }
 
-const render = () => {
-  const chapter = chapterFromHash()
+// Apart from the images, so switching language leaves the transition be.
+// Its BM labels are drafts (sources in src/data/ui-text.js).
+const renderText = (source) => {
+  const chapter = localize(source)
+  const chapterLabel = t({ en: `Chapter ${chapter.number}`, ms: `Bab ${chapter.number}` })
 
-  document.title = `Chapter ${chapter.number}: ${chapter.name} | ipr25-testing`
-  // Picks the chapter's accent colours (see .chapter-detail in style.css).
-  section.dataset.chapter = chapter.number
+  document.title = `${chapterLabel}: ${chapter.name} | ipr25-testing`
   name.textContent = chapter.name
-  number.textContent = `Chapter ${chapter.number}`
+  number.textContent = chapterLabel
   intro.replaceChildren(...chapter.intro.map(toParagraph))
   rationaleTitle.textContent = chapter.rationale.title
   rationaleText.replaceChildren(...chapter.rationale.text.map(toParagraph))
-  const chapterHighlights = highlights[chapter.number]
-  highlightsLabel.textContent = chapterHighlights?.label ?? 'Key Highlights 2025'
+  const chapterHighlights = localize(highlights[chapter.number])
+  highlightsLabel.textContent =
+    chapterHighlights?.label ?? t({ en: 'Key Highlights 2025', ms: 'Sorotan Utama 2025' })
   highlightsLabel.hidden = !chapterHighlights
   highlightsList.hidden = !chapterHighlights
   renderHighlights(highlightsList, chapterHighlights)
-  cta.textContent = `Explore ${chapter.shortName}`
+  cta.textContent = t({ en: `Explore ${chapter.shortName}`, ms: `Terokai ${chapter.shortName}` })
+}
+
+const render = () => {
+  const chapter = chapterFromHash()
+
+  // Picks the chapter's accent colours (see .chapter-detail in style.css).
+  section.dataset.chapter = chapter.number
+  renderText(chapter)
   // The column starts on the first and the transition reveals the second.
   const [first, second] = chapter.reverse
     ? [chapter.background, chapter.image]
@@ -128,5 +139,7 @@ window.addEventListener('hashchange', () => {
   render()
   window.scrollTo(0, 0)
 })
+
+onLangChange(() => renderText(chapterFromHash()))
 
 render()

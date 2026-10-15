@@ -46,6 +46,8 @@
 // 'percent', 'million', 'billion', 'mbps' or 'rmBillion', with `decimals` to
 // override its own; see units in src/highlights.js. `tone` ('plain',
 // 'tint', 'card', 'outline', 'dark') and `wide` override a type's defaults.
+// Any text can be a { en, ms } pair for the BM toggle (src/i18n.js);
+// plain text shows in both languages.
 import broadbandIcon from '../../images/chapter3-highlights-broadband.png'
 import jendelaIcon from '../../images/chapter3-highlights-Jendela.png'
 import mobileIcon from '../../images/chapter3-highlights-mobile.png'
@@ -181,53 +183,75 @@ export const highlights = {
       {
         type: 'figure',
         tone: 'tint',
-        label: 'Total Broadband Subscriptions',
+        // BM checked against the sources in src/data/ui-text.js.
+        label: { en: 'Total Broadband Subscriptions', ms: 'Jumlah Langganan Jalur Lebar' }, // confirmed: Pocket Book
         unit: 'million',
         value: 49.91,
         change: 0.6,
         icon: broadbandIcon,
         itemStyle: 'stats',
         items: [
-          { label: 'Mobile Broadband Subscriptions', value: 44.87 },
-          { label: 'Fixed Broadband Subscriptions', value: 5.04 },
+          // confirmed: Pocket Book
+          { label: { en: 'Mobile Broadband Subscriptions', ms: 'Langganan Jalur Lebar Mudah Alih' }, value: 44.87 },
+          // confirmed: Pocket Book ("Jalur Lebar Tetap")
+          { label: { en: 'Fixed Broadband Subscriptions', ms: 'Langganan Jalur Lebar Tetap' }, value: 5.04 },
         ],
       },
       {
         type: 'figure',
         tone: 'card',
-        intro: 'JENDELA surpassed its fibre target while continuing to strengthen nationwide mobile broadband coverage and speeds.',
+        intro: {
+          en: 'JENDELA surpassed its fibre target while continuing to strengthen nationwide mobile broadband coverage and speeds.',
+          ms: 'JENDELA melepasi sasaran gentian optiknya sambil terus memperkukuh liputan dan kelajuan jalur lebar mudah alih di seluruh negara.', // draft
+        },
         icon: jendelaIcon,
         itemStyle: 'stats',
         items: [
-          { label: 'Premises Passed with Fibre', value: 9.81, unit: 'million' },
-          { label: '4G LTE Coverage in Populated Areas', value: 99.71, unit: 'percent', decimals: 2 },
-          { label: 'Median Mobile Broadband Speed', value: 143.7, unit: 'mbps' },
+          // draft: JENDELA reports say "premis tersedia dengan capaian gentian optik"
+          { label: { en: 'Premises Passed with Fibre', ms: 'Premis Dilalui Gentian Optik' }, value: 9.81, unit: 'million' },
+          {
+            // confirmed: JENDELA progress ("Liputan 4G di kawasan berpenduduk")
+            label: { en: '4G LTE Coverage in Populated Areas', ms: 'Liputan 4G LTE di Kawasan Berpenduduk' },
+            value: 99.71,
+            unit: 'percent',
+            decimals: 2,
+          },
+          {
+            // draft: JENDELA progress reports the average ("purata"), not the median
+            label: { en: 'Median Mobile Broadband Speed', ms: 'Kelajuan Median Jalur Lebar Mudah Alih' },
+            value: 143.7,
+            unit: 'mbps',
+          },
         ],
       },
       {
         type: 'figure',
         tone: 'card',
-        label: 'Mobile Cellular Subscriptions',
+        label: { en: 'Mobile Cellular Subscriptions', ms: 'Langganan Selular Mudah Alih' }, // confirmed: Pocket Book
         unit: 'million',
         value: 49.79,
         change: 0.3,
         icon: mobileIcon,
         itemStyle: 'stats',
         items: [
-          { label: 'Prepaid Subscriptions', value: 32.94 },
-          { label: 'Postpaid Subscriptions', value: 16.85 },
+          { label: { en: 'Prepaid Subscriptions', ms: 'Langganan Prabayar' }, value: 32.94 }, // confirmed: Pocket Book
+          { label: { en: 'Postpaid Subscriptions', ms: 'Langganan Pascabayar' }, value: 16.85 }, // confirmed: Pocket Book
         ],
       },
       {
         type: 'figure',
         tone: 'card',
-        label: '5G Subscriptions',
+        label: { en: '5G Subscriptions', ms: 'Langganan 5G' }, // confirmed: Pocket Book
         unit: 'million',
         decimals: 1,
         value: 29.0,
         previous: 18.2,
-        description: 'Penetration rate of 84.6 per 100 inhabitants',
-        itemsLabel: 'Coverage of Populated Areas (CoPA)',
+        description: {
+          en: 'Penetration rate of 84.6 per 100 inhabitants',
+          ms: 'Kadar penembusan 84.6 bagi 100 penduduk', // confirmed: Pocket Book ("kadar penembusan bagi 100 penduduk")
+        },
+        // confirmed: JENDELA progress ("kawasan berpenduduk")
+        itemsLabel: { en: 'Coverage of Populated Areas (CoPA)', ms: 'Liputan Kawasan Berpenduduk (CoPA)' },
         icon: fiveGIcon,
         itemStyle: 'bullets',
         items: [

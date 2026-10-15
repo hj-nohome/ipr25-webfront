@@ -1,5 +1,8 @@
 import './style.css'
 import { countUp } from './count-up.js'
+import { chapters } from './data/chapters.js'
+import { bm } from './data/ui-text.js'
+import { lang, onLangChange, setLang, t } from './i18n.js'
 import bgVideoUrl from '../images/ipr-background-video.webm'
 
 // Looping background video, shared by every page.
@@ -146,6 +149,29 @@ if (intro && getComputedStyle(intro).display !== 'none') {
   })
   setTimeout(unlockScroll, 5000)
 }
+
+// Language toggle (BM / EN) in every page's nav. Page text swaps by its
+// data-i18n key in ui-text.js, chapter names by data-chapter-name from
+// chapters.js. English is the page's own text, kept for switching back.
+const langOptions = document.querySelectorAll('.lang-toggle__option')
+const english = new Map()
+
+const applyLang = () => {
+  for (const el of document.querySelectorAll('[data-i18n]')) {
+    if (!english.has(el)) english.set(el, el.textContent)
+    el.textContent = (lang === 'ms' && bm[el.dataset.i18n]) || english.get(el)
+  }
+  for (const el of document.querySelectorAll('[data-chapter-name]')) {
+    el.textContent = t(chapters.find((chapter) => chapter.number === Number(el.dataset.chapterName)).name)
+  }
+  langOptions.forEach((option) => option.setAttribute('aria-pressed', String(option.dataset.lang === lang)))
+}
+
+applyLang()
+onLangChange(applyLang)
+langOptions.forEach((option) => option.addEventListener('click', () => setLang(option.dataset.lang)))
+// Hidden by the <head> script until now, for BM.
+document.documentElement.classList.remove('i18n-pending')
 
 const toggle = document.querySelector('#nav-toggle')
 const links = document.querySelector('#nav-links')

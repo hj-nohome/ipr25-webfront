@@ -7,6 +7,8 @@
 // sets how long a circle-lines transition takes; its default otherwise.
 // `reverse` swaps the two: the column starts on `background` and reveals
 // `image`. `rationale` explains the choice of imagery, under the column.
+// Any text can be a { en, ms } pair for the BM toggle (src/i18n.js);
+// plain text shows in both languages.
 import chapter1Image from '../../images/chapter1-cover-1400.jpg'
 import chapter2Image from '../../images/chapter2-cover-1400.jpg'
 import chapter3Image from '../../images/chapter3-cover-1400.jpg'
@@ -27,8 +29,8 @@ import chapter8Background from '../../images/chapter8-highlight-bg.jpg'
 export const chapters = [
   {
     number: 1,
-    name: 'Licensing',
-    shortName: 'Licensing',
+    name: { en: 'Licensing', ms: 'Pelesenan' },
+    shortName: { en: 'Licensing', ms: 'Pelesenan' },
     image: chapter1Image,
     background: chapter1Background,
     reverse: true,
@@ -47,8 +49,8 @@ export const chapters = [
   },
   {
     number: 2,
-    name: 'Economic Performance of the C&M Industry',
-    shortName: 'Industry Performance',
+    name: { en: 'Economic Performance of the C&M Industry', ms: 'Prestasi Ekonomi Industri K&M' },
+    shortName: { en: 'Industry Performance', ms: 'Prestasi Industri' },
     image: chapter2Image,
     background: chapter2Background,
     reverse: true,
@@ -67,28 +69,44 @@ export const chapters = [
   },
   {
     number: 3,
-    name: 'Services and Connectivity',
-    shortName: 'Connectivity',
+    // BM checked against the sources in src/data/ui-text.js.
+    // draft: "Kesalinghubungan" confirmed by Gov portal; the title awaits the official edition
+    name: { en: 'Services and Connectivity', ms: 'Perkhidmatan dan Kesalinghubungan' },
+    shortName: { en: 'Connectivity', ms: 'Kesalinghubungan' }, // confirmed: Gov portal
     image: chapter3Image,
     background: chapter3Background,
     reverse: true,
     transition: 'circle-lines-smooth',
-    intro: [
-      'This chapter presents the state of connectivity in Malaysia, covering fixed broadband, mobile broadband, mobile cellular services, satellite broadband and 5G development. It also highlights the continued progress of JENDELA in strengthening high-speed broadband infrastructure and widening access to reliable digital connectivity nationwide.',
-      "Malaysia's connectivity landscape advanced further in 2025 through higher subscriptions, wider network coverage and continued public-private collaboration.",
-    ],
-    rationale: {
-      title: 'Extending the Nation’s Reach',
-      text: [
-        'The image illustrates a telecommunications tower silhouetted against a warm sunset, representing the extensive communications infrastructure that enables seamless connectivity across Malaysia. As a familiar feature throughout the country, telecommunications towers form the foundation of mobile and wireless services, ensuring that individuals, businesses and communities remain connected regardless of location.',
-        "The visual was selected to symbolise the essential role of communications infrastructure in delivering reliable services and expanding nationwide connectivity. It complements the chapter's focus on service availability, network coverage and the continuous enhancement of communications services that support Malaysia's digital transformation and an increasingly connected society.",
+    intro: {
+      en: [
+        'This chapter presents the state of connectivity in Malaysia, covering fixed broadband, mobile broadband, mobile cellular services, satellite broadband and 5G development. It also highlights the continued progress of JENDELA in strengthening high-speed broadband infrastructure and widening access to reliable digital connectivity nationwide.',
+        "Malaysia's connectivity landscape advanced further in 2025 through higher subscriptions, wider network coverage and continued public-private collaboration.",
       ],
+      // draft
+      ms: [
+        'Bab ini membentangkan status kesalinghubungan di Malaysia, merangkumi jalur lebar talian tetap, jalur lebar mudah alih, perkhidmatan selular mudah alih, jalur lebar satelit dan pembangunan 5G. Bab ini turut mengetengahkan kemajuan berterusan JENDELA dalam memperkukuh infrastruktur jalur lebar berkelajuan tinggi dan memperluas akses kepada kesalinghubungan digital yang boleh diharap di seluruh negara.',
+        'Landskap kesalinghubungan Malaysia terus maju pada tahun 2025 melalui peningkatan langganan, liputan rangkaian yang lebih meluas dan kerjasama awam-swasta yang berterusan.',
+      ],
+    },
+    rationale: {
+      title: { en: 'Extending the Nation’s Reach', ms: 'Memperluas Jangkauan Negara' }, // draft
+      text: {
+        en: [
+          'The image illustrates a telecommunications tower silhouetted against a warm sunset, representing the extensive communications infrastructure that enables seamless connectivity across Malaysia. As a familiar feature throughout the country, telecommunications towers form the foundation of mobile and wireless services, ensuring that individuals, businesses and communities remain connected regardless of location.',
+          "The visual was selected to symbolise the essential role of communications infrastructure in delivering reliable services and expanding nationwide connectivity. It complements the chapter's focus on service availability, network coverage and the continuous enhancement of communications services that support Malaysia's digital transformation and an increasingly connected society.",
+        ],
+        // draft
+        ms: [
+          'Imej ini memaparkan siluet menara telekomunikasi berlatarbelakangkan matahari terbenam, melambangkan infrastruktur komunikasi yang meluas yang membolehkan kesalinghubungan lancar di seluruh Malaysia. Sebagai pemandangan biasa di seluruh negara, menara telekomunikasi menjadi asas kepada perkhidmatan mudah alih dan tanpa wayar, memastikan individu, perniagaan dan komuniti kekal berhubung tanpa mengira lokasi.',
+          'Visual ini dipilih bagi melambangkan peranan penting infrastruktur komunikasi dalam menyampaikan perkhidmatan yang boleh diharap dan memperluas kesalinghubungan di seluruh negara. Ia melengkapi fokus bab ini terhadap ketersediaan perkhidmatan, liputan rangkaian dan penambahbaikan berterusan perkhidmatan komunikasi yang menyokong transformasi digital Malaysia serta masyarakat yang semakin terhubung.',
+        ],
+      },
     },
   },
   {
     number: 4,
-    name: 'Content Services',
-    shortName: 'Content Services',
+    name: { en: 'Content Services', ms: 'Perkhidmatan Kandungan' },
+    shortName: { en: 'Content Services', ms: 'Perkhidmatan Kandungan' },
     image: chapter4Image,
     background: chapter4Background,
     reverse: true,
@@ -107,8 +125,8 @@ export const chapters = [
   },
   {
     number: 5,
-    name: 'Online and Community Services',
-    shortName: 'Online and Community Services',
+    name: { en: 'Online and Community Services', ms: 'Perkhidmatan Dalam Talian dan Komuniti' },
+    shortName: { en: 'Online and Community Services', ms: 'Perkhidmatan Dalam Talian dan Komuniti' },
     image: chapter5Image,
     background: chapter5Background,
     reverse: true,
@@ -127,8 +145,8 @@ export const chapters = [
   },
   {
     number: 6,
-    name: 'Postal and Courier',
-    shortName: 'Postal and Courier',
+    name: { en: 'Postal and Courier', ms: 'Pos dan Kurier' },
+    shortName: { en: 'Postal and Courier', ms: 'Pos dan Kurier' },
     image: chapter6Image,
     background: chapter6Background,
     reverse: true,
@@ -147,8 +165,8 @@ export const chapters = [
   },
   {
     number: 7,
-    name: 'Quality of Services',
-    shortName: 'Quality of Services',
+    name: { en: 'Quality of Services', ms: 'Kualiti Perkhidmatan' },
+    shortName: { en: 'Quality of Services', ms: 'Kualiti Perkhidmatan' },
     image: chapter7Image,
     background: chapter7Background,
     reverse: true,
@@ -167,8 +185,8 @@ export const chapters = [
   },
   {
     number: 8,
-    name: 'Outlook',
-    shortName: 'The Industry Outlook',
+    name: { en: 'Outlook', ms: 'Tinjauan' },
+    shortName: { en: 'The Industry Outlook', ms: 'Tinjauan Industri' },
     image: chapter8Image,
     background: chapter8Background,
     reverse: true,

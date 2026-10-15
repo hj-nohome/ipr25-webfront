@@ -7,10 +7,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ipr25-testing</title>
   <!-- The intro plays once per visit (main.js records it). Checked here,
-       before the page paints, so a skipped intro never flashes. -->
+       before the page paints, so a skipped intro never flashes. Likewise
+       BM: the page stays hidden until main.js has swapped its text in. -->
   <script>
     try {
       if (sessionStorage.getItem('ipr25-intro-seen')) document.documentElement.classList.add('intro-seen')
+      if (localStorage.getItem('ipr25-lang') === 'ms') document.documentElement.classList.add('i18n-pending')
     } catch {}
   </script>
 </head>
@@ -29,8 +31,8 @@
     <div class="intro__line"></div>
     <div class="intro__side intro__side--right">
       <div class="intro__text">
-        <p class="intro__title">Industry Performance Report 2025</p>
-        <p class="intro__subtitle">Malaysian Communications and Multimedia Commission</p>
+        <p class="intro__title" data-i18n="intro.title">Industry Performance Report 2025</p>
+        <p class="intro__subtitle" data-i18n="intro.subtitle">Malaysian Communications and Multimedia Commission</p>
       </div>
     </div>
   </div>
@@ -43,14 +45,19 @@
       </a>
       <nav id="nav-links" class="nav__links">
         <!-- Home, the file size and the note show in the phone menu only. -->
-        <a href="index.html" class="nav__link nav__link--home" aria-current="page">HOME</a>
-        <a href="chapters.html" class="nav__link">CHAPTERS</a>
+        <a href="index.html" class="nav__link nav__link--home" aria-current="page" data-i18n="nav.home">HOME</a>
+        <a href="chapters.html" class="nav__link" data-i18n="nav.chapters">CHAPTERS</a>
         <!-- replace url if MCMC hosts the report -->
         <a href="ipr25-report.pdf" class="nav__link nav__link--download" download="MCMC-Industry-Performance-Report-2025.pdf" target="_blank">
-          DOWNLOAD <span class="nav__link-meta">PDF, 15.6 MB</span>
+          <span data-i18n="nav.download">DOWNLOAD</span> <span class="nav__link-meta">PDF, 15.6 MB</span>
         </a>
-        <p class="nav__note">Industry Performance Report 2025</p>
+        <p class="nav__note" data-i18n="nav.note">Industry Performance Report 2025</p>
       </nav>
+      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+        <button type="button" class="lang-toggle__option" data-lang="ms" lang="ms" aria-pressed="false">BM</button>
+        <span class="lang-toggle__divider" aria-hidden="true">/</span>
+        <button type="button" class="lang-toggle__option" data-lang="en" lang="en" aria-pressed="true">EN</button>
+      </div>
       <button id="nav-toggle" class="nav__toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-links">
         <span></span><span></span><span></span>
       </button>
@@ -60,19 +67,19 @@
   <main>
     <section class="hero">
       <h1 class="hero__title">
-        <span class="line-reveal__line"><span>Industry</span></span>
-        <span class="line-reveal__line"><span>Performance</span></span>
-        <span class="line-reveal__line"><span class="hero__nowrap">Report&nbsp;2025</span></span>
+        <span class="line-reveal__line"><span data-i18n="hero.line1">Industry</span></span>
+        <span class="line-reveal__line"><span data-i18n="hero.line2">Performance</span></span>
+        <span class="line-reveal__line"><span class="hero__nowrap" data-i18n="hero.line3">Report&nbsp;2025</span></span>
       </h1>
 
       <div class="hero__text-group page-intro">
-        <p class="hero__body reveal">
+        <p class="hero__body reveal" data-i18n="hero.body1">
           The MCMC Industry Performance Report 2025 offers a comprehensive view of
           Malaysia's communications and multimedia landscape, from the pace of 5G adoption
           and fibre expansion to the evolving digital habits shaping the country's connectivity,
           economy and everyday life.
         </p>
-        <p class="hero__body reveal">
+        <p class="hero__body reveal" data-i18n="hero.body2">
           In 2025, Malaysia's communications sector continued to drive growth through
           stronger mobile and fixed broadband coverage, improved network resilience and
           rising demand for cloud, cybersecurity and data analytics. The report examines the
@@ -85,14 +92,14 @@
 
     <section class="split-section panel panel--purple-light">
       <div class="split-section__text reveal">
-        <h2 class="split-section__title">Chairman's Statement</h2>
-        <p class="split-section__body">
+        <h2 class="split-section__title" data-i18n="chairman.title">Chairman's Statement</h2>
+        <p class="split-section__body" data-i18n="chairman.quote">
           "Together, we will build a communications and
           multimedia ecosystem that is trusted, inclusive,
           innovative and ready to support Malaysia's aspirations
           as a leading digital nation"
         </p>
-        <a href="#" class="button">Read Chairman's Statement</a>
+        <a href="#" class="button" data-i18n="chairman.cta">Read Chairman's Statement</a>
       </div>
       <div class="split-section__media split-section__media--swirl reveal reveal--delay-1">
         <img src="images/chairman.png" alt="MCMC Chairman" />
@@ -101,8 +108,8 @@
 
     <section class="split-section split-section--single">
       <div class="split-section__text reveal">
-        <h2 class="split-section__title">Executive Summary</h2>
-        <p class="split-section__body">
+        <h2 class="split-section__title" data-i18n="summary.title">Executive Summary</h2>
+        <p class="split-section__body" data-i18n="summary.body">
           Malaysia's communications and multimedia industry
           remained resilient in 2025, supported by sustained
           demand for connectivity, continued infrastructure
@@ -119,33 +126,33 @@
     </section>
 
     <section class="split-section split-section--single panel panel--purple-light">
-      <h2 class="split-section__subtitle reveal">Explore the Industry Performance</h2>
+      <h2 class="split-section__subtitle reveal" data-i18n="industry.title">Explore the Industry Performance</h2>
       <div class="accordion split-section__bleed-right draw-lines reveal reveal--delay-1">
         <div class="accordion__item">
           <button type="button" class="accordion__question" id="acc-question-1" aria-expanded="false"
             aria-controls="acc-answer-1">
-            <span>Economic Performance of the Industry</span>
+            <span data-i18n="industry.economic">Economic Performance of the Industry</span>
             <svg class="accordion__icon" viewBox="0 0 32 32" fill="none" aria-hidden="true">
               <path d="M16 0v32M0 16h32" stroke="currentColor" stroke-width="1" />
             </svg>
           </button>
           <div class="accordion__answer" id="acc-answer-1" role="region" aria-labelledby="acc-question-1">
             <div class="accordion__answer-inner">
-              <p>Malaysia's communications and multimedia (C&amp;M) industry remained resilient in 2025, supported by sustained demand for digital connectivity
+              <p data-i18n="industry.economic.body">Malaysia's communications and multimedia (C&amp;M) industry remained resilient in 2025, supported by sustained demand for digital connectivity
                 and infrastructure investment. Industry revenue increased by 1.5%, while listed C&amp;M companies continued to play an important role in Malaysia's
                 digital economy, with telecommunications remaining the leading contributor.</p>
               <ul class="accordion__stats">
                 <li class="accordion__stat">
                   <span class="accordion__stat-value">RM<span data-count="49.45">49.45</span>B</span>
-                  <span class="accordion__stat-label">C&amp;M Industry Revenue</span>
+                  <span class="accordion__stat-label" data-i18n="industry.economic.revenue">C&amp;M Industry Revenue</span>
                 </li>
                 <li class="accordion__stat">
                   <span class="accordion__stat-value">RM<span data-count="110.63">110.63</span>B</span>
-                  <span class="accordion__stat-label">Listed C&amp;M Market Capitalisation</span>
+                  <span class="accordion__stat-label" data-i18n="industry.economic.marketCap">Listed C&amp;M Market Capitalisation</span>
                 </li>
               </ul>
               <a href="ipr25-report.pdf" target="_blank" class="accordion__explore">
-                Explore Economic Performance
+                <span data-i18n="industry.economic.explore">Explore Economic Performance</span>
                 <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
                   <path d="M5 13 13 5M6.5 5H13v6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
@@ -156,29 +163,29 @@
         <div class="accordion__item">
           <button type="button" class="accordion__question" id="acc-question-2" aria-expanded="false"
             aria-controls="acc-answer-2">
-            <span>State of Connectivity in Malaysia</span>
+            <span data-i18n="industry.connectivity">State of Connectivity in Malaysia</span>
             <svg class="accordion__icon" viewBox="0 0 32 32" fill="none" aria-hidden="true">
               <path d="M16 0v32M0 16h32" stroke="currentColor" stroke-width="1" />
             </svg>
           </button>
           <div class="accordion__answer" id="acc-answer-2" role="region" aria-labelledby="acc-question-2">
             <div class="accordion__answer-inner">
-              <p>Malaysia continued to strengthen its digital connectivity in 2025 through the expansion of broadband, fibre and mobile infrastructure under
+              <p data-i18n="industry.connectivity.body">Malaysia continued to strengthen its digital connectivity in 2025 through the expansion of broadband, fibre and mobile infrastructure under
                 national initiatives such as JENDELA. Fibre connectivity reached 9.81 million premises passed, exceeding the national target of 9 million, while
                 4G LTE coverage expanded to 99.71% of populated areas. The country also recorded 29.0 million 5G subscriptions, reflecting growing adoption
                 of next-generation mobile technology.</p>
               <ul class="accordion__stats">
                 <li class="accordion__stat">
-                  <span class="accordion__stat-value"><span data-count="9.81">9.81</span> Million</span>
-                  <span class="accordion__stat-label">Premises Passed With Fibre</span>
+                  <span class="accordion__stat-value"><span data-count="9.81">9.81</span> <span data-i18n="unit.million">Million</span></span>
+                  <span class="accordion__stat-label" data-i18n="industry.connectivity.fibre">Premises Passed With Fibre</span>
                 </li>
                 <li class="accordion__stat">
-                  <span class="accordion__stat-value"><span data-count="29.0">29.0</span> Million</span>
-                  <span class="accordion__stat-label">5G Subscriptions</span>
+                  <span class="accordion__stat-value"><span data-count="29.0">29.0</span> <span data-i18n="unit.million">Million</span></span>
+                  <span class="accordion__stat-label" data-i18n="industry.connectivity.fiveG">5G Subscriptions</span>
                 </li>
               </ul>
               <a href="ipr25-report.pdf" target="_blank" class="accordion__explore">
-                Explore State of Connectivity
+                <span data-i18n="industry.connectivity.explore">Explore State of Connectivity</span>
                 <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
                   <path d="M5 13 13 5M6.5 5H13v6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
@@ -189,28 +196,28 @@
         <div class="accordion__item">
           <button type="button" class="accordion__question" id="acc-question-3" aria-expanded="false"
             aria-controls="acc-answer-3">
-            <span>Content Services</span>
+            <span data-i18n="industry.content">Content Services</span>
             <svg class="accordion__icon" viewBox="0 0 32 32" fill="none" aria-hidden="true">
               <path d="M16 0v32M0 16h32" stroke="currentColor" stroke-width="1" />
             </svg>
           </button>
           <div class="accordion__answer" id="acc-answer-3" role="region" aria-labelledby="acc-question-3">
             <div class="accordion__answer-inner">
-              <p>Malaysia's content services landscape continued to evolve as audiences increasingly embraced streaming, digital media and on-demand
+              <p data-i18n="industry.content.body">Malaysia's content services landscape continued to evolve as audiences increasingly embraced streaming, digital media and on-demand
                 entertainment. While Pay-TV penetration declined amid changing viewing preferences, radio maintained a strong audience presence.
                 Broadcasters also expanded their focus on local content, digital distribution and audience engagement.</p>
               <ul class="accordion__stats">
                 <li class="accordion__stat">
                   <span class="accordion__stat-value"><span data-count="62.9">62.9</span>%</span>
-                  <span class="accordion__stat-label">Pay-TV Penetration</span>
+                  <span class="accordion__stat-label" data-i18n="industry.content.payTv">Pay-TV Penetration</span>
                 </li>
                 <li class="accordion__stat">
-                  <span class="accordion__stat-value"><span data-count="21.9">21.9</span> Million</span>
-                  <span class="accordion__stat-label">Weekly Radio Listeners</span>
+                  <span class="accordion__stat-value"><span data-count="21.9">21.9</span> <span data-i18n="unit.million">Million</span></span>
+                  <span class="accordion__stat-label" data-i18n="industry.content.radio">Weekly Radio Listeners</span>
                 </li>
               </ul>
               <a href="ipr25-report.pdf" target="_blank" class="accordion__explore">
-                Explore Content Services
+                <span data-i18n="industry.content.explore">Explore Content Services</span>
                 <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
                   <path d="M5 13 13 5M6.5 5H13v6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
@@ -221,28 +228,28 @@
         <div class="accordion__item">
           <button type="button" class="accordion__question" id="acc-question-4" aria-expanded="false"
             aria-controls="acc-answer-4">
-            <span>Online and Community Services</span>
+            <span data-i18n="industry.online">Online and Community Services</span>
             <svg class="accordion__icon" viewBox="0 0 32 32" fill="none" aria-hidden="true">
               <path d="M16 0v32M0 16h32" stroke="currentColor" stroke-width="1" />
             </svg>
           </button>
           <div class="accordion__answer" id="acc-answer-4" role="region" aria-labelledby="acc-question-4">
             <div class="accordion__answer-inner">
-              <p>Malaysia continued advancing digital inclusion and trusted online services through community-based initiatives, digital authentication and
+              <p data-i18n="industry.online.body">Malaysia continued advancing digital inclusion and trusted online services through community-based initiatives, digital authentication and
                 growing participation in the digital economy. NADI expanded access to digital learning and services, while the increasing use of digital
                 certificates supported secure online communications and transactions.</p>
               <ul class="accordion__stats">
                 <li class="accordion__stat">
-                  <span class="accordion__stat-value"><span data-count="1.9">1.9</span> Million+</span>
-                  <span class="accordion__stat-label">NADI Users Nationwide</span>
+                  <span class="accordion__stat-value"><span data-count="1.9">1.9</span> <span data-i18n="unit.million">Million</span>+</span>
+                  <span class="accordion__stat-label" data-i18n="industry.online.nadi">NADI Users Nationwide</span>
                 </li>
                 <li class="accordion__stat">
-                  <span class="accordion__stat-value"><span data-count="34.6">34.6</span> Million</span>
-                  <span class="accordion__stat-label">Digital Certificates Issued Cumulatively</span>
+                  <span class="accordion__stat-value"><span data-count="34.6">34.6</span> <span data-i18n="unit.million">Million</span></span>
+                  <span class="accordion__stat-label" data-i18n="industry.online.certificates">Digital Certificates Issued Cumulatively</span>
                 </li>
               </ul>
               <a href="ipr25-report.pdf" target="_blank" class="accordion__explore">
-                Explore Online and Community Services
+                <span data-i18n="industry.online.explore">Explore Online and Community Services</span>
                 <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
                   <path d="M5 13 13 5M6.5 5H13v6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
@@ -253,28 +260,28 @@
         <div class="accordion__item">
           <button type="button" class="accordion__question" id="acc-question-5" aria-expanded="false"
             aria-controls="acc-answer-5">
-            <span>Postal and Courier</span>
+            <span data-i18n="industry.postal">Postal and Courier</span>
             <svg class="accordion__icon" viewBox="0 0 32 32" fill="none" aria-hidden="true">
               <path d="M16 0v32M0 16h32" stroke="currentColor" stroke-width="1" />
             </svg>
           </button>
           <div class="accordion__answer" id="acc-answer-5" role="region" aria-labelledby="acc-question-5">
             <div class="accordion__answer-inner">
-              <p>Malaysia's postal and courier industry continued to transform, supported by growing e-commerce activity and demand for parcel delivery.
+              <p data-i18n="industry.postal.body">Malaysia's postal and courier industry continued to transform, supported by growing e-commerce activity and demand for parcel delivery.
                 Courier traffic expanded significantly in 2025, while parcel deliveries per capita exceeded the national PAKEJ target. Industry players also
                 strengthened their infrastructure and adopted technology to improve delivery efficiency.</p>
               <ul class="accordion__stats">
                 <li class="accordion__stat">
                   <span class="accordion__stat-value"><span data-count="45.9">45.9</span></span>
-                  <span class="accordion__stat-label">Parcels Per Capita</span>
+                  <span class="accordion__stat-label" data-i18n="industry.postal.parcels">Parcels Per Capita</span>
                 </li>
                 <li class="accordion__stat">
-                  <span class="accordion__stat-value"><span data-count="1.58">1.58</span> Billion</span>
-                  <span class="accordion__stat-label">Courier Items Handled</span>
+                  <span class="accordion__stat-value"><span data-count="1.58">1.58</span> <span data-i18n="unit.billion">Billion</span></span>
+                  <span class="accordion__stat-label" data-i18n="industry.postal.courier">Courier Items Handled</span>
                 </li>
               </ul>
               <a href="ipr25-report.pdf" target="_blank" class="accordion__explore">
-                Explore Postal and Courier
+                <span data-i18n="industry.postal.explore">Explore Postal and Courier</span>
                 <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
                   <path d="M5 13 13 5M6.5 5H13v6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
@@ -285,28 +292,28 @@
         <div class="accordion__item">
           <button type="button" class="accordion__question" id="acc-question-6" aria-expanded="false"
             aria-controls="acc-answer-6">
-            <span>Quality of Services</span>
+            <span data-i18n="industry.quality">Quality of Services</span>
             <svg class="accordion__icon" viewBox="0 0 32 32" fill="none" aria-hidden="true">
               <path d="M16 0v32M0 16h32" stroke="currentColor" stroke-width="1" />
             </svg>
           </button>
           <div class="accordion__answer" id="acc-answer-6" role="region" aria-labelledby="acc-question-6">
             <div class="accordion__answer-inner">
-              <p>Consumer protection, service quality and regulatory compliance remained central to MCMC's priorities in 2025. Despite higher complaint
+              <p data-i18n="industry.quality.body">Consumer protection, service quality and regulatory compliance remained central to MCMC's priorities in 2025. Despite higher complaint
                 volumes, the majority of cases were resolved by year-end. MCMC also strengthened regulatory oversight, service standards and digital safety
                 initiatives to improve accountability and consumer confidence.</p>
               <ul class="accordion__stats">
                 <li class="accordion__stat">
                   <span class="accordion__stat-value"><span data-count="96">96</span>%</span>
-                  <span class="accordion__stat-label">Consumer Complaints Resolved</span>
+                  <span class="accordion__stat-label" data-i18n="industry.quality.resolved">Consumer Complaints Resolved</span>
                 </li>
                 <li class="accordion__stat">
                   <span class="accordion__stat-value"><span data-count="71919">71,919</span></span>
-                  <span class="accordion__stat-label">Consumer Complaints Recorded</span>
+                  <span class="accordion__stat-label" data-i18n="industry.quality.recorded">Consumer Complaints Recorded</span>
                 </li>
               </ul>
               <a href="ipr25-report.pdf" target="_blank" class="accordion__explore">
-                Explore Quality of Services
+                <span data-i18n="industry.quality.explore">Explore Quality of Services</span>
                 <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
                   <path d="M5 13 13 5M6.5 5H13v6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
@@ -318,15 +325,15 @@
     </section>
 
     <section id="chapters" class="chapters draw-lines panel panel--purple-dark">
-      <h2 class="chapters__title reveal">Explore the Chapters</h2>
+      <h2 class="chapters__title reveal" data-i18n="chapters.title">Explore the Chapters</h2>
       <ul class="chapters__list reveal reveal--delay-1">
         <li class="chapters__item">
           <a href="chapter.html#chapter-1" class="chapters__link">
             <span class="chapters__thumb" aria-hidden="true">
               <img src="images/chapter1-cover-480.jpg" alt="" loading="lazy" />
             </span>
-            <span class="chapters__name">01 | Licensing</span>
-            <span class="chapters__tag">Chapter</span>
+            <span class="chapters__name">01 | <span data-chapter-name="1">Licensing</span></span>
+            <span class="chapters__tag" data-i18n="chapter">Chapter</span>
           </a>
         </li>
         <li class="chapters__item">
@@ -334,8 +341,8 @@
             <span class="chapters__thumb" aria-hidden="true">
               <img src="images/chapter2-cover-480.jpg" alt="" loading="lazy" />
             </span>
-            <span class="chapters__name">02 | Economic Performance of the C&amp;M Industry</span>
-            <span class="chapters__tag">Chapter</span>
+            <span class="chapters__name">02 | <span data-chapter-name="2">Economic Performance of the C&amp;M Industry</span></span>
+            <span class="chapters__tag" data-i18n="chapter">Chapter</span>
           </a>
         </li>
         <li class="chapters__item">
@@ -343,8 +350,8 @@
             <span class="chapters__thumb" aria-hidden="true">
               <img src="images/chapter3-cover-480.jpg" alt="" loading="lazy" />
             </span>
-            <span class="chapters__name">03 | Services and Connectivity</span>
-            <span class="chapters__tag">Chapter</span>
+            <span class="chapters__name">03 | <span data-chapter-name="3">Services and Connectivity</span></span>
+            <span class="chapters__tag" data-i18n="chapter">Chapter</span>
           </a>
         </li>
         <li class="chapters__item">
@@ -352,8 +359,8 @@
             <span class="chapters__thumb" aria-hidden="true">
               <img src="images/chapter4-cover-480.jpg" alt="" loading="lazy" />
             </span>
-            <span class="chapters__name">04 | Content Services</span>
-            <span class="chapters__tag">Chapter</span>
+            <span class="chapters__name">04 | <span data-chapter-name="4">Content Services</span></span>
+            <span class="chapters__tag" data-i18n="chapter">Chapter</span>
           </a>
         </li>
         <li class="chapters__item">
@@ -361,8 +368,8 @@
             <span class="chapters__thumb" aria-hidden="true">
               <img src="images/chapter5-cover-480.jpg" alt="" loading="lazy" />
             </span>
-            <span class="chapters__name">05 | Online and Community Services</span>
-            <span class="chapters__tag">Chapter</span>
+            <span class="chapters__name">05 | <span data-chapter-name="5">Online and Community Services</span></span>
+            <span class="chapters__tag" data-i18n="chapter">Chapter</span>
           </a>
         </li>
         <li class="chapters__item">
@@ -370,8 +377,8 @@
             <span class="chapters__thumb" aria-hidden="true">
               <img src="images/chapter6-cover-480.jpg" alt="" loading="lazy" />
             </span>
-            <span class="chapters__name">06 | Postal and Courier</span>
-            <span class="chapters__tag">Chapter</span>
+            <span class="chapters__name">06 | <span data-chapter-name="6">Postal and Courier</span></span>
+            <span class="chapters__tag" data-i18n="chapter">Chapter</span>
           </a>
         </li>
         <li class="chapters__item">
@@ -379,8 +386,8 @@
             <span class="chapters__thumb" aria-hidden="true">
               <img src="images/chapter7-cover-480.jpg" alt="" loading="lazy" />
             </span>
-            <span class="chapters__name">07 | Quality of Services</span>
-            <span class="chapters__tag">Chapter</span>
+            <span class="chapters__name">07 | <span data-chapter-name="7">Quality of Services</span></span>
+            <span class="chapters__tag" data-i18n="chapter">Chapter</span>
           </a>
         </li>
         <li class="chapters__item">
@@ -388,8 +395,8 @@
             <span class="chapters__thumb" aria-hidden="true">
               <img src="images/chapter8-cover-480.jpg" alt="" loading="lazy" />
             </span>
-            <span class="chapters__name">08 | Outlook</span>
-            <span class="chapters__tag">Chapter</span>
+            <span class="chapters__name">08 | <span data-chapter-name="8">Outlook</span></span>
+            <span class="chapters__tag" data-i18n="chapter">Chapter</span>
           </a>
         </li>
       </ul>
@@ -401,12 +408,12 @@
 
       <!-- Column 1: Contact Info -->
       <div class="footer-column">
-        <h3>Contact us:</h3>
+        <h3 data-i18n="footer.contact">Contact us:</h3>
         <p>T: +603 8688 8000</p>
         <p>F: +603 8688 1000</p>
-        <p>Email: <a href="#">www.mcmc.gov.my</a></p>
+        <p><span data-i18n="footer.email">Email:</span> <a href="#">www.mcmc.gov.my</a></p>
 
-        <p class="footer-copyright">&copy; 2026 Malaysian Communications and Multimedia Commission. All rights reserved.
+        <p class="footer-copyright" data-i18n="footer.copyright">&copy; 2026 Malaysian Communications and Multimedia Commission. All rights reserved.
         </p>
       </div>
 
