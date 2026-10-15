@@ -902,34 +902,56 @@ html.intro-playing {
   overflow: hidden;
 }
 
-/* Phones wrap the text to fit each half, so the halves stay even. */
+/* Phones: logo | line | text is centred as one group, between two
+   flexible columns, so the line sits a little left of centre (the text is
+   wider than the logo) and the screen splits open there. Each side is as
+   wide as its content, so nothing is cut off. */
 @media (max-width: 768px) {
   .intro {
-    --intro-offset: 0px;
     --intro-gap: 16px;
+    grid-template-columns: minmax(0, 1fr) auto auto auto minmax(0, 1fr);
+  }
+
+  .intro__panel--left {
+    grid-column: 1 / 4;
+  }
+
+  .intro__panel--right {
+    grid-column: 3 / 6;
+  }
+
+  .intro__side--left {
+    grid-column: 2;
+    padding-left: 0;
   }
 
   .intro__line {
     --intro-line-height: 88px;
+    grid-column: 3;
+  }
+
+  .intro__side--right {
+    grid-column: 4;
+    padding-right: 0;
   }
 
   .intro__logo {
     height: 48px;
   }
 
-  /* Readable sizes that wrap to two balanced lines in half the screen;
-     the divisors are each text's longest line ("Industry Performance",
-     "Malaysian Communications") in em, so they shrink to stay at two. */
+  /* Two lines each, broken by width: just wider than the first line
+     ("Industry Performance", "Malaysian Communications"), too narrow for
+     the next word. */
   .intro__title {
-    font-size: clamp(10px, calc((50vw - 30px) / 9.8), 14px);
+    max-width: 10.5em;
+    font-size: 14px;
     white-space: normal;
-    text-wrap: balance;
   }
 
   .intro__subtitle {
-    font-size: clamp(9.5px, calc((50vw - 30px) / 12.9), 11px);
+    max-width: 13.5em;
+    font-size: 11px;
     white-space: normal;
-    text-wrap: balance;
   }
 }
 
@@ -1599,9 +1621,11 @@ html.intro-seen .intro ~ main {
 }
 
 @media (max-width: 768px) {
-  /* Title inset evenly; the list below still runs edge to edge. */
+  /* Title inset evenly; the list below still runs edge to edge. No bottom
+     padding, as on desktop: the left line ends on the last row's line, and
+     the footer's own padding spaces what follows. */
   .chapters {
-    padding: 48px 20px 72px;
+    padding: 48px 20px 0;
   }
 
   .chapters__list {
