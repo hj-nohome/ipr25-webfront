@@ -1150,6 +1150,20 @@ html.intro-seen .intro ~ main {
   gap: 28px;
 }
 
+/* Report cover beside the text; the narrow fixed column leaves the text
+   most of the width. */
+.split-section--cover {
+  grid-template-columns: minmax(0, 220px) 1fr;
+  gap: 96px;
+}
+
+.split-section__cover {
+  display: block;
+  width: 100%;
+  height: auto;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+}
+
 /* Runs to the section's right edge by cancelling its padding. */
 .split-section__bleed-right {
   margin-right: calc(-1 * var(--content-right));
@@ -1350,6 +1364,15 @@ html.intro-seen .intro ~ main {
   .split-section__media {
     aspect-ratio: 16 / 10;
     order: -1;
+  }
+
+  .split-section--cover {
+    gap: 32px;
+  }
+
+  .split-section__cover {
+    justify-self: center;
+    max-width: 160px;
   }
 
   /* Same proportions as on wider screens; stacked above the text here, so
@@ -2277,20 +2300,14 @@ html.intro-seen .intro ~ main {
   padding: 16px 0;
 }
 
-.hl-block--tint {
-  padding: 24px;
-  background: var(--chapter-tint);
-}
-
+/* tint and outline now match card, so every light block is the same
+   white with only the soft shadow. */
+.hl-block--tint,
 .hl-block--card,
 .hl-block--outline {
   padding: 24px;
   background: #ffffff;
   box-shadow: 0 4px 24px rgb(23 19 31 / 0.08);
-}
-
-.hl-block--outline {
-  border: 1px solid rgb(23 19 31 / 0.1);
 }
 
 .hl-block--dark {
@@ -2565,7 +2582,8 @@ html.intro-seen .intro ~ main {
   font-size: 17px;
 }
 
-/* cards: white cards, the change beside the value. */
+/* cards: pale chapter-tinted boxes inside the white block, the change
+   beside the value. */
 .hl-items--cards {
   gap: 12px;
 }
@@ -2580,8 +2598,7 @@ html.intro-seen .intro ~ main {
   justify-items: start;
   padding: 14px 16px;
   border-radius: 6px;
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgb(23 19 31 / 0.06);
+  background: var(--chapter-tint);
 }
 
 .hl-items--cards .hl-item__label {
@@ -3091,12 +3108,6 @@ html.intro-seen .intro ~ main {
   color: var(--chapter-ink);
   font-size: 14px;
   line-height: 1.5;
-}
-
-/* Notes: paler than the other tinted blocks, text in the label's colour;
-   both follow each chapter's accent. */
-.hl-block--notes {
-  background: color-mix(in srgb, var(--chapter-accent) 4%, #ffffff);
 }
 
 .hl-notes {

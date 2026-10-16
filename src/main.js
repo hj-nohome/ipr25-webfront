@@ -2,7 +2,7 @@ import './style.css'
 import { countUp } from './count-up.js'
 import { chapters } from './data/chapters.js'
 import { bm } from './data/ui-text.js'
-import { lang, onLangChange, setLang, t } from './i18n.js'
+import { lang, onLangChange, setLang, t, translationEnabled } from './i18n.js'
 import bgVideoUrl from '../images/ipr-background-video.webm'
 
 // Looping background video, shared by every page.
@@ -169,7 +169,12 @@ const applyLang = () => {
 
 applyLang()
 onLangChange(applyLang)
-langOptions.forEach((option) => option.addEventListener('click', () => setLang(option.dataset.lang)))
+// With translation off, a click only moves the toggle.
+const pressOption = (pressed) =>
+  langOptions.forEach((option) => option.setAttribute('aria-pressed', String(option === pressed)))
+langOptions.forEach((option) =>
+  option.addEventListener('click', () => (translationEnabled ? setLang(option.dataset.lang) : pressOption(option)))
+)
 // Hidden by the <head> script until now, for BM.
 document.documentElement.classList.remove('i18n-pending')
 

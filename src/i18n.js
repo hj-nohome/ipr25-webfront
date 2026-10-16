@@ -5,6 +5,10 @@
 const STORAGE_KEY = 'ipr25-lang'
 const languages = ['en', 'ms']
 
+// Off for now: the toggle still animates (main.js), but the site stays in
+// English and a stored BM choice is ignored.
+export const translationEnabled = false
+
 const stored = () => {
   try {
     return localStorage.getItem(STORAGE_KEY)
@@ -13,7 +17,7 @@ const stored = () => {
   }
 }
 
-export let lang = languages.includes(stored()) ? stored() : 'en'
+export let lang = translationEnabled && languages.includes(stored()) ? stored() : 'en'
 document.documentElement.lang = lang
 
 export const t = (text) => (text?.constructor === Object ? text[lang] ?? text.en : text)
@@ -27,7 +31,7 @@ export const localize = (data) => {
 }
 
 export const setLang = (next) => {
-  if (next === lang || !languages.includes(next)) return
+  if (!translationEnabled || next === lang || !languages.includes(next)) return
   lang = next
   try {
     localStorage.setItem(STORAGE_KEY, next)
