@@ -463,8 +463,17 @@ html.i18n-pending body {
 }
 
 @media (max-width: 768px) {
+  /* Fixed below the menu button's 32px (8px padding × 2 + three 2px bars +
+     two 5px gaps), so it stays smaller whatever the text metrics. */
   .lang-toggle {
+    height: 26px;
     margin: 0 8px 0 auto;
+    font-size: 11px;
+  }
+
+  .lang-toggle__option {
+    padding: 0 10px;
+    line-height: 1;
   }
 
   /* The drawer covers it. */
