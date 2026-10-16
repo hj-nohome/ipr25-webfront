@@ -286,7 +286,8 @@ a {
 
 .nav__links {
   display: flex;
-  gap: 80px;
+  /* Narrows to 48px by 769px, where the three links only just fit. */
+  gap: clamp(48px, 6.25vw, 80px);
   /* Keeps the links beside the language toggle, not centred. */
   margin-left: auto;
 }
@@ -303,11 +304,7 @@ a {
   opacity: 0.7;
 }
 
-/* Phone menu only (shown again under 769px): on desktop the logo is the
-   way home, and the bar has no room for the full download label or the
-   note. */
-.nav__link--home,
-.nav__link-rest,
+/* Phone menu only (shown again under 769px): the bar has no room for it. */
 .nav__note {
   display: none;
 }
@@ -624,24 +621,32 @@ html.i18n-pending body {
   }
 
   /* Download: a file, not a page, so a bordered button at the foot of the
-     drawer, its label spelled out in full. In title case, which fits the
-     narrowest drawer on one line where capitals wrap. */
+     drawer, its label spelled out in full. Size and padding keep it, icon
+     included, on one line in the narrowest (280px) drawer, in EN and BM. */
   .nav__link--download {
     margin-top: auto;
     display: block;
-    padding: 14px 16px;
+    padding: 14px 8px;
     border: 1px solid var(--border);
-    font-size: 15px;
-    text-transform: none;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .nav__link--download::after {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-left: 6px;
+    vertical-align: -2px;
+    background: currentColor;
+    -webkit-mask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3v12M7 10l5 5 5-5M4 17v4h16v-4'/></svg>") center / contain no-repeat;
+    mask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3v12M7 10l5 5 5-5M4 17v4h16v-4'/></svg>") center / contain no-repeat;
   }
 
   .nav__link--download:hover {
     opacity: 1;
     background: rgba(255, 255, 255, 0.08);
-  }
-
-  .nav__link-rest {
-    display: inline;
   }
 
   .nav__note {

@@ -24,7 +24,7 @@ export const bm = {
   'nav.home': 'UTAMA', // draft: MCMC's BM site keeps "HOME" in English
   'nav.chapters': 'BAB', // draft
   'nav.download': 'Muat Turun', // draft: standard BM, not found on MCMC's site
-  'nav.downloadRest': ' Laporan Penuh', // draft; phone menu only
+  'nav.downloadRest': ' Laporan Penuh', // draft
   'nav.note': 'Laporan Prestasi Industri 2025', // draft: as intro.title
 
   'hero.line1': 'Laporan', // draft: as intro.title

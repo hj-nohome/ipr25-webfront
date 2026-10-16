@@ -74,7 +74,7 @@ export const chapters = [
     background: chapter2Background,
     reverse: true,
     transition: 'circle-lines-smooth',
-    rationalePhone: 'bottom',
+    rationalePhone: 'top',
     intro: {
       en: [
         'This chapter examines the economic performance of Malaysia\'s communications and multimedia industry across telecommunications, broadcasting, and postal and courier services. It highlights market capitalisation, industry revenue, capital expenditure, average revenue per user and the performance of communications and multimedia companies listed on the ACE Market.',
@@ -111,7 +111,7 @@ export const chapters = [
     background: chapter3Background,
     reverse: true,
     transition: 'circle-lines-smooth',
-    rationalePhone: 'button',
+    rationalePhone: 'top',
     intro: {
       en: [
         'This chapter presents the state of connectivity in Malaysia, covering fixed broadband, mobile broadband, mobile cellular services, satellite broadband and 5G development. It also highlights the continued progress of JENDELA in strengthening high-speed broadband infrastructure and widening access to reliable digital connectivity nationwide.',
@@ -146,6 +146,7 @@ export const chapters = [
     background: chapter4Background,
     reverse: true,
     transition: 'circle-lines-smooth',
+    rationalePhone: 'top',
     intro: {
       en: [
         "This chapter explores the changing broadcasting and content landscape in Malaysia as audiences move between television, radio, streaming services, mobile applications and social platforms. It highlights developments in audience behaviour, local content, digital distribution, advertising and the National Broadcasting Policy.",
@@ -180,6 +181,7 @@ export const chapters = [
     background: chapter5Background,
     reverse: true,
     transition: 'circle-lines-smooth',
+    rationalePhone: 'top',
     intro: {
       en: [
         "This chapter highlights Malaysia's online and community services ecosystem, focusing on digital inclusion, community empowerment, e-commerce, cashless adoption, online safety and trusted digital transactions.",
@@ -214,6 +216,7 @@ export const chapters = [
     background: chapter6Background,
     reverse: true,
     transition: 'circle-lines-smooth',
+    rationalePhone: 'top',
     intro: {
       en: [
         'This chapter reviews the performance and transformation of Malaysia\'s postal and courier sector in 2025. It covers postal and courier traffic, infrastructure expansion, technology adoption, sustainability initiatives and the conclusion of the five-year Pelan Accelerator Kurier Negara.',
@@ -248,6 +251,7 @@ export const chapters = [
     background: chapter7Background,
     reverse: true,
     transition: 'circle-lines-smooth',
+    rationalePhone: 'top',
     intro: {
       en: [
         "This chapter examines service quality, consumer protection and regulatory governance across Malaysia's communications and multimedia ecosystem. It covers complaint management, consumer safeguards, network and service quality, market and content regulation, technical standards and the role of industry forums in strengthening accountability.",
@@ -282,6 +286,7 @@ export const chapters = [
     background: chapter8Background,
     reverse: true,
     transition: 'circle-lines-smooth',
+    rationalePhone: 'top',
     intro: {
       en: [
         "This chapter looks ahead to the technologies, market shifts and new opportunities expected to shape Malaysia's communications and multimedia industry. It explores the future of telecommunications, cybersecurity, cloud and data centres, AI-enabled services, broadcasting, digital content, and postal and courier services.",
