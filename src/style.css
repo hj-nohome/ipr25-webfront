@@ -1150,16 +1150,12 @@ html.intro-seen .intro ~ main {
   gap: 28px;
 }
 
-/* Report cover beside the text; the narrow fixed column leaves the text
-   most of the width. */
-.split-section--cover {
-  grid-template-columns: minmax(0, 220px) 1fr;
-  gap: 96px;
-}
-
+/* Report cover beside the text, in the split's equal columns so the text
+   lines up with the hero's body text and the cover with its title. */
 .split-section__cover {
   display: block;
   width: 100%;
+  max-width: 360px;
   height: auto;
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
 }
@@ -1372,7 +1368,7 @@ html.intro-seen .intro ~ main {
 
   .split-section__cover {
     justify-self: center;
-    max-width: 160px;
+    max-width: 230px;
   }
 
   /* Same proportions as on wider screens; stacked above the text here, so
