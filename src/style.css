@@ -383,33 +383,77 @@ a {
 }
 
 /* Language toggle: outside the drawer, so it stays in the bar on phones. */
+/* Equal columns so the thumb (half the inner width) lines up with either
+   option. */
 .lang-toggle {
-  display: flex;
-  align-items: center;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   margin-left: 64px;
-  font-size: 14px;
-  letter-spacing: 0.04em;
+  padding: 2px;
+  border: 1px solid color-mix(in srgb, var(--border) 25%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text) 12%, transparent);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.lang-toggle::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 2px;
+  width: calc(50% - 2px);
+  border-radius: 999px;
+  background: var(--text);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lang-toggle:has([data-lang='en'][aria-pressed='true'])::before {
+  transform: translateX(100%);
 }
 
 .lang-toggle__option {
-  padding: 4px;
+  position: relative;
+  padding: 6px 14px;
   border: none;
+  border-radius: 999px;
   background: none;
   color: inherit;
   font: inherit;
   letter-spacing: inherit;
-  opacity: 0.5;
+  opacity: 0.7;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    color 0.3s ease;
 }
 
-.lang-toggle__option:hover,
-.lang-toggle__option[aria-pressed='true'] {
+.lang-toggle__option:hover {
   opacity: 1;
 }
 
+.lang-toggle__option[aria-pressed='true'] {
+  color: var(--bg);
+  opacity: 1;
+}
+
+.lang-toggle__option:focus-visible {
+  outline: 1px solid var(--text);
+  outline-offset: 3px;
+}
+
+/* The track's split replaces it. */
 .lang-toggle__divider {
-  opacity: 0.5;
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lang-toggle::before {
+    transition: none;
+  }
 }
 
 /* Set by the <head> script for BM visitors until main.js has swapped the
