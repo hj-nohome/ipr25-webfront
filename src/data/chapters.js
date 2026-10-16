@@ -7,6 +7,10 @@
 // sets how long a circle-lines transition takes; its default otherwise.
 // `reverse` swaps the two: the column starts on `background` and reveals
 // `image`. `rationale` explains the choice of imagery, under the column.
+// `rationalePhone` places it on phones: 'top' pins the image and rationale
+// while the text scrolls up over them; 'bottom' puts it after the text, as
+// the chapter's last section; 'button' puts a button on the image
+// that opens it as a panel over the text. Hidden on phones unless set.
 // Any text can be a { en, ms } pair for the BM toggle (src/i18n.js);
 // plain text shows in both languages.
 import chapter1Image from '../../images/chapter1-cover-1400.webp'
@@ -35,6 +39,7 @@ export const chapters = [
     background: chapter1Background,
     reverse: true,
     transition: 'circle-lines-smooth',
+    rationalePhone: 'top',
     intro: [
       'This chapter presents Malaysia\'s communications and multimedia licensing landscape in 2025. It covers the growth of Individual and Class Licences, licensing activity and renewals, compliance with licence conditions, cloud service provision and the ownership structure of Individual Licensees.',
       'Malaysia\'s technology-neutral licensing framework continues to support participation and investment across network infrastructure, services, applications and content as the industry evolves alongside 5G, cloud computing, artificial intelligence and the Internet of Things.',
@@ -55,6 +60,7 @@ export const chapters = [
     background: chapter2Background,
     reverse: true,
     transition: 'circle-lines-smooth',
+    rationalePhone: 'bottom',
     intro: [
       'This chapter examines the economic performance of Malaysia\'s communications and multimedia industry across telecommunications, broadcasting, and postal and courier services. It highlights market capitalisation, industry revenue, capital expenditure, average revenue per user and the performance of communications and multimedia companies listed on the ACE Market.',
       'In 2025, the industry demonstrated resilience amid evolving market conditions, supported by strong demand for broadband, mobile connectivity, enterprise solutions and digital infrastructure.',
@@ -77,6 +83,7 @@ export const chapters = [
     background: chapter3Background,
     reverse: true,
     transition: 'circle-lines-smooth',
+    rationalePhone: 'button',
     intro: {
       en: [
         'This chapter presents the state of connectivity in Malaysia, covering fixed broadband, mobile broadband, mobile cellular services, satellite broadband and 5G development. It also highlights the continued progress of JENDELA in strengthening high-speed broadband infrastructure and widening access to reliable digital connectivity nationwide.',

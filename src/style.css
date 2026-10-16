@@ -3090,6 +3090,12 @@ html.intro-seen .intro ~ main {
   }
 }
 
+/* Groups the image and rationale for phones (below); on wider screens it
+   steps aside, so they stay separate cells of the grid. */
+.chapter-detail__visual {
+  display: contents;
+}
+
 .chapter-detail__media {
   position: relative;
   grid-area: media;
@@ -3177,6 +3183,37 @@ html.intro-seen .intro ~ main {
   margin-bottom: 0;
 }
 
+/* Phones only, for rationalePhone 'button' (below): sits on the image's
+   bottom left corner. */
+.chapter-detail__rationale-toggle {
+  display: none;
+  position: absolute;
+  left: 20px;
+  bottom: 16px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 2px;
+  background: #ffffff;
+  color: #17131f;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  box-shadow: 0 2px 8px rgb(23 19 31 / 0.15);
+  cursor: pointer;
+}
+
+.chapter-detail__rationale-toggle:focus-visible {
+  outline: 2px solid var(--chapter-accent);
+  outline-offset: 2px;
+}
+
+@keyframes rationale-open {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .chapter-detail__back svg {
     transition: none;
@@ -3215,12 +3252,105 @@ html.intro-seen .intro ~ main {
     padding: 40px 20px 48px;
   }
 
+  /* Chapters that show the rationale on phones (`rationalePhone` in
+     src/data/chapters.js, set as data-rationale-phone by chapter.js): a
+     column of blocks instead of grid cells, so they can stick, with the
+     text on its own panel in front. */
+  .chapter-detail[data-rationale-phone] .chapter-detail__body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chapter-detail[data-rationale-phone] .chapter-detail__rationale {
+    display: block;
+    padding: 28px 20px 32px;
+  }
+
+  .chapter-detail[data-rationale-phone] .chapter-detail__text {
+    position: relative;
+    z-index: 1;
+    background: var(--panel-bg);
+  }
+
+  /* Top: the image and rationale come first and pin (at --visual-top, set
+     by chapter.js), and the text slides up over them. */
+  .chapter-detail[data-rationale-phone='top'] .chapter-detail__visual {
+    display: block;
+    order: -1;
+    position: sticky;
+    top: var(--visual-top, 0px);
+  }
+
+  .chapter-detail[data-rationale-phone='top'] .chapter-detail__text {
+    box-shadow: 0 -12px 24px rgb(23 19 31 / 0.08);
+  }
+
+  /* Bottom: the image, the text, then the rationale as the chapter's last
+     section, after the button; nothing of it shows any earlier. */
+  .chapter-detail[data-rationale-phone='bottom'] .chapter-detail__media {
+    order: -1;
+  }
+
+  /* Button: the chapter starts straight under the image. A button on the
+     image opens the rationale as a panel just below it, over the text
+     (chapter.js toggles .is-rationale-open); long text scrolls inside. */
+  .chapter-detail[data-rationale-phone='button'] .chapter-detail__visual {
+    display: block;
+    order: -1;
+    position: relative;
+    z-index: 2;
+  }
+
+  .chapter-detail[data-rationale-phone='button'] .chapter-detail__rationale-toggle {
+    display: block;
+  }
+
+  .chapter-detail[data-rationale-phone='button'] .chapter-detail__rationale {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 20px;
+    right: 20px;
+    max-height: min(60svh, 520px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 16px;
+    color: #3d3f48;
+    box-shadow: 0 12px 32px rgb(23 19 31 / 0.18);
+  }
+
+  .chapter-detail[data-rationale-phone='button'] .is-rationale-open .chapter-detail__rationale {
+    display: block;
+    animation: rationale-open 0.2s ease-out both;
+  }
+
+  /* The button names it. */
+  .chapter-detail[data-rationale-phone='button'] .chapter-detail__rationale-label {
+    display: none;
+  }
+
+  .chapter-detail[data-rationale-phone='button'] .chapter-detail__rationale-title {
+    font-size: 14px;
+  }
+
+  .chapter-detail[data-rationale-phone='button'] .chapter-detail__rationale-text p {
+    font-size: 13px;
+    font-style: normal;
+    line-height: 1.5;
+  }
+
   .chapter-detail__title {
     font-size: 32px;
   }
 
   .chapter-detail__cta {
     margin-top: 40px;
+  }
+}
+
+@media (max-width: 768px) and (prefers-reduced-motion: reduce) {
+  .chapter-detail[data-rationale-phone='button'] .is-rationale-open .chapter-detail__rationale {
+    animation: none;
   }
 }
 

@@ -82,6 +82,37 @@ const revealPhoto = async (name, durationMs) => {
   if (!controller.signal.aborted) media.classList.add('is-photo-shown')
 }
 
+// Phones, rationale at the top: the image and rationale pin while the text
+// scrolls up over them. Taller than the screen, they pin only once their
+// bottom reaches its bottom, so the whole rationale can be read first.
+const visual = document.querySelector('.chapter-detail__visual')
+const updateVisualTop = () =>
+  section.style.setProperty('--visual-top', `${Math.min(0, window.innerHeight - visual.offsetHeight)}px`)
+new ResizeObserver(updateVisualTop).observe(visual)
+window.addEventListener('resize', updateVisualTop)
+
+// Phones, rationale behind a button: it opens the rationale as a panel over
+// the text, which closes again on a second tap, a tap elsewhere or Esc.
+const rationaleToggle = document.querySelector('.chapter-detail__rationale-toggle')
+
+const setRationaleOpen = (open) => {
+  visual.classList.toggle('is-rationale-open', open)
+  rationaleToggle.setAttribute('aria-expanded', String(open))
+}
+
+rationaleToggle.addEventListener('click', () => setRationaleOpen(!visual.classList.contains('is-rationale-open')))
+
+document.addEventListener('click', (event) => {
+  if (!visual.contains(event.target)) setRationaleOpen(false)
+})
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && visual.classList.contains('is-rationale-open')) {
+    setRationaleOpen(false)
+    rationaleToggle.focus()
+  }
+})
+
 // Fades the background and its dark overlay in once the image is ready,
 // like the video on the other pages (see body.bg-loaded in style.css).
 background.addEventListener('load', () => document.body.classList.add('bg-loaded'))
@@ -124,6 +155,10 @@ const render = () => {
 
   // Picks the chapter's accent colours (see .chapter-detail in style.css).
   section.dataset.chapter = chapter.number
+  // Where the rationale goes on phones; hidden there when unset.
+  if (chapter.rationalePhone) section.dataset.rationalePhone = chapter.rationalePhone
+  else delete section.dataset.rationalePhone
+  setRationaleOpen(false)
   renderText(chapter)
   // The column starts on the first and the transition reveals the second.
   const [first, second] = chapter.reverse
