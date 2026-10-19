@@ -286,7 +286,8 @@ a {
 
 .nav__links {
   display: flex;
-  gap: 80px;
+  /* Narrows to 48px by 769px, where the three links only just fit. */
+  gap: clamp(48px, 6.25vw, 80px);
   /* Keeps the links beside the language toggle, not centred. */
   margin-left: auto;
 }
@@ -303,11 +304,7 @@ a {
   opacity: 0.7;
 }
 
-/* Phone menu only (shown again under 769px): on desktop the logo is the
-   way home, and the bar has no room for the full download label or the
-   note. */
-.nav__link--home,
-.nav__link-rest,
+/* Phone menu only (shown again under 769px): the bar has no room for it. */
 .nav__note {
   display: none;
 }
@@ -383,33 +380,77 @@ a {
 }
 
 /* Language toggle: outside the drawer, so it stays in the bar on phones. */
+/* Equal columns so the thumb (half the inner width) lines up with either
+   option. */
 .lang-toggle {
-  display: flex;
-  align-items: center;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   margin-left: 64px;
-  font-size: 14px;
-  letter-spacing: 0.04em;
+  padding: 2px;
+  border: 1px solid color-mix(in srgb, var(--border) 25%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text) 12%, transparent);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.lang-toggle::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 2px;
+  width: calc(50% - 2px);
+  border-radius: 999px;
+  background: var(--text);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lang-toggle:has([data-lang='en'][aria-pressed='true'])::before {
+  transform: translateX(100%);
 }
 
 .lang-toggle__option {
-  padding: 4px;
+  position: relative;
+  padding: 6px 14px;
   border: none;
+  border-radius: 999px;
   background: none;
   color: inherit;
   font: inherit;
   letter-spacing: inherit;
-  opacity: 0.5;
+  opacity: 0.7;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    color 0.3s ease;
 }
 
-.lang-toggle__option:hover,
-.lang-toggle__option[aria-pressed='true'] {
+.lang-toggle__option:hover {
   opacity: 1;
 }
 
+.lang-toggle__option[aria-pressed='true'] {
+  color: var(--bg);
+  opacity: 1;
+}
+
+.lang-toggle__option:focus-visible {
+  outline: 1px solid var(--text);
+  outline-offset: 3px;
+}
+
+/* The track's split replaces it. */
 .lang-toggle__divider {
-  opacity: 0.5;
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lang-toggle::before {
+    transition: none;
+  }
 }
 
 /* Set by the <head> script for BM visitors until main.js has swapped the
@@ -419,8 +460,17 @@ html.i18n-pending body {
 }
 
 @media (max-width: 768px) {
+  /* Fixed below the menu button's 32px (8px padding × 2 + three 2px bars +
+     two 5px gaps), so it stays smaller whatever the text metrics. */
   .lang-toggle {
+    height: 26px;
     margin: 0 8px 0 auto;
+    font-size: 11px;
+  }
+
+  .lang-toggle__option {
+    padding: 0 10px;
+    line-height: 1;
   }
 
   /* The drawer covers it. */
@@ -571,24 +621,32 @@ html.i18n-pending body {
   }
 
   /* Download: a file, not a page, so a bordered button at the foot of the
-     drawer, its label spelled out in full. In title case, which fits the
-     narrowest drawer on one line where capitals wrap. */
+     drawer, its label spelled out in full. Size and padding keep it, icon
+     included, on one line in the narrowest (280px) drawer, in EN and BM. */
   .nav__link--download {
     margin-top: auto;
     display: block;
-    padding: 14px 16px;
+    padding: 14px 8px;
     border: 1px solid var(--border);
-    font-size: 15px;
-    text-transform: none;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .nav__link--download::after {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-left: 6px;
+    vertical-align: -2px;
+    background: currentColor;
+    -webkit-mask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3v12M7 10l5 5 5-5M4 17v4h16v-4'/></svg>") center / contain no-repeat;
+    mask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3v12M7 10l5 5 5-5M4 17v4h16v-4'/></svg>") center / contain no-repeat;
   }
 
   .nav__link--download:hover {
     opacity: 1;
     background: rgba(255, 255, 255, 0.08);
-  }
-
-  .nav__link-rest {
-    display: inline;
   }
 
   .nav__note {
@@ -1097,6 +1155,16 @@ html.intro-seen .intro ~ main {
   gap: 28px;
 }
 
+/* Report cover beside the text, in the split's equal columns so the text
+   lines up with the hero's body text and the cover with its title. */
+.split-section__cover {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  height: auto;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+}
+
 /* Runs to the section's right edge by cancelling its padding. */
 .split-section__bleed-right {
   margin-right: calc(-1 * var(--content-right));
@@ -1297,6 +1365,15 @@ html.intro-seen .intro ~ main {
   .split-section__media {
     aspect-ratio: 16 / 10;
     order: -1;
+  }
+
+  .split-section--cover {
+    gap: 32px;
+  }
+
+  .split-section__cover {
+    justify-self: center;
+    max-width: 230px;
   }
 
   /* Same proportions as on wider screens; stacked above the text here, so
@@ -2224,20 +2301,14 @@ html.intro-seen .intro ~ main {
   padding: 16px 0;
 }
 
-.hl-block--tint {
-  padding: 24px;
-  background: var(--chapter-tint);
-}
-
+/* tint and outline now match card, so every light block is the same
+   white with only the soft shadow. */
+.hl-block--tint,
 .hl-block--card,
 .hl-block--outline {
   padding: 24px;
   background: #ffffff;
   box-shadow: 0 4px 24px rgb(23 19 31 / 0.08);
-}
-
-.hl-block--outline {
-  border: 1px solid rgb(23 19 31 / 0.1);
 }
 
 .hl-block--dark {
@@ -2512,7 +2583,8 @@ html.intro-seen .intro ~ main {
   font-size: 17px;
 }
 
-/* cards: white cards, the change beside the value. */
+/* cards: pale chapter-tinted boxes inside the white block, the change
+   beside the value. */
 .hl-items--cards {
   gap: 12px;
 }
@@ -2527,8 +2599,7 @@ html.intro-seen .intro ~ main {
   justify-items: start;
   padding: 14px 16px;
   border-radius: 6px;
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgb(23 19 31 / 0.06);
+  background: var(--chapter-tint);
 }
 
 .hl-items--cards .hl-item__label {
@@ -3038,12 +3109,6 @@ html.intro-seen .intro ~ main {
   color: var(--chapter-ink);
   font-size: 14px;
   line-height: 1.5;
-}
-
-/* Notes: paler than the other tinted blocks, text in the label's colour;
-   both follow each chapter's accent. */
-.hl-block--notes {
-  background: color-mix(in srgb, var(--chapter-accent) 4%, #ffffff);
 }
 
 .hl-notes {
