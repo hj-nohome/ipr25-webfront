@@ -1155,9 +1155,11 @@ html.intro-seen .intro ~ main {
 }
 
 /* Report cover beside the text, in the split's equal columns so the text
-   lines up with the hero's body text and the cover with its title. */
+   lines up with the hero's body text. Centred in its column, mirroring the
+   Chairman's portrait in its own. */
 .split-section__cover {
   display: block;
+  justify-self: center;
   width: 100%;
   max-width: 360px;
   height: auto;
@@ -1371,7 +1373,6 @@ html.intro-seen .intro ~ main {
   }
 
   .split-section__cover {
-    justify-self: center;
     max-width: 230px;
   }
 
