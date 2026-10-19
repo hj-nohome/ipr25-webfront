@@ -21,8 +21,8 @@ export const bm = {
   'intro.title': 'Laporan Prestasi Industri 2025', // draft: no BM title found; MCMC's site uses the English one
   'intro.subtitle': 'Suruhanjaya Komunikasi dan Multimedia Malaysia', // confirmed: MCMC site, Pocket Book
 
-  'nav.home': 'UTAMA', // draft: MCMC's BM site keeps "HOME" in English
-  'nav.chapters': 'BAB', // draft
+  'nav.home': 'Utama', // draft: MCMC's BM site keeps "HOME" in English
+  'nav.chapters': 'Bab', // draft
   'nav.download': 'Muat Turun', // draft: standard BM, not found on MCMC's site
   'nav.downloadRest': ' Laporan Penuh', // draft
   'nav.note': 'Laporan Prestasi Industri 2025', // draft: as intro.title

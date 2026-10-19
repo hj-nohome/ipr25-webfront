@@ -236,11 +236,36 @@ countUp(document.querySelectorAll('.accordion [data-count]'), {
   },
 })
 
+const ACCORDION_SLIDE_MS = 250 // .accordion__answer's transition
+
+const setAccordionItemOpen = (item, open) => {
+  item.classList.toggle('is-open', open)
+  item.querySelector('.accordion__question').setAttribute('aria-expanded', String(open))
+}
+
+// Scrolls the page with `el` each frame for `ms`, so it stays where it is on
+// screen while the content above it changes height.
+const holdOnScreen = (el, ms) => {
+  const top = el.getBoundingClientRect().top
+  const end = performance.now() + ms
+  const step = () => {
+    window.scrollBy({ top: el.getBoundingClientRect().top - top, behavior: 'instant' })
+    if (performance.now() < end) requestAnimationFrame(step)
+  }
+  requestAnimationFrame(step)
+}
+
 document.querySelectorAll('.accordion__question').forEach((question) => {
   question.addEventListener('click', () => {
     const item = question.closest('.accordion__item')
-    const isOpen = item.classList.toggle('is-open')
-    question.setAttribute('aria-expanded', String(isOpen))
+    const isOpen = !item.classList.contains('is-open')
+    // One item open at a time: opening this one closes the others. An open
+    // item above would pull this one up as it closes, on phones off the top
+    // of the screen, so the page follows it instead.
+    const others = isOpen ? item.parentElement.querySelectorAll('.accordion__item.is-open') : []
+    if (others.length) holdOnScreen(question, ACCORDION_SLIDE_MS + 50)
+    others.forEach((other) => setAccordionItemOpen(other, false))
+    setAccordionItemOpen(item, isOpen)
     if (!isOpen) return
     accordionCounts.get(item)?.forEach((start, i) => start(ACCORDION_COUNT_DELAY + i * ACCORDION_COUNT_STAGGER))
     accordionCounts.delete(item)
