@@ -216,6 +216,7 @@ export const chapters = [
     background: chapter6Background,
     reverse: true,
     transition: 'circle-lines-smooth',
+    transitionMs: 6150,
     rationalePhone: 'top',
     intro: {
       en: [
@@ -251,6 +252,7 @@ export const chapters = [
     background: chapter7Background,
     reverse: true,
     transition: 'circle-lines-smooth',
+    transitionMs: 5150,
     rationalePhone: 'top',
     intro: {
       en: [
@@ -286,6 +288,7 @@ export const chapters = [
     background: chapter8Background,
     reverse: true,
     transition: 'circle-lines-smooth',
+    transitionMs: 4150,
     rationalePhone: 'top',
     intro: {
       en: [
