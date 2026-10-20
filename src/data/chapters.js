@@ -39,6 +39,7 @@ export const chapters = [
     background: chapter1Background,
     reverse: true,
     transition: 'circle-lines-smooth',
+    transitionMs: 5150,
     rationalePhone: 'top',
     intro: {
       en: [
@@ -74,6 +75,7 @@ export const chapters = [
     background: chapter2Background,
     reverse: true,
     transition: 'circle-lines-smooth',
+    transitionMs: 5150,
     rationalePhone: 'top',
     intro: {
       en: [
@@ -111,6 +113,7 @@ export const chapters = [
     background: chapter3Background,
     reverse: true,
     transition: 'circle-lines-smooth',
+    transitionMs: 5150,
     rationalePhone: 'top',
     intro: {
       en: [
@@ -146,6 +149,7 @@ export const chapters = [
     background: chapter4Background,
     reverse: true,
     transition: 'circle-lines-smooth',
+    transitionMs: 5150,
     rationalePhone: 'top',
     intro: {
       en: [
@@ -181,6 +185,7 @@ export const chapters = [
     background: chapter5Background,
     reverse: true,
     transition: 'circle-lines-smooth',
+    transitionMs: 5150,
     rationalePhone: 'top',
     intro: {
       en: [
@@ -216,7 +221,7 @@ export const chapters = [
     background: chapter6Background,
     reverse: true,
     transition: 'circle-lines-smooth',
-    transitionMs: 6150,
+    transitionMs: 5150,
     rationalePhone: 'top',
     intro: {
       en: [
@@ -288,7 +293,7 @@ export const chapters = [
     background: chapter8Background,
     reverse: true,
     transition: 'circle-lines-smooth',
-    transitionMs: 4150,
+    transitionMs: 5150,
     rationalePhone: 'top',
     intro: {
       en: [
