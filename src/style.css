@@ -1149,11 +1149,6 @@ html.intro-seen .intro ~ main {
   align-items: start;
 }
 
-.split-section--single {
-  grid-template-columns: 1fr;
-  gap: 28px;
-}
-
 /* Report cover beside the text, in the split's equal columns so the text
    lines up with the hero's body text. Centred in its column, mirroring the
    Chairman's portrait in its own. */
@@ -1166,9 +1161,12 @@ html.intro-seen .intro ~ main {
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
 }
 
-/* Runs to the section's right edge by cancelling its padding. */
-.split-section__bleed-right {
-  margin-right: calc(-1 * var(--content-right));
+/* Starts at the cover's left edge: the cover (max 360px) is centred in a
+   column of (100% - 48px gap) / 2, so it sits in by a quarter of the
+   leftover width. Percentages resolve against the full grid width. */
+.split-section__wide {
+  grid-column: 1 / -1;
+  margin-left: max(0px, 25% - 192px);
 }
 
 .split-section__text {
@@ -1186,13 +1184,6 @@ html.intro-seen .intro ~ main {
   font-size: 42px;
   font-weight: 400;
   letter-spacing: -0.02em;
-}
-
-.split-section__subtitle {
-  margin: 0;
-  font-family: var(--heading-font-family);
-  font-size: 24px;
-  font-weight: 600;
 }
 
 /* Intro paragraph under a page title; each page sets its own spacing. */
@@ -1383,8 +1374,8 @@ html.intro-seen .intro ~ main {
     aspect-ratio: 6 / 5;
   }
 
-  .split-section__bleed-right {
-    margin-right: -20px;
+  .split-section__wide {
+    margin-left: 0;
   }
 }
 
@@ -1497,9 +1488,7 @@ html.intro-seen .intro ~ main {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  /* Inset from the accordion's left line; the accordion bleeds past the
-     content's right edge, so this brings the icon back to it. */
-  padding: 20px var(--row-end) 20px 20px;
+  padding: 20px;
   background: none;
   border: none;
   font: inherit;

@@ -48,7 +48,6 @@ export const bm = {
   'summary.body':
     'Industri komunikasi dan multimedia Malaysia kekal berdaya tahan pada tahun 2025, disokong oleh permintaan yang kukuh terhadap kesalinghubungan, pelaburan infrastruktur yang berterusan dan peranan perkhidmatan digital yang semakin penting dalam kehidupan seharian. Syarikat komunikasi dan multimedia tersenarai mencatatkan permodalan pasaran sebanyak RM110.63 bilion, manakala hasil industri meningkat sebanyak 1.5% kepada RM49.45 bilion. Kesalinghubungan negara turut bertambah baik, dengan 9.81 juta premis dilalui gentian optik, liputan 4G LTE sebanyak 99.71% di kawasan berpenduduk dan 29.0 juta langganan 5G.',
 
-  'industry.title': 'Terokai Prestasi Industri', // draft
   'industry.economic': 'Prestasi Ekonomi Industri', // draft
   // draft
   'industry.economic.body':
